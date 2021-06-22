@@ -24,3 +24,4 @@ yarn-error.log*
 # Python
 venv
 __pycache__
+config.json
