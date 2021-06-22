@@ -25,7 +25,7 @@ def user():
         raise NotImplementedError()
 
 
-@auth.route("/api-key", methods=["GET"])
+@auth.route("/api-key", methods=["GET", "POST"])
 def get_api_key():
     """
     Endpoint to get an api key for the given login credentials.
@@ -40,5 +40,6 @@ def get_api_key():
     password = request.form.get("password", request.args.get("password", ""))
     if username and password:
         user = User.objects(name=username).first_or_404()
-        return rest.response(200, data={"key": user.api_key})
+        if user.check_password(password):
+            return rest.response(200, data={"key": user.api_key})
     abort(401)
