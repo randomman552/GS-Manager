@@ -70,10 +70,15 @@ login_manager.init_app(app)
 
 @login_manager.request_loader
 def load_user_from_request(request: Request):
-    if request.get_json():
-        data = request.get_json()
-        api_key = data.get("api-key", "")
+    if request.method == "POST" or request.method == "PUT":
+        if request.get_json():
+            data = request.get_json()
+            api_key = data.get("apikey", "")
 
+            if api_key:
+                return User.objects(api_key=api_key).first()
+    elif request.method == "GET":
+        api_key = request.args.get("apikey", "")
         if api_key:
             return User.objects(api_key=api_key).first()
     return None
