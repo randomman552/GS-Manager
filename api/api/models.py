@@ -1,7 +1,7 @@
 import os
 import uuid
 import subprocess
-from typing import Union
+from typing import Union, Optional
 
 from flask import current_app
 from flask_login import UserMixin
@@ -9,7 +9,7 @@ from flask_mongoengine import Document
 from mongoengine import StringField, DictField
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .util import run_server, run_update
+from .util import ServerCommandExecutor
 
 
 class User(Document, UserMixin):
@@ -75,27 +75,68 @@ class GameServer(Document):
     Working directory of the server.
     """
 
-    def start(self):
-        if self.status == "stopped":
-            watchdog = run_server(self)
-            if not current_app.config.get("worker_processes"):
-                current_app.config["worker_processes"] = dict()
-            current_app.config["worker_processes"][str(self.id)] = watchdog
-            self.status = "running"
-            self.save()
+    def __init__(self, *args, **values):
+        super().__init__(*args, **values)
+        self.process = None
 
-    def stop(self):
-        watchdog = current_app.config.get("worker_processes", dict()).get(str(self.id))
-        if watchdog:
-            watchdog.stop()
+    def create_command_executor(self, cmd: str) -> Optional[ServerCommandExecutor]:
+        if cmd == self.start_cmd:
+            return ServerCommandExecutor(
+                self.working_directory, cmd,
+                self.on_start, self.on_stop
+            )
+        elif cmd == self.update_cmd:
+            return ServerCommandExecutor(
+                self.working_directory, cmd,
+                self.on_update, self.on_stop
+            )
+        return None
+
+    def on_start(self):
+        self.status = "started"
+        self.save()
+        print(f"Server {self.name} starting...")
+
+    def on_update(self):
+        self.status = "updating"
+        self.save()
+        print(f"Server {self.name} updating...")
+
+    def on_stop(self):
         self.status = "stopped"
         self.save()
+        print(f"Server {self.name} stopped with exit code {self.process.returncode}")
+
+    def run_start(self):
+        """
+        Run the server start command.
+        :return: True if server started, False if server is already running and wasn't started.
+        """
+        if self.process is None and self.status == "stopped":
+            self.process = self.create_command_executor(self.start_cmd)
+            self.process.start()
+            return True
+        return False
 
     def run_update(self):
-        if self.status == "stopped":
-            watchdog = run_update(self)
-            if not current_app.config.get("worker_processes"):
-                current_app.config["worker_processes"] = dict()
-            current_app.config["worker_processes"][str(self.id)] = watchdog
-            self.status = "updating"
-            self.save()
+        """
+        Start the server update process.
+        :return: True of the update was started, False otherwise.
+        """
+        if self.process is None and self.status == "stopped":
+            self.process = self.create_command_executor(self.update_cmd)
+            self.process.start()
+            return True
+        return False
+
+    def stop(self):
+        """
+        Stop server or update execution.
+        :return: True if execution was stopped, False otherwise
+        """
+        if self.process:
+            self.process.kill()
+            self.process = None
+            return True
+        self.save()
+        return False
