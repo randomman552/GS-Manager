@@ -3,6 +3,28 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/LoginPage";
 import './App.css';
 
+
+async function apiPost(apiKey, data, url) {
+    data = {
+        "apikey": apiKey,
+        "data": data
+    }
+
+    let response = await fetch (
+        url,
+        {
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            method: "post",
+            body: JSON.stringify(data)
+        }
+    );
+    return await response.json()
+}
+
+
 export class App extends React.Component{
     constructor(props) {
         super(props);
@@ -12,17 +34,13 @@ export class App extends React.Component{
     }
 
     login(username, password) {
-        const data = new FormData();
-        data.set("username", username);
-        data.set("password", password);
+        const data = {
+            "username": username,
+            "password": password
+        }
 
-        fetch(
-            "/api/auth/api-key",
-            {
-                method: "post",
-                body: data
-            }
-        ).then(res => res.json()).then(data => {
+        apiPost(null, data, "/api/auth/apikey")
+            .then(data => {
             if (!data.error) {
                 this.setState({
                     "apikey": data.data.key

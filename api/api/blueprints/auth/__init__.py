@@ -25,21 +25,35 @@ def user():
         raise NotImplementedError()
 
 
-@auth.route("/api-key", methods=["GET", "POST"])
+@auth.route("/apikey", methods=["GET", "POST"])
 def get_api_key():
     """
     Endpoint to get an api key for the given login credentials.
-    Login credentials can be provided through request.forms or request.args
+    Login credentials can be provided through:
+        GET request supplying username and password arguments
+        POST request containing json in following structure:
+            {
+                "apikey": None,
+                "data": {
+                    "username": username,
+                    "password": password
+                }
+            }
     :return:
     """
     if current_user.is_authenticated:
         return rest.response(200, data={"key": current_user.api_key})
 
-    # Attempt to get credentials from form first, then args
-    username = request.form.get("username", request.args.get("username", ""))
-    password = request.form.get("password", request.args.get("password", ""))
-    if username and password:
-        user = User.objects(name=username).first_or_404()
-        if user.check_password(password):
-            return rest.response(200, data={"key": user.api_key})
+    def return_key(username: str, password: str):
+        if username and password:
+            user = User.objects(name=username).first_or_404()
+            if user.check_password(password):
+                return rest.response(200, data={"key": user.api_key})
+        abort(401)
+
+    if request.method == "GET":
+        return return_key(request.args.get("username", ""), request.args.get("password", ""))
+    elif request.method == "POST":
+        data = request.get_json().get("data", dict())
+        return return_key(data.get("username", ""), data.get("password", ""))
     abort(401)

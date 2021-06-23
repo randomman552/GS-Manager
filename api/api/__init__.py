@@ -70,10 +70,13 @@ login_manager.init_app(app)
 
 @login_manager.request_loader
 def load_user_from_request(request: Request):
-    api_key = request.headers.get("x-api-key", request.args.get("api-key", ""))
+    if request.get_json():
+        data = request.get_json()
+        api_key = data.get("api-key", "")
 
-    if api_key:
-        return User.objects(api_key=api_key).first()
+        if api_key:
+            return User.objects(api_key=api_key).first()
+    return None
 
 
 @login_manager.user_loader
