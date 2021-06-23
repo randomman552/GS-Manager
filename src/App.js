@@ -1,35 +1,15 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/LoginPage";
+import { getCookie, apiPost } from "./util";
 import './App.css';
-
-
-async function apiPost(apiKey, data, url) {
-    data = {
-        "apikey": apiKey,
-        "data": data
-    }
-
-    let response = await fetch (
-        url,
-        {
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            method: "post",
-            body: JSON.stringify(data)
-        }
-    );
-    return await response.json()
-}
-
 
 export class App extends React.Component{
     constructor(props) {
         super(props);
+        const apikey = getCookie("apikey")
         this.state = {
-            "apikey": null
+            "apikey": apikey
         };
     }
 
@@ -37,7 +17,7 @@ export class App extends React.Component{
         const data = {
             "username": username,
             "password": password
-        }
+        };
 
         apiPost(null, data, "/api/auth/apikey")
             .then(data => {
@@ -45,6 +25,8 @@ export class App extends React.Component{
                 this.setState({
                     "apikey": data.data.key
                 });
+                // Set cookie so that until browser restarts, user doesn't have to reload
+                document.cookie = "apikey=" + data.data.key;
             }
         });
     }
@@ -66,7 +48,8 @@ export class App extends React.Component{
         return (
             <div id="app">
                 <Switch>
-
+                    <Route exact path="/servers" />
+                    <Redirect to="/servers" />
                 </Switch>
             </div>
         );
