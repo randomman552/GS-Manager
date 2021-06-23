@@ -7,7 +7,7 @@ from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
 
 from .blueprints import *
-from .models import User
+from .models import User, GameServer
 from . import rest
 
 app = Flask(__name__)
@@ -24,6 +24,7 @@ def load_config(app):
             "MONGODB_SETTINGS": {
                 "host": "mongodb://localhost:27017/gsmanager?authSource=gsmanager"
             },
+            "STORAGE_PATH": os.path.join(app.root_path, "../../storage/"),
             "SECRET_KEY": os.urandom(24).hex()
         }
         save_config(config)
@@ -92,6 +93,7 @@ def load_user(api_key):
 
 # region Register routes/blueprints
 app.register_blueprint(auth)
+app.register_blueprint(servers)
 
 
 # region Error handlers
@@ -113,4 +115,3 @@ def error_404(error):
     return rest.response(404, error)
 # endregion
 # endregion
-
