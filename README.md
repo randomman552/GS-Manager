@@ -11,13 +11,20 @@ This section defines how requests and responses should be structured.
 Data from the frontend should ALWAYS conform to the following JSON format:
 ```json
 {
-  "apikey": null,
+  "auth":  {
+    "apikey": null,
+    "username": null,
+    "password": null
+  },
   "data": {
     
   }
 }
 ```
-The `apikey` provides authorisation to complete a request.\
+`Auth` provides the means of authorisation for the requested action, this can be provided as:
+- An `apikey` or
+- a `username` `password` combo
+
 `data` contains more JSON encoded data which is used on the server side and varies per end-point
 
 ### Back to front end

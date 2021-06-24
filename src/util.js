@@ -1,6 +1,14 @@
-export async function apiPost(apiKey, data, url) {
+/**
+ * Method to send a request to the api backend
+ * @param auth Object containing authorisation information.
+ * @param data Object containing data to send with request.
+ * @param url {string} URL to send request to.
+ * @param method {string} HTTP method to use, defaults to 'post'.
+ * @returns {Promise<any>} Promise of return data as object.
+ */
+export async function apiFetch(auth, data, url, method="post") {
     data = {
-        "apikey": apiKey,
+        "auth": auth,
         "data": data
     }
 
@@ -11,7 +19,7 @@ export async function apiPost(apiKey, data, url) {
                 "Accept": "application/json",
                 "Content-Type": "application/json"
             },
-            method: "post",
+            method: method,
             body: JSON.stringify(data)
         }
     );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/LoginPage";
-import { getCookie, apiPost } from "./util";
+import { getCookie, apiFetch } from "./util";
 import './App.css';
 
 export class App extends React.Component{
@@ -14,12 +14,12 @@ export class App extends React.Component{
     }
 
     login(username, password) {
-        const data = {
+        const auth = {
             "username": username,
             "password": password
         };
 
-        apiPost(null, data, "/api/auth/apikey")
+        apiFetch(auth, null, "/api/auth/apikey")
             .then(data => {
             if (!data.error) {
                 this.setState({

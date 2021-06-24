@@ -1,5 +1,5 @@
 from flask import Blueprint, request, abort
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from ... import rest
 from ...models import User
@@ -8,6 +8,7 @@ auth = Blueprint("auth", __name__, static_folder="static", template_folder="temp
 
 
 @auth.route("/", methods=["GET", "PUT"])
+@login_required
 def user():
     """
     Endpoint to get currently logged in user details.
@@ -26,6 +27,7 @@ def user():
 
 
 @auth.route("/apikey", methods=["GET", "POST"])
+@login_required
 def get_api_key():
     """
     Endpoint to get an api key for the given login credentials.
@@ -41,19 +43,4 @@ def get_api_key():
             }
     :return:
     """
-    if current_user.is_authenticated:
-        return rest.response(200, data={"key": current_user.api_key})
-
-    def return_key(username: str, password: str):
-        if username and password:
-            user = User.objects(name=username).first_or_404()
-            if user.check_password(password):
-                return rest.response(200, data={"key": user.api_key})
-        abort(401)
-
-    if request.method == "GET":
-        return return_key(request.args.get("username", ""), request.args.get("password", ""))
-    elif request.method == "POST":
-        data = request.get_json().get("data", dict())
-        return return_key(data.get("username", ""), data.get("password", ""))
-    abort(401)
+    return rest.response(200, data={"key": current_user.api_key})
