@@ -1,0 +1,15 @@
+.sidebar {
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 240px;
+    padding: 58px 5px 10px 5px;
+    box-shadow: 2px 0 5px #888888;
+    z-index: -1;
+}
+
+.navbar {
+    box-shadow: 2px 0 5px #888888;
+}
