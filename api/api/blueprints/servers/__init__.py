@@ -7,7 +7,7 @@ from ... import rest
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
 
 
-@servers.route("/")
+@servers.route("/", methods=["GET", "POST"])
 @login_required
 def list_servers():
     all_servers = GameServer.objects().all()
@@ -15,7 +15,7 @@ def list_servers():
     return rest.response(200, data={"servers": servers_list})
 
 
-@servers.route("/<name>")
+@servers.route("/<name>", methods=["GET", "POST"])
 @login_required
 def server_details(name: str):
     server = GameServer.objects(name=name).first_or_404()
@@ -24,7 +24,7 @@ def server_details(name: str):
     return rest.response(200, data=server)
 
 
-@servers.route("/<name>/start")
+@servers.route("/<name>/start", methods=["GET", "POST"])
 @login_required
 def start_server(name: str):
     server = GameServer.objects(name=name).first_or_404()
@@ -33,7 +33,7 @@ def start_server(name: str):
     return rest.response(400, error="Server is already running/updating")
 
 
-@servers.route("/<name>/stop")
+@servers.route("/<name>/stop", methods=["GET", "POST"])
 @login_required
 def stop_server(name: str):
     server = GameServer.objects(name=name).first_or_404()
@@ -42,7 +42,7 @@ def stop_server(name: str):
     return rest.response(400, error="Server is not running")
 
 
-@servers.route("/<name>/update")
+@servers.route("/<name>/update", methods=["GET", "POST"])
 @login_required
 def update_server(name: str):
     server = GameServer.objects(name=name).first_or_404()

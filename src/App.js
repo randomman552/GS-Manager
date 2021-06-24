@@ -1,21 +1,32 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/LoginPage";
-import { getCookie, apiFetch } from "./util";
+import { getCookie, setCookie, deleteCookie, apiFetch } from "./util";
 import { ServersPage } from "./pages/ServersPage";
 import './App.css';
 
 export class App extends React.Component{
     constructor(props) {
         super(props);
+
         const apikey = getCookie("apikey")
-        const username = getCookie("username")
         this.state = {
             "apikey": apikey,
-            "username": username
+            "user": null,
+            "servers": []
         };
+
+        if (apikey) {
+            this.getUser();
+            this.getServers();
+        }
     }
 
+    /**
+     * Send an authentication request to the server to get the api key used to make future requests.
+     * @param username {string} The username to authenticate with.
+     * @param password {string} The password to authenticate with.
+     */
     login(username, password) {
         let auth = {
             "username": username,
@@ -31,25 +42,62 @@ export class App extends React.Component{
                 });
 
                 // Set cookie so that until browser restarts, user doesn't have to re-log
-                document.cookie = "apikey=" + data.data.key;
-                document.cookie = "username=" + username;
+                setCookie("apikey", data.data.key);
+
+                this.getUser();
+                this.getServers();
             }
+        });
+
+    }
+
+    /**
+     * Forget the currently remembered apikey.
+     */
+    logout() {
+        deleteCookie("apikey");
+        this.setState({
+            "apikey": null,
+            "user": null,
+            "servers": []
         });
     }
 
-    logout() {
-        this.setState({
-            "apikey": null,
-            "username": null
-        })
+    /**
+     * Query the api for the User object, when received it will be stored in this.state.user
+     */
+    getUser() {
+        const auth = {
+            "apikey": this.state.apikey
+        };
+
+        apiFetch(auth, null, "/api/auth/").then(data => {
+            if (!data.error) {
+                this.setState({
+                    "user": data.data.user
+                });
+            }
+            return null;
+        });
     }
 
-    getUsername() {
-        return this.state.username;
-    }
-
+    /**
+     * Query the api for the names of all servers.
+     * Stores them in this.state.servers.
+     */
     getServers() {
-        return ["test", "Gmod: Sandbox"]
+        const auth = {
+            "apikey": this.state.apikey
+        };
+
+        apiFetch(auth, null, "/api/servers/").then(data => {
+            if (!data.error) {
+                this.setState({
+                    "servers": data.data.servers
+                });
+            }
+            return null;
+        });
     }
 
     render() {
@@ -66,13 +114,16 @@ export class App extends React.Component{
             );
         }
 
+        const username = (this.state.user)? this.state.user.name : "username";
+        const servers = this.state.servers;
+
         return (
             <div id="app">
                 <Switch>
                     <Route path="/servers" render={() => {
                             return <ServersPage
-                                servers={ this.getServers() }
-                                username={ this.getUsername() }
+                                servers={ servers }
+                                username={ username }
                                 logoutAction={ () => this.logout() }
                             />
                         }} />

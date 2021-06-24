@@ -38,3 +38,13 @@ export function getCookie(key) {
             return splitCookie[1];
     }
 }
+
+export function setCookie(key, value) {
+    let cookie = key + "=" + value;
+    document.cookie = cookie;
+}
+
+export function deleteCookie(key) {
+    let cookie = key + "=" + getCookie(key);
+    document.cookie = cookie + ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
+}
