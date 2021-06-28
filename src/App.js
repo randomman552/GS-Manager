@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/LoginPage";
 import { getCookie, setCookie, deleteCookie, apiFetch } from "./util";
 import { ServersPage } from "./pages/ServersPage";
+import { Modal, Button } from "react-bootstrap";
 import './App.css';
 
 export class App extends React.Component{
@@ -13,7 +14,11 @@ export class App extends React.Component{
         this.state = {
             "apikey": apikey,
             "user": null,
-            "servers": []
+            "servers": [],
+            "modal": {
+                "title": null,
+                "message": null
+            }
         };
 
         if (apikey) {
@@ -46,6 +51,8 @@ export class App extends React.Component{
 
                 this.getUser();
                 this.getServers();
+            } else if (data.code === 401) {
+                this.showModal("Login Failed", "Incorrect username or password...");
             }
         });
 
@@ -100,10 +107,67 @@ export class App extends React.Component{
         });
     }
 
+    /**
+     * Method to show the global modal in the application.
+     * @param title The title to display
+     * @param message The message to display
+     */
+    showModal(title, message) {
+        this.setState({
+            "modal": {
+                "show": true,
+                "title": title,
+                "message": message
+            }
+        });
+    }
+
+    hideModal() {
+        this.setState({
+            "modal": {
+                "show": false,
+                "title": this.state.modal.title,
+                "message": this.state.modal.message
+            }
+        });
+    }
+
+    renderModal() {
+        const show = this.state.modal.show;
+        const title = this.state.modal.title;
+        const message = this.state.modal.message;
+
+        const onHide = () => { this.hideModal() };
+
+        return (
+            <Modal
+                show={show}
+                onHide={onHide}
+                keyboard={true}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>{title}</Modal.Title>
+              </Modal.Header>
+
+              <Modal.Body>
+                <p>
+                    {message}
+                </p>
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Button variant="primary" onClick={onHide}>Close</Button>
+              </Modal.Footer>
+            </Modal>
+        )
+}
+
     render() {
+        const modal = this.renderModal();
         if (!this.state.apikey) {
             return (
                 <div id="app">
+                    {modal}
                     <Switch>
                         <Route exact path="/login" render={ () => {
                             return <LoginPage loginAction={ (u, p) => this.login(u, p) }/>
