@@ -178,19 +178,33 @@ export class App extends React.Component{
             );
         }
 
-        const username = (this.state.user)? this.state.user.name : "username";
+        const user = this.state.user;
         const servers = this.state.servers;
 
         return (
             <div id="app">
                 <Switch>
-                    <Route path="/servers" render={() => {
+                    <Route
+                        exact path="/servers"
+                        render={(props) => {
+                                return <ServersPage
+                                    {...props}
+                                    servers={ servers }
+                                    user={user}
+                                    logoutAction={ () => this.logout() }
+                                />
+                            }} />
+                    <Route
+                        path="/servers/:serverName"
+                        render={(props) => {
                             return <ServersPage
+                                {...props}
                                 servers={ servers }
-                                username={ username }
+                                user={user}
                                 logoutAction={ () => this.logout() }
                             />
-                        }} />
+                        }}
+                    />
                     <Redirect to="/servers" />
                 </Switch>
             </div>

@@ -62,12 +62,10 @@ class LoginForm extends React.Component {
     }
 }
 
-export class LoginPage extends React.Component {
-    render() {
-        return (
-            <div className="login-page">
-                <LoginForm loginAction={this.props.loginAction}/>
-            </div>
-        );
-    }
+export function LoginPage(props) {
+    return (
+        <div className="login-page">
+            <LoginForm loginAction={props.loginAction}/>
+        </div>
+    );
 }

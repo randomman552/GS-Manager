@@ -17,12 +17,12 @@ function ServerNavigation(props) {
     }
 
     const locationSplit = decodeURI(window.location.pathname).split("/");
-    const defaultKey = locationSplit[locationSplit.length - 1];
+    const activeKey = locationSplit[locationSplit.length - 1];
 
     return (
         <Nav
                 variant="pills"
-                defaultActiveKey={defaultKey}
+                activeKey={activeKey}
                 className="flex-column bg-white sidebar"
             >
 
@@ -35,7 +35,7 @@ function ServerNavigation(props) {
 
 
 export function Navigation(props) {
-    const loggedInMessage = (props.username) ? "Logged in as: " + props.username : "Logged in";
+    const loggedInMessage = (props.user) ? "Logged in as: " + props.user.name : "Logged in";
     const logoutAction = props.logoutAction;
 
     return (
