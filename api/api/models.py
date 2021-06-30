@@ -37,6 +37,8 @@ class User(Document, UserMixin):
 
 
 class GameServer(Document):
+    __running = dict()
+
     name = StringField(required=True, unique=True)
     status = StringField(default="stopped")
 
@@ -95,16 +97,19 @@ class GameServer(Document):
     def on_start(self):
         self.status = "started"
         self.save()
+        self.__running[str(self.id)] = self
         print(f"Server {self.name} starting...")
 
     def on_update(self):
         self.status = "updating"
         self.save()
+        self.__running[str(self.id)] = self
         print(f"Server {self.name} updating...")
 
     def on_stop(self):
         self.status = "stopped"
         self.save()
+        self.__running.pop(str(self.id))
         print(f"Server {self.name} stopped with exit code {self.process.returncode}")
 
     def run_start(self):
@@ -134,9 +139,10 @@ class GameServer(Document):
         Stop server or update execution.
         :return: True if execution was stopped, False otherwise
         """
+        id = str(self.id)
         if self.process:
             self.process.kill()
-            self.process = None
             return True
-        self.save()
+        elif id in self.__running:
+            return self.__running.get(id).stop()
         return False

@@ -1,8 +1,7 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request
 from flask_login import current_user, login_required
 
 from ... import rest
-from ...models import User
 
 auth = Blueprint("auth", __name__, static_folder="static", template_folder="templates", url_prefix="/api/auth")
 
@@ -12,7 +11,6 @@ auth = Blueprint("auth", __name__, static_folder="static", template_folder="temp
 def user():
     """
     Endpoint to get currently logged in user details.
-    :return:
     """
     if request.method == "PUT":
         raise NotImplementedError()
@@ -28,16 +26,6 @@ def user():
 def get_api_key():
     """
     Endpoint to get an api key for the given login credentials.
-    Login credentials can be provided through:
-        GET request supplying username and password arguments
-        POST request containing json in following structure:
-            {
-                "apikey": None,
-                "data": {
-                    "username": username,
-                    "password": password
-                }
-            }
-    :return:
+    Login is handled by the login_required decorator.
     """
     return rest.response(200, data={"key": current_user.api_key})
