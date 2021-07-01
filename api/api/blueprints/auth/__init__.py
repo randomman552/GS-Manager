@@ -18,7 +18,7 @@ def user():
     # Do not send user id or password
     cur_user.pop("_id")
     cur_user.pop("password")
-    return rest.response(200, data={"user": cur_user})
+    return rest.response(200, data=cur_user)
 
 
 @auth.route("/apikey", methods=["GET", "POST"])
@@ -28,4 +28,4 @@ def get_api_key():
     Endpoint to get an api key for the given login credentials.
     Login is handled by the login_required decorator.
     """
-    return rest.response(200, data={"key": current_user.api_key})
+    return rest.response(200, data=current_user.api_key)

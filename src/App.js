@@ -42,12 +42,12 @@ export class App extends React.Component{
             .then(data => {
             if (!data.error) {
                 this.setState({
-                    "apikey": data.data.key,
+                    "apikey": data.data,
                     "username": username
                 });
 
                 // Set cookie so that until browser restarts, user doesn't have to re-log
-                setCookie("apikey", data.data.key);
+                setCookie("apikey", data.data);
 
                 this.getUser();
                 this.getServers();
@@ -81,7 +81,7 @@ export class App extends React.Component{
         apiFetch(auth, null, "/api/auth/").then(data => {
             if (!data.error) {
                 this.setState({
-                    "user": data.data.user
+                    "user": data.data
                 });
             }
             return null;
@@ -100,7 +100,7 @@ export class App extends React.Component{
         apiFetch(auth, null, "/api/servers/").then(data => {
             if (!data.error) {
                 this.setState({
-                    "servers": data.data.servers
+                    "servers": data.data
                 });
             }
             return null;

@@ -12,7 +12,7 @@ servers = Blueprint("servers", __name__, static_folder="static", template_folder
 def list_servers():
     all_servers = GameServer.objects().all()
     servers_list = [server.name for server in all_servers]
-    return rest.response(200, data={"servers": servers_list})
+    return rest.response(200, data=servers_list)
 
 
 @servers.route("/<name>", methods=["GET", "POST", "PUT"])
