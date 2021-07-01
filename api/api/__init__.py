@@ -5,6 +5,7 @@ import os
 from flask import Flask, Request
 from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
+from mongoengine import Q
 
 from .blueprints import *
 from .models import User, GameServer
@@ -127,4 +128,18 @@ def error_404(error):
     error = str(error)
     return rest.response(404, error)
 # endregion
+# endregion
+
+
+# region Start any servers that should already be started
+def start_servers():
+    to_start = GameServer.objects.filter(Q(status="updating") | Q(status="started")).all()
+    for server in to_start:
+        if server.status == "updating":
+            server.run_run_update()
+        else:
+            server.run_start()
+
+
+start_servers()
 # endregion
