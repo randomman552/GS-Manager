@@ -179,6 +179,7 @@ export class App extends React.Component{
         }
 
         const user = this.state.user;
+        const apikey = this.state.apikey
         const servers = this.state.servers;
 
         return (
@@ -189,6 +190,7 @@ export class App extends React.Component{
                         render={(props) => {
                                 return <ServersPage
                                     {...props}
+                                    apikey={apikey}
                                     servers={ servers }
                                     user={user}
                                     logoutAction={ () => this.logout() }
@@ -199,6 +201,7 @@ export class App extends React.Component{
                         render={(props) => {
                             return <ServersPage
                                 {...props}
+                                apikey={apikey}
                                 servers={ servers }
                                 user={user}
                                 logoutAction={ () => this.logout() }

@@ -157,6 +157,8 @@ class GameServer(Document):
         Stop server or update execution.
         :return: True if execution was stopped, False otherwise
         """
+        self.status = "stopped"
+        self.save()
         if self.worker:
             self.worker.kill()
             return True

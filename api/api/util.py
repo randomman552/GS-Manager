@@ -60,21 +60,21 @@ class ServerCommandExecutor(threading.Thread):
 
     def write_to_stdin(self, text: str):
         self.server.output.append(text)
-        # We expect this to timeout as this should NOT terminate any worker we are running
-        try:
-            self.process.communicate(text.encode(), timeout=0.5)
-        except subprocess.TimeoutExpired:
-            pass
+        if isinstance(text, str):
+            text = text.encode("utf-8")
+        self.process.stdin.write(text)
+        self.process.stdin.flush()
         self.server.save()
 
     def __add_output(self):
         try:
             while self.server.status != "stopped":
                 line = self.process.stdout.readline()
-                if isinstance(line, bytes):
-                    line = line.decode("utf-8")
-                self.server.output.append(line)
-                self.server.save()
+                if line:
+                    if isinstance(line, bytes):
+                        line = line.decode("utf-8")
+                    self.server.output.append(line)
+                    self.server.save()
         # ValueError is raised when stdout pipe is broken on worker stop, so catch it here.
         except ValueError:
             pass

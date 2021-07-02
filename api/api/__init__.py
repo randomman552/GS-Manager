@@ -136,7 +136,8 @@ def start_servers():
     to_start = GameServer.objects.filter(Q(status="updating") | Q(status="started")).all()
     for server in to_start:
         if server.status == "updating":
-            server.run_run_update()
+            server.status = "stopped"
+            server.save()
         else:
             server.run_start()
 
