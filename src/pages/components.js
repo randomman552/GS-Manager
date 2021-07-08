@@ -21,15 +21,14 @@ function ServerNavigation(props) {
 
     return (
         <Nav
-                variant="pills"
-                activeKey={activeKey}
-                className="flex-column bg-white sidebar"
-            >
-
-                <Nav.Item>
-                    {servers}
-                </Nav.Item>
-            </Nav>
+            variant="pills"
+            activeKey={activeKey}
+            className="flex-column bg-white sidebar"
+        >
+            <Nav.Item>
+                {servers}
+            </Nav.Item>
+        </Nav>
     )
 }
 

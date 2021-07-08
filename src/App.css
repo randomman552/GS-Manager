@@ -1,3 +1,10 @@
 body {
   background-color: #f5f5f5;
 }
+
+.flex-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

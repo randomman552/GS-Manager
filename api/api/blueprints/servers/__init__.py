@@ -1,5 +1,6 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, abort
 from flask_login import login_required
+from mongoengine import OperationError
 
 from ...models import GameServer
 from ... import rest
@@ -15,12 +16,34 @@ def list_servers():
     return rest.response(200, data=servers_list)
 
 
-@servers.route("/<name>", methods=["GET", "POST", "PUT"])
+@servers.route("/<name>", methods=["GET", "POST", "PUT", "DELETE"])
 @login_required
 def server_details(name: str):
+    server = GameServer.objects(name=name).first()
+
+    # Updating and creating method
     if request.method == "PUT":
-        raise NotImplementedError("Altering of server settings not yet supported.")
-    server = GameServer.objects(name=name).first_or_404()
+        json = request.get_json()
+        if json:
+            data = json.get("data")
+            if data:
+                try:
+                    server.update(**data)
+                    server.save()
+                    return rest.response(200, data=data)
+                except (OperationError, AttributeError):
+                    server = GameServer(**data)
+                    server.name = name
+                    server.save()
+                    return rest.response(201, data=data)
+        return rest.response(400, error="No JSON data provided.")
+
+    elif request.method == "DELETE":
+        server.delete()
+        return rest.response(200)
+
+    if not server:
+        abort(404)
     server_dict = server.to_mongo().to_dict()
     server_dict.pop("_id")
     return rest.response(200, data=server_dict)

@@ -1,11 +1,14 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Navigation } from "./components";
 import { apiFetch } from "../util";
 import { Card, Button, Form } from "react-bootstrap";
 import "./styles/ServersPage.css"
 import ScrollToBottom from "react-scroll-to-bottom";
+import PropTypes from 'prop-types';
 
-class ServerDashboardCommandLine extends React.Component {
+// region Command sending form
+
+class SendCommandForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -54,6 +57,84 @@ class ServerDashboardCommandLine extends React.Component {
     }
 }
 
+SendCommandForm.propTypes = {
+    disabled: PropTypes.bool,
+    submitAction: PropTypes.func.isRequired
+}
+
+SendCommandForm.defaultProps = {
+    disabled: true
+}
+
+//endregion
+
+// region Server update form
+
+class UpdateServerForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: ""
+        }
+    }
+
+    handleChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        if (this.props.submitAction) {
+            this.props.submitAction(this.state)
+        }
+    }
+
+    render() {
+        const name = this.state.name;
+        const title = (this.props.variant === "new") ? "New server" : "Edit settings";
+        const submitText = (this.props.variant === "new") ? "Create" : "Update";
+
+        return (
+            <Form className="flex-form" onSubmit={(event) => this.handleSubmit(event)}>
+                <h1>{title}</h1>
+                <Form.Control
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={name}
+                    onChange={(event) => this.handleChange(event)}
+                />
+                <Button variant="primary" type="submit" disabled={this.props.disabled}>
+                    {submitText}
+                </Button>
+            </Form>
+        )
+    }
+}
+
+UpdateServerForm.propTypes = {
+    name: PropTypes.string,
+    variant: PropTypes.oneOf(['new', 'update']),
+    submitAction: PropTypes.func.isRequired
+}
+
+UpdateServerForm.defaultProps = {
+    variant: 'update'
+}
+
+// endregion
+
+// region Primary dashboard components
+
+/**
+ * Dashboard displayed when on a route for a given server.
+ */
 class ServerDashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -176,7 +257,7 @@ class ServerDashboard extends React.Component {
                                 {outputLines}
                             </ScrollToBottom>
 
-                            <ServerDashboardCommandLine
+                            <SendCommandForm
                                 key={this.state.server.name}
                                 submitAction={(command) => this.sendCommand(command)}
                                 disabled={!running}
@@ -202,6 +283,45 @@ class ServerDashboard extends React.Component {
     }
 }
 
+/**
+ * Dashboard displayed on route normal /servers route.
+ */
+class NoServerDashboard extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            "name": this.props.name,
+            "user": this.props.user,
+            "apikey": this.props.apikey,
+            "server": {
+                "name": this.props.name,
+                "output": []
+            }
+        };
+    }
+
+    createServer(data) {
+        const auth = {
+            apikey: this.state.apikey
+        }
+        const queryUrl = "/api/servers/" + data.name
+
+        apiFetch(auth, data, queryUrl, "put").then((data) => {
+            console.log(data)
+        });
+    }
+
+    render() {
+        return (
+            <div className="server-dashboard">
+                <UpdateServerForm variant="new" submitAction={(data) => this.createServer(data)} />
+            </div>
+        );
+    }
+}
+
+// endregion
+
 export function ServersPage(props) {
     const servers = props.servers;
     const user = props.user;
@@ -209,6 +329,19 @@ export function ServersPage(props) {
     const apikey = props.apikey;
     const serverName = props.match.params.serverName;
 
+    if (serverName) {
+        return (
+            <article className="page">
+                <Navigation
+                    activeKey="/servers"
+                    servers={servers}
+                    user={user}
+                    logoutAction={logoutAction}
+                />
+                <ServerDashboard key={serverName} name={serverName} apikey={apikey} user={user}/>
+            </article>
+        )
+    }
     return (
         <article className="page">
             <Navigation
@@ -217,7 +350,7 @@ export function ServersPage(props) {
                 user={user}
                 logoutAction={logoutAction}
             />
-            <ServerDashboard key={serverName} name={serverName} apikey={apikey} user={user} />
+            <NoServerDashboard apikey={apikey} user={user}/>
         </article>
     )
 }
