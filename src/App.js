@@ -1,30 +1,22 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/LoginPage";
-import { getCookie, setCookie, deleteCookie, apiFetch } from "./util";
+import { apiFetch } from "./util";
 import { ServersPage } from "./pages/ServersPage";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
 
-export class App extends React.Component{
+export class App extends React.Component {
     constructor(props) {
         super(props);
-
-        const apikey = getCookie("apikey")
         this.state = {
-            "apikey": apikey,
-            "user": null,
-            "servers": [],
-            "modal": {
+            user: null,
+            servers: [],
+            modal: {
                 "title": null,
                 "message": null
             }
         };
-
-        if (apikey) {
-            this.getUser();
-            this.getServers();
-        }
     }
 
     /**
@@ -38,18 +30,12 @@ export class App extends React.Component{
             "password": password
         };
 
-        apiFetch(auth, null, "/api/auth/apikey")
+        apiFetch(auth, null, "/api/auth/")
             .then(data => {
             if (!data.error) {
                 this.setState({
-                    "apikey": data.data,
-                    "username": username
-                });
-
-                // Set cookie so that until browser restarts, user doesn't have to re-log
-                setCookie("apikey", data.data);
-
-                this.getUser();
+                    user: data.data
+                })
                 this.getServers();
             } else if (data.code === 401) {
                 this.showModal("Login Failed", "Incorrect username or password...");
@@ -62,29 +48,8 @@ export class App extends React.Component{
      * Forget the currently remembered apikey.
      */
     logout() {
-        deleteCookie("apikey");
         this.setState({
-            "apikey": null,
-            "user": null,
-            "servers": []
-        });
-    }
-
-    /**
-     * Query the api for the User object, when received it will be stored in this.state.user
-     */
-    getUser() {
-        const auth = {
-            "apikey": this.state.apikey
-        };
-
-        apiFetch(auth, null, "/api/auth/").then(data => {
-            if (!data.error) {
-                this.setState({
-                    "user": data.data
-                });
-            }
-            return null;
+            "user": null
         });
     }
 
@@ -93,18 +58,26 @@ export class App extends React.Component{
      * Stores them in this.state.servers.
      */
     getServers() {
-        const auth = {
-            "apikey": this.state.apikey
-        };
-
+        const auth = this.getAuth();
         apiFetch(auth, null, "/api/servers/").then(data => {
             if (!data.error) {
                 this.setState({
-                    "servers": data.data
+                    servers: data.data
                 });
             }
             return null;
         });
+    }
+
+    /**
+     * Method to construct authentication object from current app state.
+     */
+    getAuth() {
+        if (this.state.user)
+            return {
+                apikey: this.state.user.api_key
+            };
+        return null;
     }
 
     /**
@@ -164,7 +137,7 @@ export class App extends React.Component{
 
     render() {
         const modal = this.renderModal();
-        if (!this.state.apikey) {
+        if (!this.state.user) {
             return (
                 <div id="app">
                     {modal}
@@ -179,29 +152,18 @@ export class App extends React.Component{
         }
 
         const user = this.state.user;
-        const apikey = this.state.apikey
         const servers = this.state.servers;
+        const auth = this.getAuth();
 
         return (
             <div id="app">
                 <Switch>
                     <Route
-                        exact path="/servers"
-                        render={(props) => {
-                                return <ServersPage
-                                    {...props}
-                                    apikey={apikey}
-                                    servers={ servers }
-                                    user={user}
-                                    logoutAction={ () => this.logout() }
-                                />
-                            }} />
-                    <Route
-                        path="/servers/:serverName"
+                        path="/servers"
                         render={(props) => {
                             return <ServersPage
                                 {...props}
-                                apikey={apikey}
+                                auth={auth}
                                 servers={ servers }
                                 user={user}
                                 logoutAction={ () => this.logout() }

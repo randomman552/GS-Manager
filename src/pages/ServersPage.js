@@ -5,6 +5,7 @@ import { Card, Button, Form } from "react-bootstrap";
 import "./styles/ServersPage.css"
 import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
+import { Switch, Route } from "react-router-dom";
 
 // region Command sending form
 
@@ -101,15 +102,20 @@ class UpdateServerForm extends React.Component {
         const submitText = (this.props.variant === "new") ? "Create" : "Update";
 
         return (
-            <Form className="flex-form" onSubmit={(event) => this.handleSubmit(event)}>
+            <Form className="flex flex-column flex-center" onSubmit={(event) => this.handleSubmit(event)}>
                 <h1>{title}</h1>
-                <Form.Control
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={name}
-                    onChange={(event) => this.handleChange(event)}
-                />
+                <Form.Group>
+                    <Form.Label className="flex flex-column flex-center" htmlFor="name">
+                        Name
+                    </Form.Label>
+                    <Form.Control
+                        id="name"
+                        name="name"
+                        type="text"
+                        value={name}
+                        onChange={(event) => this.handleChange(event)}
+                    />
+                </Form.Group>
                 <Button variant="primary" type="submit" disabled={this.props.disabled}>
                     {submitText}
                 </Button>
@@ -139,12 +145,10 @@ class ServerDashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            "name": this.props.name,
-            "user": this.props.user,
-            "apikey": this.props.apikey,
-            "server": {
-                "name": this.props.name,
-                "output": []
+            name: props.match.params.serverName,
+            server: {
+                name: props.match.params.serverName,
+                output: []
             }
         };
     }
@@ -153,20 +157,19 @@ class ServerDashboard extends React.Component {
         const name = this.state.name;
         if (name) {
             const queryUrl = "/api/servers/" + this.state.name;
-            const auth = {
-                "apikey": this.state.apikey
-            }
+            const auth = this.props.auth;
 
             apiFetch(auth, null, queryUrl).then((data) => {
                 this.setState({
-                    "server": data.data
+                    server: data.data
                 })
             });
         }
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => this.getServer(), 1000);
+        this.getServer();
+        this.interval = setInterval(() => this.getServer(), 500);
     }
 
     componentWillUnmount() {
@@ -177,10 +180,7 @@ class ServerDashboard extends React.Component {
         const name = this.state.name;
         if (name) {
             const queryUrl = "/api/servers/" + this.state.name + "/start";
-            const auth = {
-                "apikey": this.state.apikey
-            }
-
+            const auth = this.props.auth;
             apiFetch(auth, null, queryUrl).then(r => {});
         }
     }
@@ -189,10 +189,7 @@ class ServerDashboard extends React.Component {
         const name = this.state.name;
         if (name) {
             const queryUrl = "/api/servers/" + this.state.name + "/update";
-            const auth = {
-                "apikey": this.state.apikey
-            }
-
+            const auth = this.props.auth;
             apiFetch(auth, null, queryUrl).then(r => {});
         }
     }
@@ -201,9 +198,7 @@ class ServerDashboard extends React.Component {
         const name = this.state.name;
         if (name) {
             const queryUrl = "/api/servers/" + this.state.name + "/stop";
-            const auth = {
-                "apikey": this.state.apikey
-            }
+            const auth = this.props.auth;
 
             apiFetch(auth, null, queryUrl).then(r => {});
         }
@@ -213,9 +208,7 @@ class ServerDashboard extends React.Component {
         const name = this.state.name;
         if (name) {
             const queryUrl = "/api/servers/" + this.state.name + "/command";
-            const auth = {
-                "apikey": this.state.apikey
-            };
+            const auth = this.props.auth;
             const data = {
                 "command": command
             };
@@ -283,6 +276,10 @@ class ServerDashboard extends React.Component {
     }
 }
 
+ServerDashboard.propTypes = {
+    auth: PropTypes.object.isRequired
+}
+
 /**
  * Dashboard displayed on route normal /servers route.
  */
@@ -290,21 +287,14 @@ class NoServerDashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            "name": this.props.name,
-            "user": this.props.user,
-            "apikey": this.props.apikey,
-            "server": {
-                "name": this.props.name,
-                "output": []
-            }
+            user: this.props.user,
+            auth:this.props.auth
         };
     }
 
     createServer(data) {
-        const auth = {
-            apikey: this.state.apikey
-        }
-        const queryUrl = "/api/servers/" + data.name
+        const auth = this.state.auth;
+        const queryUrl = "/api/servers/" + data.name;
 
         apiFetch(auth, data, queryUrl, "put").then((data) => {
             console.log(data)
@@ -320,28 +310,20 @@ class NoServerDashboard extends React.Component {
     }
 }
 
+NoServerDashboard.propTypes = {
+    auth: PropTypes.object.isRequired
+}
+
 // endregion
+
+// region Server page export
 
 export function ServersPage(props) {
     const servers = props.servers;
     const user = props.user;
     const logoutAction = props.logoutAction;
-    const apikey = props.apikey;
-    const serverName = props.match.params.serverName;
+    const auth = props.auth;
 
-    if (serverName) {
-        return (
-            <article className="page">
-                <Navigation
-                    activeKey="/servers"
-                    servers={servers}
-                    user={user}
-                    logoutAction={logoutAction}
-                />
-                <ServerDashboard key={serverName} name={serverName} apikey={apikey} user={user}/>
-            </article>
-        )
-    }
     return (
         <article className="page">
             <Navigation
@@ -350,7 +332,29 @@ export function ServersPage(props) {
                 user={user}
                 logoutAction={logoutAction}
             />
-            <NoServerDashboard apikey={apikey} user={user}/>
+            <Switch>
+                <Route
+                    path="/servers/:serverName"
+                    render={(props) => {
+                        return (<ServerDashboard {...props} key={props.match.params.serverName} auth={auth}/>)
+                    }}
+                />
+                <Route
+                    exact path="/servers"
+                    render={(props) => {
+                        return (<NoServerDashboard {...props} auth={auth} />)
+                    }}
+                />
+            </Switch>
         </article>
-    )
+    );
 }
+
+ServersPage.propTypes = {
+    servers: PropTypes.array,
+    user: PropTypes.object,
+    logoutAction: PropTypes.func,
+    auth: PropTypes.object
+}
+
+// endregion
