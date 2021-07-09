@@ -34,7 +34,7 @@ class User(Document, UserMixin):
 
 
 class GameServer(Document):
-    name = StringField(required=True, unique=True)
+    name = StringField(required=True, unique=True, min_length=3)
     status = StringField(default="stopped")
     output = ListField(StringField())
 

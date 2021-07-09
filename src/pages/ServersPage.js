@@ -294,7 +294,7 @@ class NoServerDashboard extends React.Component {
 
     createServer(data) {
         const auth = this.state.auth;
-        const queryUrl = "/api/servers/" + data.name;
+        const queryUrl = "/api/servers/";
 
         apiFetch(auth, data, queryUrl, "put").then((data) => {
             console.log(data)

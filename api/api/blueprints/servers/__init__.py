@@ -1,6 +1,6 @@
 from flask import Blueprint, request, abort
 from flask_login import login_required
-from mongoengine import OperationError
+from mongoengine import ValidationError
 
 from ...models import GameServer
 from ... import server_runner as runner
@@ -9,9 +9,21 @@ from ... import rest
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
 
 
-@servers.route("/", methods=["GET", "POST"])
+@servers.route("/", methods=["GET", "POST", "PUT"])
 @login_required
-def list_servers():
+def servers_root():
+    if request.method == "PUT":
+        json = request.get_json()
+        if json:
+            data = json.get("data")
+            if data:
+                try:
+                    new_server = GameServer(**data)
+                    new_server.save()
+                    return rest.response(201)
+                except ValidationError as e:
+                    return rest.response(400, error=e.message)
+            return rest.response(400, error="No data provided.")
     all_servers = GameServer.objects().all()
     servers_list = [server.name for server in all_servers]
     return rest.response(200, data=servers_list)
@@ -20,31 +32,23 @@ def list_servers():
 @servers.route("/<name>", methods=["GET", "POST", "PUT", "DELETE"])
 @login_required
 def server_details(name: str):
-    server = GameServer.objects(name=name).first()
+    server = GameServer.objects(name=name).first_or_404()
 
-    # Updating and creating method
+    # Updating method
     if request.method == "PUT":
         json = request.get_json()
         if json:
             data = json.get("data")
             if data:
-                try:
-                    server.update(**data)
-                    server.save()
-                    return rest.response(200, data=data)
-                except (OperationError, AttributeError):
-                    server = GameServer(**data)
-                    server.name = name
-                    server.save()
-                    return rest.response(201, data=data)
-        return rest.response(400, error="No JSON data provided.")
+                server.update(**data)
+                server.save()
+                return rest.response(200, data=data)
+        return rest.response(400, error="No data provided.")
 
     elif request.method == "DELETE":
         server.delete()
         return rest.response(200)
 
-    if not server:
-        abort(404)
     server_dict = server.to_mongo().to_dict()
     server_dict.pop("_id")
     return rest.response(200, data=server_dict)
