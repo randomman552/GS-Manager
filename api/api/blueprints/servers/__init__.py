@@ -1,6 +1,6 @@
 from flask import Blueprint, request, abort
 from flask_login import login_required
-from mongoengine import ValidationError
+from mongoengine import ValidationError, NotUniqueError
 
 from ...models import GameServer
 from ... import server_runner as runner
@@ -23,7 +23,10 @@ def servers_root():
                     return rest.response(201)
                 except ValidationError as e:
                     return rest.response(400, error=e.message)
+                except NotUniqueError as e:
+                    return rest.response(400, error=str(e))
             return rest.response(400, error="No data provided.")
+
     all_servers = GameServer.objects().all()
     servers_list = [server.name for server in all_servers]
     return rest.response(200, data=servers_list)
