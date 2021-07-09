@@ -103,6 +103,7 @@ def update_server(server: GameServer) -> bool:
         __start_watcher_threads(server_id)
 
         server.status = "updating"
+        server.output = []
         server.save()
         return True
     return False
