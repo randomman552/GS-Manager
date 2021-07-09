@@ -9,6 +9,7 @@ from mongoengine import Q
 
 from .blueprints import *
 from .models import User, GameServer
+from . import server_runner as runner
 from . import rest
 
 app = Flask(__name__)
@@ -139,7 +140,7 @@ def start_servers():
             server.status = "stopped"
             server.save()
         else:
-            server.run_start()
+            runner.start_server(server)
 
 
 start_servers()

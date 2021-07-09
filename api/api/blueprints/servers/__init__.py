@@ -3,6 +3,7 @@ from flask_login import login_required
 from mongoengine import OperationError
 
 from ...models import GameServer
+from ... import server_runner as runner
 from ... import rest
 
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
@@ -53,7 +54,7 @@ def server_details(name: str):
 @login_required
 def server_command(name: str):
     """
-    Endpoint to write a command to the servers stdin
+    Endpoint to write a cmd to the servers stdin
     """
     server = GameServer.objects(name=name).first_or_404()
     command = ""
@@ -67,7 +68,7 @@ def server_command(name: str):
             command = data.get("command")
 
     if command:
-        if server.run_command(command):
+        if runner.run_command(command, server):
             return rest.response(202)
         return rest.response(409, error="Server is not running")
     return rest.response(400, error="No command provided")
@@ -77,7 +78,7 @@ def server_command(name: str):
 @login_required
 def start_server(name: str):
     server = GameServer.objects(name=name).first_or_404()
-    if server.run_start():
+    if runner.start_server(server):
         return rest.response(202)
     return rest.response(409, error="Server is already running/updating")
 
@@ -86,7 +87,7 @@ def start_server(name: str):
 @login_required
 def stop_server(name: str):
     server = GameServer.objects(name=name).first_or_404()
-    if server.stop():
+    if runner.stop_server(server):
         return rest.response(202)
     return rest.response(409, error="Server is not running")
 
@@ -95,6 +96,6 @@ def stop_server(name: str):
 @login_required
 def update_server(name: str):
     server = GameServer.objects(name=name).first_or_404()
-    if server.run_update():
+    if runner.update_server(server):
         return rest.response(202)
     return rest.response(409, error="Server is already running/updating")
