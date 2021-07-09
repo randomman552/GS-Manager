@@ -41,7 +41,10 @@ def __poll_process(server_id: str) -> None:
 
     if __running.get(server_id):
         __running.pop(server_id)
-    GameServer.objects(id=server_id).update(status="stopped")
+    GameServer.objects(id=server_id).update(
+        set__status="stopped",
+        push__output=f"Exited with code '{process.returncode}'"
+    )
 
 
 def __create_process(working_directory: str, command: str) -> Popen:
