@@ -80,7 +80,7 @@ def start_server(server: GameServer) -> bool:
     :return: True if the server was started, false otherwise.
     """
     server_id = str(server.id)
-    if not __running.get(server_id) or server.status == "stopped":
+    if not __running.get(server_id) or not server.is_running:
         process = __create_process(server.working_directory, server.start_cmd)
         __running[server_id] = process
 
@@ -99,7 +99,7 @@ def update_server(server: GameServer) -> bool:
     :return: True if update was started, false otherwise.
     """
     server_id = str(server.id)
-    if not __running.get(server_id) or server.status == "stopped":
+    if not __running.get(server_id) or not server.is_running:
         process = __create_process(server.working_directory, server.update_cmd)
         __running[server_id] = process
 

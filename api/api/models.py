@@ -73,3 +73,6 @@ class GameServer(Document):
     Working directory of the server.
     """
 
+    @property
+    def is_running(self):
+        return self.status != "stopped"

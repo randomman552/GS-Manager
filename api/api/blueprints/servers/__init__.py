@@ -39,14 +39,16 @@ def server_details(name: str):
 
     # Updating method
     if request.method == "PUT":
-        json = request.get_json()
-        if json:
-            data = json.get("data")
-            if data:
-                server.update(**data)
-                server.save()
-                return rest.response(200, data=data)
-        return rest.response(400, error="No data provided.")
+        if not server.is_running:
+            json = request.get_json()
+            if json:
+                data = json.get("data")
+                if data:
+                    server.update(**data)
+                    server.save()
+                    return rest.response(200, data=data)
+            return rest.response(400, error="No data provided.")
+        return rest.response(409, error="Cannot edit server whilst it is running.")
 
     elif request.method == "DELETE":
         server.delete()
