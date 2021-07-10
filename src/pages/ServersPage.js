@@ -213,13 +213,17 @@ class UpdateServerForm extends React.Component {
         const title = (this.props.mode === "new") ? "New server" : "Edit settings";
         const submitText = (this.props.mode === "new") ? "Create" : "Update";
 
+        const closeFunc = () => {
+            if (this.props.closeAction)
+                this.props.closeAction();
+            this.resetForm();
+        };
 
         if (this.props.variant === "modal") {
             return (
                     <Modal
                     show={this.props.show}
-                    backdrop="static"
-                    keyboard={false}
+                    onHide={closeFunc}
                     >
                         <Modal.Header>
                             <h2>{title}</h2>
@@ -237,7 +241,7 @@ class UpdateServerForm extends React.Component {
                                     {submitText}
                                 </Button>
 
-                                <Button variant="danger" onClick={this.props.closeAction}>
+                                <Button variant="danger" onClick={closeFunc}>
                                     Close
                                 </Button>
                             </Modal.Footer>
