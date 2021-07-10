@@ -10,3 +10,17 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+/* Class for adding a little star next to a required field in a form */
+.required-star {
+  position: relative;
+}
+
+.required-star::after {
+  content: "*";
+  vertical-align: super;
+  color: red;
+  position: absolute;
+  right: -0.5rem;
+  top: 0;
+}

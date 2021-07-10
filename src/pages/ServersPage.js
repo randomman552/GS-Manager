@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigation } from "./components";
 import { apiFetch } from "../util";
-import { Card, Button, Form } from "react-bootstrap";
+import { Card, Button, Form, Modal } from "react-bootstrap";
 import "./styles/ServersPage.css"
 import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
@@ -72,11 +72,22 @@ SendCommandForm.defaultProps = {
 // region Server update form
 
 class UpdateServerForm extends React.Component {
+    defaultState = {
+        name: "",
+        start_cmd: "",
+        update_cmd: "",
+        working_directory: "",
+
+        validated: false
+    }
+
     constructor(props) {
         super(props);
-        this.state = {
-            name: ""
-        }
+
+        this.state = {}
+        const newState = {}
+        Object.assign(newState, this.defaultState)
+        this.setState(newState)
     }
 
     handleChange(event) {
@@ -90,48 +101,189 @@ class UpdateServerForm extends React.Component {
     }
 
     handleSubmit(event) {
+        const form = event.currentTarget;
         event.preventDefault();
+        event.stopPropagation();
+        this.setState({
+            validated: true
+        });
+
+        // Return if form does not validate correctly
+        if (!form.checkValidity())
+            return
+
         if (this.props.submitAction) {
-            this.props.submitAction(this.state)
+            const data = {};
+            const forbiddenKeys = ["validated"]
+
+            // Ignore keys we dont need
+            for (const key in this.state) {
+                if (this.state.hasOwnProperty(key) && !forbiddenKeys.includes(key)) {
+                    if (this.state[key]) {
+                        // Move data into new data object for submission
+                        data[key] = this.state[key];
+                    }
+                }
+            }
+            this.props.submitAction(data);
+            this.resetForm();
         }
     }
 
-    render() {
-        const name = this.state.name;
-        const title = (this.props.variant === "new") ? "New server" : "Edit settings";
-        const submitText = (this.props.variant === "new") ? "Create" : "Update";
+    renderFormInputs() {
+        // Get old data to use as placeholders
+        const name = this.props.data.name;
+        const start_cmd = this.props.data.start_cmd;
+        const update_cmd = this.props.data.update_cmd;
+        const working_directory = this.props.data.working_directory;
+
+        // Set required flag if each bit of data has been edited
+        const required = this.props.mode === "new";
+        const nameRequired = this.state.name || required;
 
         return (
-            <Form className="flex flex-column flex-center" onSubmit={(event) => this.handleSubmit(event)}>
-                <h1>{title}</h1>
-                <Form.Group>
-                    <Form.Label className="flex flex-column flex-center" htmlFor="name">
-                        Name
+            <div>
+                <Form.Group className="flex flex-column flex-center">
+                        <Form.Label className="required-star" htmlFor="name">
+                            Name
+                        </Form.Label>
+                        <Form.Control
+                            id="name"
+                            name="name"
+                            type="text"
+                            required={nameRequired}
+                            minLength="3"
+                            placeholder={name}
+                            onChange={(event) => this.handleChange(event)}
+                        />
+                        <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
+                    </Form.Group>
+
+                <Form.Group className="flex flex-column flex-center">
+                    <Form.Label className="required-star" htmlFor="start_cmd">
+                        Start command
                     </Form.Label>
                     <Form.Control
-                        id="name"
-                        name="name"
+                        id="start_cmd"
+                        name="start_cmd"
                         type="text"
-                        value={name}
+                        required={required}
+                        placeholder={start_cmd}
                         onChange={(event) => this.handleChange(event)}
                     />
                 </Form.Group>
-                <Button variant="primary" type="submit" disabled={this.props.disabled}>
-                    {submitText}
-                </Button>
-            </Form>
+
+                <Form.Group className="flex flex-column flex-center">
+                    <Form.Label className="required-star" htmlFor="update_cmd">
+                        Update command
+                    </Form.Label>
+                    <Form.Control
+                        id="update_cmd"
+                        name="update_cmd"
+                        type="text"
+                        required={required}
+                        placeholder={update_cmd}
+                        onChange={(event) => this.handleChange(event)}
+                    />
+                </Form.Group>
+
+                <Form.Group className="flex flex-column flex-center">
+                    <Form.Label htmlFor="working_directory">
+                        Working directory
+                    </Form.Label>
+                    <Form.Control
+                        id="working_directory"
+                        name="working_directory"
+                        type="text"
+                        placeholder={working_directory}
+                        onChange={(event) => this.handleChange(event)}
+                    />
+                </Form.Group>
+            </div>
         )
+    }
+
+    resetForm() {
+        const newState = {}
+        Object.assign(newState, this.defaultState)
+        this.setState(newState)
+    }
+
+    render() {
+        const title = (this.props.mode === "new") ? "New server" : "Edit settings";
+        const submitText = (this.props.mode === "new") ? "Create" : "Update";
+
+
+        if (this.props.variant === "modal") {
+            return (
+                    <Modal
+                    show={this.props.show}
+                    backdrop="static"
+                    keyboard={false}
+                    >
+                        <Modal.Header>
+                            <h2>{title}</h2>
+                        </Modal.Header>
+                        <Form
+                            noValidate
+                            validated={this.state.validated}
+                            onSubmit={(event) => this.handleSubmit(event)}
+                        >
+                            <Modal.Body>
+                                {this.renderFormInputs()}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="primary" type="submit">
+                                    {submitText}
+                                </Button>
+
+                                <Button variant="danger" onClick={this.props.closeAction}>
+                                    Close
+                                </Button>
+                            </Modal.Footer>
+                        </Form>
+                    </Modal>
+            )
+        }
+        else {
+            return (
+                <Form
+                    noValidate
+                    validated={this.state.validated}
+                    className="flex flex-column flex-center"
+                    onSubmit={(event) => this.handleSubmit(event)}
+                >
+                    <h1>{title}</h1>
+                    {this.renderFormInputs()}
+                    <Button variant="primary" type="submit">
+                        {submitText}
+                    </Button>
+                </Form>
+            )
+        }
     }
 }
 
 UpdateServerForm.propTypes = {
-    name: PropTypes.string,
-    variant: PropTypes.oneOf(['new', 'update']),
-    submitAction: PropTypes.func.isRequired
+    // TODO: Custom data validator?
+    data: PropTypes.object,
+    mode: PropTypes.oneOf(['new', 'update']),
+    variant: PropTypes.oneOf(['modal', 'stand-alone']),
+    show: PropTypes.bool,
+    submitAction: PropTypes.func.isRequired,
+    closeAction: PropTypes.func
 }
 
 UpdateServerForm.defaultProps = {
-    variant: 'update'
+    data: {
+        name: "",
+        start_cmd: "",
+        update_cmd: "",
+        working_directory: ""
+    },
+    variant: 'stand-alone',
+    mode: 'new',
+    show: false
 }
 
 // endregion
@@ -149,7 +301,8 @@ class ServerDashboard extends React.Component {
             server: {
                 name: props.match.params.serverName,
                 output: []
-            }
+            },
+            showSettingsModal: false
         };
     }
 
@@ -204,6 +357,18 @@ class ServerDashboard extends React.Component {
         }
     }
 
+    openSettings() {
+        this.setState({
+            showSettingsModal: true
+        });
+    }
+
+    closeSettings() {
+        this.setState({
+            showSettingsModal: false
+        });
+    }
+
     sendCommand(command) {
         const name = this.state.name;
         if (name) {
@@ -215,6 +380,41 @@ class ServerDashboard extends React.Component {
 
             apiFetch(auth, data, queryUrl).then(r => {});
         }
+    }
+
+    /**
+     * Method to edit the current server with the given data.
+     * @param data
+     */
+    modifySettings(data) {
+        const name = this.state.name;
+        if (name) {
+            const queryUrl = "/api/servers/" + this.state.name;
+            const auth = this.props.auth;
+
+            apiFetch(auth, data, queryUrl, "put").then(data => {
+                if (data.code === 200) {
+                    this.closeSettings();
+                }
+                // TODO: Redirect to new page on name change
+            });
+        }
+    }
+
+    renderSettings() {
+        const show = this.state.showSettingsModal;
+
+        return (
+            <UpdateServerForm
+                variant="modal"
+                mode="update"
+                show={show}
+                submitAction={(data) => this.modifySettings(data)}
+                closeAction={() => this.closeSettings()}
+
+                data={this.state.server}
+            />
+        )
     }
 
     renderOutputLines() {
@@ -234,10 +434,12 @@ class ServerDashboard extends React.Component {
 
     render() {
         const outputLines = this.renderOutputLines();
+        const settingsModal = this.renderSettings();
         const running = this.state.server.status !== "stopped";
 
         return (
             <article id={this.state.server.name} className="server-dashboard">
+                {settingsModal}
                 <Card className="server-info">
                     <Card.Header className="server-info-header">{this.state.server.name}</Card.Header>
                     <Card.Body className="server-info-body">
@@ -267,6 +469,10 @@ class ServerDashboard extends React.Component {
 
                             <Button disabled={!running} variant="danger" onClick={() => this.stopServer()}>
                                 Stop
+                            </Button>
+
+                            <Button disabled={running} variant="secondary" onClick={() => this.openSettings()}>
+                                Settings
                             </Button>
                         </article>
                     </Card.Body>
@@ -304,7 +510,7 @@ class NoServerDashboard extends React.Component {
     render() {
         return (
             <div className="server-dashboard">
-                <UpdateServerForm variant="new" submitAction={(data) => this.createServer(data)} />
+                <UpdateServerForm variant="stand-alone" mode="new" submitAction={(data) => this.createServer(data)} />
             </div>
         );
     }
