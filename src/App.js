@@ -21,13 +21,12 @@ export class App extends React.Component {
 
     /**
      * Send an authentication request to the server to get the api key used to make future requests.
-     * @param username {string} The username to authenticate with.
-     * @param password {string} The password to authenticate with.
+     * @param data Data provided by BaseForm class.
      */
-    login(username, password) {
+    login(data) {
         let auth = {
-            "username": username,
-            "password": password
+            "username": data.username,
+            "password": data.password
         };
 
         apiFetch(auth, null, "/api/auth/")
@@ -41,7 +40,6 @@ export class App extends React.Component {
                 this.showModal("Login Failed", "Incorrect username or password...");
             }
         });
-
     }
 
     /**

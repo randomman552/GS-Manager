@@ -1,298 +1,16 @@
 import React from "react";
-import { Navigation } from "./components";
-import { apiFetch } from "../util";
-import { Card, Button, Form, Modal } from "react-bootstrap";
-import "./styles/ServersPage.css"
+import {Card, Button} from "react-bootstrap";
 import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
-import { Switch, Route } from "react-router-dom";
+import {Switch, Route} from "react-router-dom";
 
-// region Command sending form
+import {Navigation} from "./components";
+import {apiFetch} from "../util";
+import {SendCommandForm} from "./forms/servers-page/SendCommandForm"
+import {UpdateServerForm} from "./forms/servers-page/UpdateServerForm"
+import {NewServerForm} from "./forms/servers-page/NewServerForm";
+import "./styles/ServersPage.css"
 
-class SendCommandForm extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            "command": ""
-        };
-    }
-
-    handleChange(event) {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
-    }
-
-    handleSubmit(event) {
-        event.preventDefault();
-        if (this.props.submitAction) {
-            this.props.submitAction(this.state.command);
-            this.setState({
-                "command": ""
-            });
-        }
-    }
-
-    render() {
-        const command = this.state.command;
-        return (
-            <Form className="server-console-input" onSubmit={(event) => this.handleSubmit(event)}>
-                <Form.Control
-                    id="command"
-                    name="command"
-                    type="text"
-                    value={command}
-                    placeholder="Command here..."
-                    disabled={this.props.disabled}
-                    onChange={(event) => this.handleChange(event)}
-                />
-                <Button variant="primary" type="submit" disabled={this.props.disabled}>
-                    Send
-                </Button>
-            </Form>
-        )
-    }
-}
-
-SendCommandForm.propTypes = {
-    disabled: PropTypes.bool,
-    submitAction: PropTypes.func.isRequired
-}
-
-SendCommandForm.defaultProps = {
-    disabled: true
-}
-
-//endregion
-
-// region Server update form
-
-class UpdateServerForm extends React.Component {
-    defaultState = {
-        name: "",
-        start_cmd: "",
-        update_cmd: "",
-        working_directory: "",
-
-        validated: false
-    }
-
-    constructor(props) {
-        super(props);
-
-        this.state = {}
-        const newState = {}
-        Object.assign(newState, this.defaultState)
-        this.setState(newState)
-    }
-
-    handleChange(event) {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
-    }
-
-    handleSubmit(event) {
-        const form = event.currentTarget;
-        event.preventDefault();
-        event.stopPropagation();
-        this.setState({
-            validated: true
-        });
-
-        // Return if form does not validate correctly
-        if (!form.checkValidity())
-            return
-
-        if (this.props.submitAction) {
-            const data = {};
-            const forbiddenKeys = ["validated"]
-
-            // Ignore keys we dont need
-            for (const key in this.state) {
-                if (this.state.hasOwnProperty(key) && !forbiddenKeys.includes(key)) {
-                    if (this.state[key]) {
-                        // Move data into new data object for submission
-                        data[key] = this.state[key];
-                    }
-                }
-            }
-            this.props.submitAction(data);
-            this.resetForm();
-        }
-    }
-
-    renderFormInputs() {
-        // Get old data to use as placeholders
-        const name = this.props.data.name;
-        const start_cmd = this.props.data.start_cmd;
-        const update_cmd = this.props.data.update_cmd;
-        const working_directory = this.props.data.working_directory;
-
-        // Set required flag if each bit of data has been edited
-        const required = this.props.mode === "new";
-        const nameRequired = this.state.name || required;
-
-        return (
-            <div>
-                <Form.Group className="flex flex-column flex-center">
-                        <Form.Label className="required-star" htmlFor="name">
-                            Name
-                        </Form.Label>
-                        <Form.Control
-                            id="name"
-                            name="name"
-                            type="text"
-                            required={nameRequired}
-                            minLength="3"
-                            placeholder={name}
-                            onChange={(event) => this.handleChange(event)}
-                        />
-                        <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
-                    </Form.Group>
-
-                <Form.Group className="flex flex-column flex-center">
-                    <Form.Label className="required-star" htmlFor="start_cmd">
-                        Start command
-                    </Form.Label>
-                    <Form.Control
-                        id="start_cmd"
-                        name="start_cmd"
-                        type="text"
-                        required={required}
-                        placeholder={start_cmd}
-                        onChange={(event) => this.handleChange(event)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="flex flex-column flex-center">
-                    <Form.Label className="required-star" htmlFor="update_cmd">
-                        Update command
-                    </Form.Label>
-                    <Form.Control
-                        id="update_cmd"
-                        name="update_cmd"
-                        type="text"
-                        required={required}
-                        placeholder={update_cmd}
-                        onChange={(event) => this.handleChange(event)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="flex flex-column flex-center">
-                    <Form.Label htmlFor="working_directory">
-                        Working directory
-                    </Form.Label>
-                    <Form.Control
-                        id="working_directory"
-                        name="working_directory"
-                        type="text"
-                        placeholder={working_directory}
-                        onChange={(event) => this.handleChange(event)}
-                    />
-                </Form.Group>
-            </div>
-        )
-    }
-
-    resetForm() {
-        const newState = {}
-        Object.assign(newState, this.defaultState)
-        this.setState(newState)
-    }
-
-    render() {
-        const title = (this.props.mode === "new") ? "New server" : "Edit settings";
-        const submitText = (this.props.mode === "new") ? "Create" : "Update";
-
-        const closeFunc = () => {
-            if (this.props.closeAction)
-                this.props.closeAction();
-            this.resetForm();
-        };
-
-        if (this.props.variant === "modal") {
-            return (
-                    <Modal
-                    show={this.props.show}
-                    onHide={closeFunc}
-                    >
-                        <Modal.Header>
-                            <h2>{title}</h2>
-                        </Modal.Header>
-                        <Form
-                            noValidate
-                            validated={this.state.validated}
-                            onSubmit={(event) => this.handleSubmit(event)}
-                        >
-                            <Modal.Body>
-                                {this.renderFormInputs()}
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="primary" type="submit">
-                                    {submitText}
-                                </Button>
-
-                                <Button variant="danger" onClick={closeFunc}>
-                                    Close
-                                </Button>
-                            </Modal.Footer>
-                        </Form>
-                    </Modal>
-            )
-        }
-        else {
-            return (
-                <Form
-                    noValidate
-                    validated={this.state.validated}
-                    className="flex flex-column flex-center"
-                    onSubmit={(event) => this.handleSubmit(event)}
-                >
-                    <h1>{title}</h1>
-                    {this.renderFormInputs()}
-                    <Button variant="primary" type="submit">
-                        {submitText}
-                    </Button>
-                </Form>
-            )
-        }
-    }
-}
-
-UpdateServerForm.propTypes = {
-    // TODO: Custom data validator?
-    data: PropTypes.object,
-    mode: PropTypes.oneOf(['new', 'update']),
-    variant: PropTypes.oneOf(['modal', 'stand-alone']),
-    show: PropTypes.bool,
-    submitAction: PropTypes.func.isRequired,
-    closeAction: PropTypes.func
-}
-
-UpdateServerForm.defaultProps = {
-    data: {
-        name: "",
-        start_cmd: "",
-        update_cmd: "",
-        working_directory: ""
-    },
-    variant: 'stand-alone',
-    mode: 'new',
-    show: false
-}
-
-// endregion
-
-// region Primary dashboard components
 
 /**
  * Dashboard displayed when on a route for a given server.
@@ -373,16 +91,16 @@ class ServerDashboard extends React.Component {
         });
     }
 
-    sendCommand(command) {
+    sendCommand(data) {
         const name = this.state.name;
-        if (name) {
+        if (name && data.command) {
             const queryUrl = "/api/servers/" + this.state.name + "/command";
             const auth = this.props.auth;
-            const data = {
-                "command": command
+            const toSend = {
+                "command": data.command
             };
 
-            apiFetch(auth, data, queryUrl).then(r => {});
+            apiFetch(auth, toSend, queryUrl).then(r => {});
         }
     }
 
@@ -410,11 +128,9 @@ class ServerDashboard extends React.Component {
 
         return (
             <UpdateServerForm
-                variant="modal"
-                mode="update"
                 show={show}
-                submitAction={(data) => this.modifySettings(data)}
-                closeAction={() => this.closeSettings()}
+                onSubmit={(data) => this.modifySettings(data)}
+                onClose={() => this.closeSettings()}
 
                 data={this.state.server}
             />
@@ -458,7 +174,7 @@ class ServerDashboard extends React.Component {
 
                             <SendCommandForm
                                 key={this.state.server.name}
-                                submitAction={(command) => this.sendCommand(command)}
+                                onSubmit={(data) => this.sendCommand(data)}
                                 disabled={!running}
                             />
                         </article>
@@ -490,6 +206,7 @@ ServerDashboard.propTypes = {
     auth: PropTypes.object.isRequired
 }
 
+
 /**
  * Dashboard displayed on route normal /servers route.
  */
@@ -514,7 +231,7 @@ class NoServerDashboard extends React.Component {
     render() {
         return (
             <div className="server-dashboard">
-                <UpdateServerForm variant="stand-alone" mode="new" submitAction={(data) => this.createServer(data)} />
+                <NewServerForm onSubmit={(data) => this.createServer(data)} />
             </div>
         );
     }
@@ -524,9 +241,6 @@ NoServerDashboard.propTypes = {
     auth: PropTypes.object.isRequired
 }
 
-// endregion
-
-// region Server page export
 
 export function ServersPage(props) {
     const servers = props.servers;
@@ -567,4 +281,3 @@ ServersPage.propTypes = {
     auth: PropTypes.object
 }
 
-// endregion
