@@ -56,14 +56,22 @@ export class BaseForm extends React.Component {
                 }
             }
             this.props.onSubmit(data);
-            this.handleReset();
+            form.reset();
         }
     }
 
     handleReset(event) {
-        this.setState({
+        const newState = {
             validated: false
-        })
+        }
+        // Set all existing data entries in state to undefined.
+        // This prevents them from being resubmitted again
+        for (const key in this.state) {
+            if (key !== "validated" && this.state.hasOwnProperty(key)) {
+                newState[key] = undefined;
+            }
+        }
+        this.setState(newState)
 
         if (this.props.onReset)
             this.props.onReset(event)
