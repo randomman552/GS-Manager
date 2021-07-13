@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Button, Form, Modal, Tab, Tabs} from "react-bootstrap";
 import PropTypes from "prop-types";
 import {BaseForm} from "../BaseForm";
@@ -75,16 +75,59 @@ GeneralSettingsForm.propTypes = {
 
 function ModeSettingsForm(props) {
     const mode_map = props.data.mode_map;
+    const [editing, setEditing] = useState(null);
+    const [modeData, setModeData] = useState({});
+
+    const modeEditOnChange = (event) => {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        setModeData({
+            [name]: value
+        });
+    }
+
     let modes = Object.keys(mode_map).map((key) => {
+        if (editing === key) {
+            return (
+                <tr key={key} className="mode-display">
+                    <Form.Control
+                        name="name"
+                        placeholder="Name"
+                        type="text"
+                        className="text-center"
+                        value={modeData.name}
+                    />
+                    <Form.Control
+                        name="arguments"
+                        placeholder="Arguments"
+                        type="text"
+                        className="text-center"
+                        value={modeData.arguments}
+
+                    />
+                    <td headers="options" className="flex-center">
+                        <Button key="editing" type="submit">Update</Button>
+                    </td>
+                </tr>
+            )
+        }
         return (
             <tr key={key} className="mode-display">
                 <td headers="name" className="flex-center">{key}</td>
                 <td headers="arguments" className="flex-center">{mode_map[key]}</td>
                 <td headers="options" className="flex-center">
-                    <Button variant="link">
+                    <Button variant="link" type="reset" onClick={() => {
+                        setEditing(key)
+                        setModeData({
+                            name: key,
+                            arguments: mode_map[key]
+                        })
+                    }}>
                         Edit
                     </Button>
-                    <Button variant="link" onClick={() => {props.onDelete({name:key})}}>
+                    <Button variant="link" type="reset" onClick={() => {props.onDelete({name:key})}}>
                         Delete
                     </Button>
                 </td>
@@ -123,18 +166,24 @@ function ModeSettingsForm(props) {
                     Add
                 </Button>
             </BaseForm>
-            <table className="modes-table">
-                <thead className="mode-display">
-                    <th id="name">Name</th>
-                    <th id="arguments">Arguments</th>
-                    <th id="options">Options</th>
-                </thead>
-                <tbody>
-                    {modes}
-                </tbody>
-            </table>
+            <BaseForm
+                onSubmit={(data) => props.onEdit({originalName: editing, arguments: mode_map[editing], ...data})}
+                onReset={() => {setEditing(null)}}
+                onChange={modeEditOnChange}
+            >
+                <table className="modes-table">
+                    <thead className="mode-display">
+                        <th id="name">Name</th>
+                        <th id="arguments">Arguments</th>
+                        <th id="options">Options</th>
+                    </thead>
+                    <tbody>
+                        {modes}
+                    </tbody>
+                </table>
+            </BaseForm>
         </>
-    )
+    );
 }
 
 ModeSettingsForm.propTypes = {

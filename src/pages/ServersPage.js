@@ -146,10 +146,33 @@ class ServerDashboard extends React.Component {
 
     /**
      * Method to edit a launch mode.
-     * @param data {{name: string, arguments: string}}
+     * @param data {{originalName: string, name: string, arguments: string}}
      */
     editMode(data) {
-        console.log(data);
+        const name = this.state.name;
+        if (name && data.originalName) {
+            const queryUrl = "/api/servers/" + this.state.name;
+            const auth = this.props.auth;
+
+            let mode_map = {};
+            if (this.state.server.mode_map)
+                mode_map = deepCopy(this.state.server.mode_map);
+
+
+            if (!data.name)
+                data.name = data.originalName;
+            if (!data.arguments)
+                data.arguments = mode_map[data.originalName]
+
+            delete mode_map[data.originalName];
+            mode_map[data.name] = data.arguments;
+
+            console.log(mode_map)
+
+            apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
+
+            });
+        }
     }
 
     /**
