@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {Switch, Route} from "react-router-dom";
 
 import {Navigation} from "./components";
-import {apiFetch} from "../util";
+import {apiFetch, deepCopy} from "../util";
 import {SendCommandForm} from "./forms/servers-page/SendCommandForm"
 import {UpdateServerForm} from "./forms/servers-page/UpdateServerForm"
 import {NewServerForm} from "./forms/servers-page/NewServerForm";
@@ -123,13 +123,56 @@ class ServerDashboard extends React.Component {
         }
     }
 
+    /**
+     * Method to add a new launch mode to a server
+     * @param data Data from BaseForm
+     */
+    addMode(data) {
+        const name = this.state.name;
+        if (name && data.name && data.arguments) {
+            const queryUrl = "/api/servers/" + this.state.name;
+            const auth = this.props.auth;
+
+            let mode_map = {}
+            if (this.state.server.mode_map)
+                mode_map = deepCopy(this.state.server.mode_map)
+            mode_map[data.name] = data.arguments
+
+            apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
+
+            });
+        }
+    }
+
+    /**
+     * Method to edit a launch mode.
+     * @param data Data from BaseForm
+     */
+    editMode(data) {
+        console.log(data);
+    }
+
+    /**
+     * Method to delete a launch mode.
+     * @param data Data from BaseForm
+     */
+    deleteMode(data) {
+        console.log(data);
+    }
+
     renderSettings() {
         const show = this.state.showSettingsModal;
 
         return (
             <UpdateServerForm
                 show={show}
-                onSubmit={(data) => this.modifySettings(data)}
+
+                onGeneralSubmit={(data) => this.modifySettings(data)}
+
+                onModeAdd={(data) => this.addMode(data)}
+                onModeEdit={(data) => this.editMode(data)}
+                onModeDelete={(data) => this.deleteMode(data)}
+
                 onClose={() => this.closeSettings()}
 
                 data={this.state.server}

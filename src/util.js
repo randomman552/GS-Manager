@@ -48,3 +48,12 @@ export function deleteCookie(key) {
     let cookie = key + "=" + getCookie(key);
     document.cookie = cookie + ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
 }
+
+/**
+ * Basic deep copy function.
+ * Returns a deep copy of the given object.
+ * NOTE: Object must be JSON serializable.
+ */
+export function deepCopy(object) {
+    return JSON.parse(JSON.stringify(object))
+}

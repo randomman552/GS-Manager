@@ -87,3 +87,10 @@
         max-width: 100%;
     }
 }
+
+.mode-display {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 20% auto 20%;
+    grid-gap: 2px;
+}
