@@ -58,14 +58,14 @@ class GameServer(Document):
     Map of modes to arguments to supply when running in that mode.
     """
 
+    start_cmd = StringField(required=True)
+    """
+    Command to run when start requested, arguments are provided according to the set mode
+    """
+
     update_cmd = StringField()
     """
     Command to run when update requested.
-    """
-
-    start_cmd = StringField()
-    """
-    Command to run when start requested, arguments are provided according to the set mode
     """
 
     working_directory = StringField()
@@ -74,5 +74,14 @@ class GameServer(Document):
     """
 
     @property
-    def is_running(self):
+    def is_running(self) -> bool:
         return self.status != "stopped"
+
+    @property
+    def current_start_cmd(self) -> str:
+        command = self.start_cmd
+        if self.default_args:
+            command += " " + self.default_args
+        if self.mode_map and self.mode:
+            command += " " + self.mode_map.get(self.mode, self.unspecified_args)
+        return command

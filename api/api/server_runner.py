@@ -81,13 +81,13 @@ def start_server(server: GameServer) -> bool:
     """
     server_id = str(server.id)
     if not __running.get(server_id) or not server.is_running:
-        process = __create_process(server.working_directory, server.start_cmd)
+        process = __create_process(server.working_directory, server.current_start_cmd)
         __running[server_id] = process
 
         __start_watcher_threads(server_id)
 
         server.status = "started"
-        server.output = []
+        server.output = [server.current_start_cmd]
         server.save()
         return True
     return False
@@ -106,7 +106,7 @@ def update_server(server: GameServer) -> bool:
         __start_watcher_threads(server_id)
 
         server.status = "updating"
-        server.output = []
+        server.output = [server.update_cmd]
         server.save()
         return True
     return False
