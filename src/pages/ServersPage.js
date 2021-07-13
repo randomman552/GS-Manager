@@ -125,7 +125,7 @@ class ServerDashboard extends React.Component {
 
     /**
      * Method to add a new launch mode to a server
-     * @param data Data from BaseForm
+     * @param data {{name: string, arguments: string}}
      */
     addMode(data) {
         const name = this.state.name;
@@ -146,7 +146,7 @@ class ServerDashboard extends React.Component {
 
     /**
      * Method to edit a launch mode.
-     * @param data Data from BaseForm
+     * @param data {{name: string, arguments: string}}
      */
     editMode(data) {
         console.log(data);
@@ -154,10 +154,23 @@ class ServerDashboard extends React.Component {
 
     /**
      * Method to delete a launch mode.
-     * @param data Data from BaseForm
+     * @param data {{name: string}}
      */
     deleteMode(data) {
-        console.log(data);
+        const name = this.state.name;
+        if (name && data.name) {
+            const queryUrl = "/api/servers/" + this.state.name;
+            const auth = this.props.auth;
+
+            let mode_map = {}
+            if (this.state.server.mode_map)
+                mode_map = deepCopy(this.state.server.mode_map)
+            delete mode_map[data.name]
+
+            apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
+
+            });
+        }
     }
 
     renderSettings() {

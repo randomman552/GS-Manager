@@ -74,6 +74,33 @@ GeneralSettingsForm.propTypes = {
 
 
 function ModeSettingsForm(props) {
+    const mode_map = props.data.mode_map;
+    let modes = Object.keys(mode_map).map((key) => {
+        return (
+            <tr key={key} className="mode-display">
+                <td headers="name" className="flex-center">{key}</td>
+                <td headers="arguments" className="flex-center">{mode_map[key]}</td>
+                <td headers="options" className="flex-center">
+                    <Button variant="link">
+                        Edit
+                    </Button>
+                    <Button variant="link" onClick={() => {props.onDelete({name:key})}}>
+                        Delete
+                    </Button>
+                </td>
+            </tr>
+        )
+    });
+
+    // If no modes, place a warning that there are no modes configured.
+    if (modes.length === 0) {
+        modes = (
+            <tr>
+                <td colSpan={3}>No configured launch modes...</td>
+            </tr>
+        )
+    }
+
     return (
         <>
             <BaseForm
@@ -96,6 +123,16 @@ function ModeSettingsForm(props) {
                     Add
                 </Button>
             </BaseForm>
+            <table className="modes-table">
+                <thead className="mode-display">
+                    <th id="name">Name</th>
+                    <th id="arguments">Arguments</th>
+                    <th id="options">Options</th>
+                </thead>
+                <tbody>
+                    {modes}
+                </tbody>
+            </table>
         </>
     )
 }

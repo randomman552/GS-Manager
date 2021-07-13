@@ -94,3 +94,13 @@
     grid-template-columns: 20% auto 20%;
     grid-gap: 2px;
 }
+
+.modes-table {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0 10px 0;
+}
+
+.modes-table tr {
+    border-top: 1px solid rgba(0.5, 0.5, 0.5, 0.25);
+}
