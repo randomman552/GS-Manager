@@ -162,9 +162,9 @@ export class App extends React.Component {
                             return <ServersPage
                                 {...props}
                                 auth={auth}
-                                servers={ servers }
+                                servers={servers}
                                 user={user}
-                                logoutAction={ () => this.logout() }
+                                onLogout={() => this.logout()}
                             />
                         }}
                     />

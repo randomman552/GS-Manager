@@ -1,9 +1,9 @@
-import {Link} from "react-router-dom";
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
-import "./styles/components.css"
+import {Link} from "react-router-dom";
+import PropTypes from 'prop-types';
+import "../styles/Navigation.css"
 
-
-function ServerNavigation(props) {
+export function ServerNavigation(props) {
     let servers = []
     if (props.servers) {
         servers = props.servers.map((name) => {
@@ -20,22 +20,28 @@ function ServerNavigation(props) {
     const activeKey = locationSplit[locationSplit.length - 1];
 
     return (
-        <Nav
-            variant="pills"
-            activeKey={activeKey}
-            className="flex-column bg-white sidebar"
-        >
-            <Nav.Item>
-                {servers}
-            </Nav.Item>
-        </Nav>
+        <header>
+            <Nav
+                variant="pills"
+                activeKey={activeKey}
+                className="flex-column bg-white sidebar"
+            >
+                <Nav.Item>
+                    {servers}
+                </Nav.Item>
+            </Nav>
+        </header>
     )
+}
+
+ServerNavigation.propTypes = {
+    servers: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 
 export function Navigation(props) {
     const loggedInMessage = (props.user) ? "Logged in as: " + props.user.name : "Logged in";
-    const logoutAction = props.logoutAction;
+    const onLogout = props.onLogout;
 
     return (
         <header>
@@ -54,7 +60,7 @@ export function Navigation(props) {
                 <Navbar.Collapse className="justify-content-end">
                     <Nav className="me-auto">
                         <NavDropdown id="user-info" title={loggedInMessage} alignRight={true}>
-                            <NavDropdown.Item onClick={logoutAction}>
+                            <NavDropdown.Item onClick={onLogout}>
                                 Logout
                             </NavDropdown.Item>
                             <NavDropdown.Divider/>
@@ -65,7 +71,11 @@ export function Navigation(props) {
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
-            <ServerNavigation servers={props.servers}/>
         </header>
     );
+}
+
+Navigation.propTypes = {
+    user: PropTypes.object,
+    onLogout: PropTypes.func.isRequired
 }
