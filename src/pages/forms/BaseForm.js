@@ -49,10 +49,8 @@ export class BaseForm extends React.Component {
             // Ignore keys we dont need
             for (const key in this.state) {
                 if (this.state.hasOwnProperty(key) && !forbiddenKeys.includes(key)) {
-                    if (this.state[key]) {
-                        // Move data into new data object for submission
-                        data[key] = this.state[key];
-                    }
+                    // Move data into new data object for submission
+                    data[key] = this.state[key];
                 }
             }
             this.props.onSubmit(data);
