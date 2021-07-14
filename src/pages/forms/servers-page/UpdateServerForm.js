@@ -109,6 +109,11 @@ function ModeSettingsForm(props) {
                     />
                     <td headers="options" className="flex-center">
                         <Button key="editing" type="submit">Update</Button>
+                        <Button
+                            key="cancel"
+                            variant="danger"
+                            type="reset"
+                            onClick={() => {setEditing(null)}}>Cancel</Button>
                     </td>
                 </tr>
             )
@@ -211,7 +216,7 @@ export function UpdateServerForm(props) {
                         onSubmit={props.onGeneralSubmit}
                     />
                 </Tab>
-                <Tab eventKey="modes" title="Modes">
+                <Tab eventKey="modes" title="Launch Arguments">
                     <ModeSettingsForm
                         data={props.data}
                         onAdd={props.onModeAdd}
