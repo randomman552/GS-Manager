@@ -205,6 +205,8 @@ class ServerDashboard extends React.Component {
 
                 onGeneralSubmit={(data) => this.modifySettings(data)}
 
+                onArgumentsSubmit={(data) => this.modifySettings(data)}
+
                 onModeAdd={(data) => this.addMode(data)}
                 onModeEdit={(data) => this.editMode(data)}
                 onModeDelete={(data) => this.deleteMode(data)}

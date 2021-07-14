@@ -108,5 +108,5 @@ BaseForm.propTypes = {
 }
 
 BaseForm.defaultProps = {
-    className: "flex flex-column flex-center"
+    className: ""
 }

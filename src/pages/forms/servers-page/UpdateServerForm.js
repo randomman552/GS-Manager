@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Form, Modal, Tab, Tabs} from "react-bootstrap";
+import {Accordion, Button, Card, Form, Modal, Tab, Tabs} from "react-bootstrap";
 import PropTypes from "prop-types";
 import {BaseForm} from "../BaseForm";
 
@@ -152,47 +152,45 @@ function ModeSettingsForm(props) {
     }
 
     return (
-        <>
-            <div id="mode forms">
-                {/* Mode forms */}
-                <BaseForm
-                    onSubmit={props.onAdd}
-                    className="modal-body mode-display"
-                >
-                    <Form.Control
-                        id="new-mode-name"
-                        name="name"
-                        placeholder="Name"
-                        required
-                    />
-                    <Form.Control
-                        id="new-mode-arguments"
-                        name="arguments"
-                        placeholder="Arguments"
-                        required
-                    />
-                    <Button type="submit" variant="primary">
-                        Add
-                    </Button>
-                </BaseForm>
-                <BaseForm
-                    onSubmit={(data) => props.onEdit({originalName: editing, arguments: mode_map[editing], ...data})}
-                    onReset={() => {setEditing(null)}}
-                    onChange={modeEditOnChange}
-                >
-                    <table className="modes-table">
-                        <thead className="mode-display">
-                            <th id="mode-name">Name</th>
-                            <th id="mode-arguments">Arguments</th>
-                            <th id="mode-options">Options</th>
-                        </thead>
-                        <tbody>
-                            {modes}
-                        </tbody>
-                    </table>
-                </BaseForm>
-            </div>
-        </>
+        <div id="mode-editing" className="text-center">
+            {/* Mode forms */}
+            <BaseForm
+                onSubmit={props.onAdd}
+                className="mode-display"
+            >
+                <Form.Control
+                    id="new-mode-name"
+                    name="name"
+                    placeholder="Name"
+                    required
+                />
+                <Form.Control
+                    id="new-mode-arguments"
+                    name="arguments"
+                    placeholder="Arguments"
+                    required
+                />
+                <Button type="submit" variant="primary">
+                    Add
+                </Button>
+            </BaseForm>
+            <BaseForm
+                onSubmit={(data) => props.onEdit({originalName: editing, arguments: mode_map[editing], ...data})}
+                onReset={() => {setEditing(null)}}
+                onChange={modeEditOnChange}
+            >
+                <table className="modes-table">
+                    <thead className="mode-display">
+                        <th id="mode-name">Name</th>
+                        <th id="mode-arguments">Arguments</th>
+                        <th id="mode-options">Options</th>
+                    </thead>
+                    <tbody>
+                        {modes}
+                    </tbody>
+                </table>
+            </BaseForm>
+        </div>
     );
 }
 
@@ -201,6 +199,86 @@ ModeSettingsForm.propTypes = {
     onAdd: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired
+}
+
+
+function ArgumentSettingsForm(props) {
+    const [data, setData] = useState(props.data);
+    const modeMap = props.data.mode_map;
+
+    const modeOptions = Object.keys(modeMap).map((key) => {
+        return (<option value={key}>{key}</option>)
+    });
+
+    const onChange = (event) => {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        setData({
+            ...data,
+            [name]: value
+        });
+    };
+
+    return (
+        <div id="argument-editing-form" className="text-center">
+            <BaseForm
+                onSubmit={props.onSubmit}
+                onChange={onChange}
+            >
+                <Form.Group>
+                    <Form.Label
+                        htmlFor="edit-default-args"
+                    >
+                        Default arguments
+                    </Form.Label>
+                    <Form.Control
+                        name="default_args"
+                        id="edit-default-args"
+                        value={data.default_args}
+                    />
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label
+                        htmlFor="edit-unspecified-args"
+                    >
+                        Unspecified arguments (used when mode not found)
+                    </Form.Label>
+                    <Form.Control
+                        name="unspecified_args"
+                        id="edit-unspecified-args"
+                        value={data.unspecified_args}
+                    />
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label
+                        htmlFor="edit-current-mode"
+                    >
+                        Current mode
+                    </Form.Label>
+                    <Form.Control
+                        name="mode"
+                        id="edit-current-mode"
+                        as="select"
+                        value={data.mode}
+                    >
+                        <option>None</option>
+                        {modeOptions}
+                    </Form.Control>
+                </Form.Group>
+
+                <Button type="submit">Update</Button>
+            </BaseForm>
+        </div>
+    );
+}
+
+ArgumentSettingsForm.propTypes = {
+    data: PropTypes.object,
+    onSubmit: PropTypes.func.isRequired
 }
 
 
@@ -222,12 +300,40 @@ export function UpdateServerForm(props) {
                     />
                 </Tab>
                 <Tab eventKey="modes" title="Launch Arguments">
-                    <ModeSettingsForm
-                        data={props.data}
-                        onAdd={props.onModeAdd}
-                        onEdit={props.onModeEdit}
-                        onDelete={props.onModeDelete}
-                    />
+                    <Accordion defaultActiveKey="0" className="modal-body">
+                        <Card>
+                            <Card.Header>
+                                <Accordion.Toggle as={Button} eventKey="0" variant="link">
+                                    Argument Settings
+                                </Accordion.Toggle>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="0">
+                                <Card.Body>
+                                    <ArgumentSettingsForm
+                                        data={props.data}
+                                        onSubmit={props.onArgumentsSubmit}
+                                    />
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        <Card>
+                            <Card.Header>
+                                <Accordion.Toggle as={Button} eventKey="1" variant="link">
+                                    Modes
+                                </Accordion.Toggle>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="1">
+                                <Card.Body>
+                                    <ModeSettingsForm
+                                        data={props.data}
+                                        onAdd={props.onModeAdd}
+                                        onEdit={props.onModeEdit}
+                                        onDelete={props.onModeDelete}
+                                    />
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                    </Accordion>
                 </Tab>
             </Tabs>
             <Modal.Footer>
@@ -245,6 +351,9 @@ UpdateServerForm.propTypes = {
     onClose: PropTypes.func.isRequired,
 
     onGeneralSubmit: PropTypes.func.isRequired,
+
+    onArgumentsSubmit: PropTypes.func.isRequired,
+
     onModeAdd: PropTypes.func.isRequired,
     onModeEdit: PropTypes.func.isRequired,
     onModeDelete: PropTypes.func.isRequired
