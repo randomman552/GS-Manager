@@ -94,6 +94,7 @@ function ModeSettingsForm(props) {
                 <tr key={key} className="mode-display">
                     <Form.Control
                         name="name"
+                        id="edit-mode-name"
                         placeholder="Name"
                         type="text"
                         className="text-center"
@@ -101,13 +102,14 @@ function ModeSettingsForm(props) {
                     />
                     <Form.Control
                         name="arguments"
+                        id="edit-mode-arguments"
                         placeholder="Arguments"
                         type="text"
                         className="text-center"
                         value={modeData.arguments}
 
                     />
-                    <td headers="options" className="flex-center">
+                    <td headers="mode-options" className="flex-center">
                         <Button key="editing" type="submit">Update</Button>
                         <Button
                             key="cancel"
@@ -120,9 +122,9 @@ function ModeSettingsForm(props) {
         }
         return (
             <tr key={key} className="mode-display">
-                <td headers="name" className="flex-center">{key}</td>
-                <td headers="arguments" className="flex-center">{mode_map[key]}</td>
-                <td headers="options" className="flex-center">
+                <td headers="mode-name" className="flex-center">{key}</td>
+                <td headers="mode-arguments" className="flex-center">{mode_map[key]}</td>
+                <td headers="mode-options" className="flex-center">
                     <Button variant="link" type="reset" onClick={() => {
                         setEditing(key)
                         setModeData({
@@ -151,42 +153,45 @@ function ModeSettingsForm(props) {
 
     return (
         <>
-            <BaseForm
-                onSubmit={props.onAdd}
-                className="modal-body mode-display"
-            >
-                <Form.Control
-                    id="name"
-                    name="name"
-                    placeholder="Name"
-                    required
-                />
-                <Form.Control
-                    id="arguments"
-                    name="arguments"
-                    placeholder="Arguments"
-                    required
-                />
-                <Button type="submit" variant="primary">
-                    Add
-                </Button>
-            </BaseForm>
-            <BaseForm
-                onSubmit={(data) => props.onEdit({originalName: editing, arguments: mode_map[editing], ...data})}
-                onReset={() => {setEditing(null)}}
-                onChange={modeEditOnChange}
-            >
-                <table className="modes-table">
-                    <thead className="mode-display">
-                        <th id="name">Name</th>
-                        <th id="arguments">Arguments</th>
-                        <th id="options">Options</th>
-                    </thead>
-                    <tbody>
-                        {modes}
-                    </tbody>
-                </table>
-            </BaseForm>
+            <div id="mode forms">
+                {/* Mode forms */}
+                <BaseForm
+                    onSubmit={props.onAdd}
+                    className="modal-body mode-display"
+                >
+                    <Form.Control
+                        id="new-mode-name"
+                        name="name"
+                        placeholder="Name"
+                        required
+                    />
+                    <Form.Control
+                        id="new-mode-arguments"
+                        name="arguments"
+                        placeholder="Arguments"
+                        required
+                    />
+                    <Button type="submit" variant="primary">
+                        Add
+                    </Button>
+                </BaseForm>
+                <BaseForm
+                    onSubmit={(data) => props.onEdit({originalName: editing, arguments: mode_map[editing], ...data})}
+                    onReset={() => {setEditing(null)}}
+                    onChange={modeEditOnChange}
+                >
+                    <table className="modes-table">
+                        <thead className="mode-display">
+                            <th id="mode-name">Name</th>
+                            <th id="mode-arguments">Arguments</th>
+                            <th id="mode-options">Options</th>
+                        </thead>
+                        <tbody>
+                            {modes}
+                        </tbody>
+                    </table>
+                </BaseForm>
+            </div>
         </>
     );
 }
