@@ -64,8 +64,8 @@ export function Navigation(props) {
                                 Logout
                             </NavDropdown.Item>
                             <NavDropdown.Divider/>
-                            <NavDropdown.Item>
-                                Settings
+                            <NavDropdown.Item as={Link} to="/user-management">
+                                User management
                             </NavDropdown.Item>
                         </NavDropdown>
                     </Nav>

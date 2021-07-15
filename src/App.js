@@ -5,6 +5,7 @@ import { apiFetch } from "./util";
 import { ServersPage } from "./pages/ServersPage";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
+import {UserManagementPage} from "./pages/UserManagementPage";
 
 export class App extends React.Component {
     constructor(props) {
@@ -163,6 +164,17 @@ export class App extends React.Component {
                                 {...props}
                                 auth={auth}
                                 servers={servers}
+                                user={user}
+                                onLogout={() => this.logout()}
+                            />
+                        }}
+                    />
+                    <Route
+                        path="/user-management"
+                        render={(props) => {
+                            return <UserManagementPage
+                                {...props}
+                                auth={auth}
                                 user={user}
                                 onLogout={() => this.logout()}
                             />
