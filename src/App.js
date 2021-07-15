@@ -142,7 +142,7 @@ export class App extends React.Component {
                     {modal}
                     <Switch>
                         <Route exact path="/login" render={ () => {
-                            return <LoginPage loginAction={ (u, p) => this.login(u, p) }/>
+                            return <LoginPage onLogin={ (u, p) => this.login(u, p) }/>
                         }} />
                         <Redirect to="/login" />
                     </Switch>

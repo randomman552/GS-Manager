@@ -6,9 +6,9 @@ import {Switch, Route} from "react-router-dom";
 
 import {Navigation, ServerNavigation} from "./components/Navigation";
 import {apiFetch, deepCopy} from "../util";
-import {SendCommandForm} from "./forms/servers-page/SendCommandForm"
-import {UpdateServerForm} from "./forms/servers-page/UpdateServerForm"
-import {NewServerForm} from "./forms/servers-page/NewServerForm";
+import {SendCommandForm} from "./components/forms/servers-page/SendCommandForm"
+import {UpdateServerForm} from "./components/forms/servers-page/UpdateServerForm"
+import {NewServerForm} from "./components/forms/servers-page/NewServerForm";
 import "./styles/ServersPage.css"
 
 
