@@ -5,7 +5,7 @@ import {BaseForm} from "../BaseForm";
 
 export function NewServerForm(props) {
     return (
-        <BaseForm onSubmit={props.onSubmit}>
+        <BaseForm onSubmit={props.onSubmit} className="flex flex-column flex-center">
             <h1>New server</h1>
 
             <Form.Group className="flex flex-column flex-center">
