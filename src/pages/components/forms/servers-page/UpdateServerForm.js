@@ -26,6 +26,10 @@ function onChangeFactory(data, setter) {
 
 function GeneralSettingsForm(props) {
     const [data, setData] = useState(props.data);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+
+    const onDelete = (confirmDelete) ? props.onDelete : () => {setConfirmDelete(true)};
+    const deleteText = (confirmDelete) ? "Confirm delete" : "Delete";
 
     return (
         <BaseForm
@@ -79,16 +83,25 @@ function GeneralSettingsForm(props) {
                     value={data.working_directory}
                 />
             </Form.Group>
-            <Button variant="primary" type="submit">
+            <Form.Group>
+                <Button variant="primary" type="submit">
                 Update
             </Button>
+            </Form.Group>
+
+            <Form.Group>
+                <Button variant="danger" onClick={onDelete}>
+                    {deleteText}
+                </Button>
+            </Form.Group>
         </BaseForm>
     )
 }
 
 GeneralSettingsForm.propTypes = {
     data: PropTypes.object,
-    onSubmit: PropTypes.func.isRequired
+    onSubmit: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired
 }
 
 
@@ -296,6 +309,7 @@ export function UpdateServerForm(props) {
                     <GeneralSettingsForm
                         data={props.data}
                         onSubmit={props.onGeneralSubmit}
+                        onDelete={props.onDelete}
                     />
                 </Tab>
                 <Tab eventKey="modes" title="Launch Arguments">
@@ -350,6 +364,7 @@ UpdateServerForm.propTypes = {
     onClose: PropTypes.func.isRequired,
 
     onGeneralSubmit: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
 
     onArgumentsSubmit: PropTypes.func.isRequired,
 

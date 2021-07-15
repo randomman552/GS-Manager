@@ -124,6 +124,24 @@ class ServerDashboard extends React.Component {
     }
 
     /**
+     * Method to delete the current server by sending a delete request to the backend.
+     */
+    deleteServer() {
+        const name = this.state.name;
+        if (name) {
+            const queryUrl = "/api/servers/" + this.state.name;
+            const auth = this.props.auth;
+
+            apiFetch(auth, null, queryUrl, "delete").then(data => {
+                if (data.code === 200) {
+                    this.closeSettings();
+                }
+                // TODO: Redirect to new page on name change
+            });
+        }
+    }
+
+    /**
      * Method to add a new launch mode to a server
      * @param data {{name: string, arguments: string}}
      */
@@ -204,6 +222,7 @@ class ServerDashboard extends React.Component {
                 show={show}
 
                 onGeneralSubmit={(data) => this.modifySettings(data)}
+                onDelete={() => this.deleteServer()}
 
                 onArgumentsSubmit={(data) => this.modifySettings(data)}
 
