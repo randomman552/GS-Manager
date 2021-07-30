@@ -20,6 +20,7 @@ export class App extends React.Component {
         };
     }
 
+
     /**
      * Send an authentication request to the server to get the api key used to make future requests.
      * @param data Data provided by BaseForm class.
@@ -36,7 +37,6 @@ export class App extends React.Component {
                 this.setState({
                     user: data.data
                 })
-                this.getServers();
             } else if (data.code === 401) {
                 this.showModal("Login Failed", "Incorrect username or password...");
             }
@@ -52,20 +52,22 @@ export class App extends React.Component {
         });
     }
 
+
     /**
-     * Query the api for the names of all servers.
-     * Stores them in this.state.servers.
+     * Query api for servers and users.
      */
-    getServers() {
+    queryApi() {
         const auth = this.getAuth();
-        apiFetch(auth, null, "/api/servers/").then(data => {
-            if (!data.error) {
-                this.setState({
-                    servers: data.data
-                });
-            }
-            return null;
-        });
+        if (auth) {
+            apiFetch(auth, null, "/api/servers/").then(data => {
+                if (!data.error) {
+                    this.setState({
+                        servers: data.data
+                    });
+                }
+                return null;
+            });
+        }
     }
 
     /**
@@ -78,6 +80,7 @@ export class App extends React.Component {
             };
         return null;
     }
+
 
     /**
      * Method to show the global modal in the application.
@@ -134,6 +137,7 @@ export class App extends React.Component {
         )
 }
 
+
     render() {
         const modal = this.renderModal();
         if (!this.state.user) {
@@ -184,6 +188,16 @@ export class App extends React.Component {
                 </Switch>
             </div>
         );
+    }
+
+
+    componentDidMount() {
+        this.queryApi();
+        this.interval = setInterval(() => this.queryApi(), 500);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 }
 

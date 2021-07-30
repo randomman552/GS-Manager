@@ -18,83 +18,47 @@ import "./styles/ServersPage.css"
 class ServerDashboard extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
-            name: props.match.params.serverName,
-            server: {
-                name: props.match.params.serverName,
-                output: []
-            },
             showSettingsModal: false
         };
     }
 
-    getServer() {
-        const name = this.state.name;
-        if (name) {
-            const queryUrl = "/api/servers/" + this.state.name;
-            const auth = this.props.auth;
 
-            apiFetch(auth, null, queryUrl).then((data) => {
-                this.setState({
-                    server: data.data
-                })
-            });
-        }
+    get server() {
+        return this.props.server;
     }
 
-    componentDidMount() {
-        this.getServer();
-        this.interval = setInterval(() => this.getServer(), 500);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.interval);
-    }
 
     startServer() {
-        const name = this.state.name;
-        if (name) {
-            const queryUrl = "/api/servers/" + this.state.name + "/start";
+        if (this.server) {
+            const queryUrl = "/api/servers/" + this.server.id + "/start";
             const auth = this.props.auth;
             apiFetch(auth, null, queryUrl).then(r => {});
         }
     }
 
     updateServer() {
-        const name = this.state.name;
-        if (name) {
-            const queryUrl = "/api/servers/" + this.state.name + "/update";
+        if (this.server) {
+            const queryUrl = "/api/servers/" + this.server.id + "/update";
             const auth = this.props.auth;
             apiFetch(auth, null, queryUrl).then(r => {});
         }
     }
 
     stopServer() {
-        const name = this.state.name;
-        if (name) {
-            const queryUrl = "/api/servers/" + this.state.name + "/stop";
+        if (this.server) {
+            const queryUrl = "/api/servers/" + this.server.id + "/stop";
             const auth = this.props.auth;
 
             apiFetch(auth, null, queryUrl).then(r => {});
         }
     }
 
-    openSettings() {
-        this.setState({
-            showSettingsModal: true
-        });
-    }
-
-    closeSettings() {
-        this.setState({
-            showSettingsModal: false
-        });
-    }
 
     sendCommand(data) {
-        const name = this.state.name;
-        if (name && data.command) {
-            const queryUrl = "/api/servers/" + this.state.name + "/command";
+        if (this.server && data.command) {
+            const queryUrl = "/api/servers/" + this.server.id + "/command";
             const auth = this.props.auth;
             const toSend = {
                 "command": data.command
@@ -109,9 +73,8 @@ class ServerDashboard extends React.Component {
      * @param data
      */
     modifySettings(data) {
-        const name = this.state.name;
-        if (name) {
-            const queryUrl = "/api/servers/" + this.state.name;
+        if (this.server) {
+            const queryUrl = "/api/servers/" + this.server.id;
             const auth = this.props.auth;
 
             apiFetch(auth, data, queryUrl, "put").then(data => {
@@ -127,9 +90,8 @@ class ServerDashboard extends React.Component {
      * Method to delete the current server by sending a delete request to the backend.
      */
     deleteServer() {
-        const name = this.state.name;
-        if (name) {
-            const queryUrl = "/api/servers/" + this.state.name;
+        if (this.server) {
+            const queryUrl = "/api/servers/" + this.server.id;
             const auth = this.props.auth;
 
             apiFetch(auth, null, queryUrl, "delete").then(data => {
@@ -141,19 +103,33 @@ class ServerDashboard extends React.Component {
         }
     }
 
+
+    openSettings() {
+        this.setState({
+            showSettingsModal: true
+        });
+    }
+
+    closeSettings() {
+        this.setState({
+            showSettingsModal: false
+        });
+    }
+
+
     /**
      * Method to add a new launch mode to a server
      * @param data {{name: string, arguments: string}}
      */
     addMode(data) {
-        const name = this.state.name;
-        if (name && data.name && data.arguments) {
-            const queryUrl = "/api/servers/" + this.state.name;
+        const server = this.server;
+        if (server && data.name && data.arguments) {
+            const queryUrl = "/api/servers/" + server.id;
             const auth = this.props.auth;
 
             let mode_map = {}
-            if (this.state.server.mode_map)
-                mode_map = deepCopy(this.state.server.mode_map)
+            if (server.mode_map)
+                mode_map = deepCopy(server.mode_map)
             mode_map[data.name] = data.arguments
 
             apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
@@ -167,14 +143,14 @@ class ServerDashboard extends React.Component {
      * @param data {{originalName: string, name: string, arguments: string}}
      */
     editMode(data) {
-        const name = this.state.name;
-        if (name && data.originalName) {
-            const queryUrl = "/api/servers/" + this.state.name;
+        const server = this.server;
+        if (server && data.originalName) {
+            const queryUrl = "/api/servers/" + server.id;
             const auth = this.props.auth;
 
             let mode_map = {};
-            if (this.state.server.mode_map)
-                mode_map = deepCopy(this.state.server.mode_map);
+            if (server.mode_map)
+                mode_map = deepCopy(server.mode_map);
 
 
             if (!data.name)
@@ -184,8 +160,6 @@ class ServerDashboard extends React.Component {
 
             delete mode_map[data.originalName];
             mode_map[data.name] = data.arguments;
-
-            console.log(mode_map)
 
             apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
 
@@ -198,14 +172,14 @@ class ServerDashboard extends React.Component {
      * @param data {{name: string}}
      */
     deleteMode(data) {
-        const name = this.state.name;
-        if (name && data.name) {
-            const queryUrl = "/api/servers/" + this.state.name;
+        const server = this.server;
+        if (server && data.name) {
+            const queryUrl = "/api/servers/" + server.id;
             const auth = this.props.auth;
 
             let mode_map = {}
-            if (this.state.server.mode_map)
-                mode_map = deepCopy(this.state.server.mode_map)
+            if (server.mode_map)
+                mode_map = deepCopy(server.mode_map)
             delete mode_map[data.name]
 
             apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
@@ -213,6 +187,7 @@ class ServerDashboard extends React.Component {
             });
         }
     }
+
 
     renderSettings() {
         const show = this.state.showSettingsModal;
@@ -232,13 +207,15 @@ class ServerDashboard extends React.Component {
 
                 onClose={() => this.closeSettings()}
 
-                data={this.state.server}
+                data={this.server}
             />
         )
     }
 
     renderOutputLines() {
-        const output = this.state.server.output;
+        if (!this.server) return [];
+
+        const output = this.server.output;
 
         if (output) {
             return output.map((line, lineNum) => {
@@ -255,13 +232,13 @@ class ServerDashboard extends React.Component {
     render() {
         const outputLines = this.renderOutputLines();
         const settingsModal = this.renderSettings();
-        const running = this.state.server.status !== "stopped";
+        const running = this.server.status !== "stopped";
 
         return (
-            <article id={this.state.server.name} className="server-dashboard">
+            <article id={this.server.name} className="server-dashboard">
                 {settingsModal}
                 <Card className="server-info">
-                    <Card.Header className="server-info-header">{this.state.server.name}</Card.Header>
+                    <Card.Header className="server-info-header">{this.server.name}</Card.Header>
                     <Card.Body className="server-info-body">
                         <article className="server-console-container">
                             <ScrollToBottom
@@ -273,7 +250,7 @@ class ServerDashboard extends React.Component {
                             </ScrollToBottom>
 
                             <SendCommandForm
-                                key={this.state.server.name}
+                                key={this.server.name}
                                 onSubmit={(data) => this.sendCommand(data)}
                                 disabled={!running}
                             />
@@ -303,6 +280,7 @@ class ServerDashboard extends React.Component {
 }
 
 ServerDashboard.propTypes = {
+    server: PropTypes.object.isRequired,
     auth: PropTypes.object.isRequired
 }
 
@@ -360,9 +338,26 @@ export function ServersPage(props) {
             />
             <Switch>
                 <Route
-                    path="/servers/:serverName"
+                    path="/servers/:serverID"
                     render={(props) => {
-                        return (<ServerDashboard {...props} key={props.match.params.serverName} auth={auth}/>)
+                        const serverID = props.match.params.serverID;
+
+                        let curServer;
+                        for (const server of servers) {
+                            if (server.id === serverID) {
+                                curServer = server;
+                                break;
+                            }
+                        }
+
+                        return (
+                            <ServerDashboard
+                                {...props}
+                                key={serverID}
+                                auth={auth}
+                                server={curServer}
+                            />
+                        )
                     }}
                 />
                 <Route

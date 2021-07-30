@@ -6,11 +6,13 @@ import "../styles/Navigation.css"
 export function ServerNavigation(props) {
     let servers = []
     if (props.servers) {
-        servers = props.servers.map((name) => {
-            const url = "/servers/" + name;
+        servers = props.servers.map((server) => {
+            const name = server.name;
+            const id = server.id;
+            const url = "/servers/" + id;
             return (
-                <Nav.Item key={name}>
-                    <Nav.Link as={Link} className="text-capitalize" eventKey={name} to={url}>{name}</Nav.Link>
+                <Nav.Item key={id}>
+                    <Nav.Link as={Link} className="text-capitalize" eventKey={id} to={url}>{name}</Nav.Link>
                 </Nav.Item>
             )
         });
