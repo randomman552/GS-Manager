@@ -2,7 +2,7 @@ import React from "react";
 import {Card, Button} from "react-bootstrap";
 import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
-import {Switch, Route} from "react-router-dom";
+import {Switch, Route, Redirect} from "react-router-dom";
 
 import {Navigation, ServerNavigation} from "./components/Navigation";
 import {apiFetch, deepCopy} from "../util";
@@ -81,7 +81,6 @@ class ServerDashboard extends React.Component {
                 if (data.code === 200) {
                     this.closeSettings();
                 }
-                // TODO: Redirect to new page on name change
             });
         }
     }
@@ -96,9 +95,14 @@ class ServerDashboard extends React.Component {
 
             apiFetch(auth, null, queryUrl, "delete").then(data => {
                 if (data.code === 200) {
-                    this.closeSettings();
+                    this.render = () => {
+                        return (
+                            <Redirect
+                                to="/servers"
+                            />
+                        )
+                    }
                 }
-                // TODO: Redirect to new page on name change
             });
         }
     }
