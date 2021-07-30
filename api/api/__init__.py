@@ -26,7 +26,6 @@ def load_config(app):
             "MONGODB_SETTINGS": {
                 "host": "mongodb://localhost:27017/gsmanager?authSource=gsmanager"
             },
-            "STORAGE_PATH": os.path.join(app.root_path, "../../storage/"),
             "SECRET_KEY": os.urandom(24).hex()
         }
         save_config(config)

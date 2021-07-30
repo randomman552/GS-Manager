@@ -1,7 +1,6 @@
 import os
-import signal
+import shutil
 import uuid
-from typing import Optional
 
 from flask_login import UserMixin
 from flask_mongoengine import Document
@@ -34,6 +33,8 @@ class User(Document, UserMixin):
 
 
 class GameServer(Document):
+    STORAGE_PATH = os.path.join(os.getcwd(), "storage")
+
     name = StringField(required=True, unique=True, min_length=3)
     status = StringField(default="stopped")
     output = ListField(StringField())
@@ -68,11 +69,6 @@ class GameServer(Document):
     Command to run when update requested.
     """
 
-    working_directory = StringField()
-    """
-    Working directory of the server.
-    """
-
     @property
     def is_running(self) -> bool:
         return self.status != "stopped"
@@ -85,3 +81,16 @@ class GameServer(Document):
         if self.mode_map and self.mode:
             command += " " + self.mode_map.get(self.mode, self.unspecified_args)
         return command
+
+    @property
+    def working_directory(self) -> str:
+        path = os.path.join(self.STORAGE_PATH, str(self.id))
+        try:
+            os.makedirs(path)
+        except FileExistsError:
+            pass
+        return path
+
+    def delete(self, signal_kwargs=None, **write_concern):
+        shutil.rmtree(self.working_directory)
+        super().delete(signal_kwargs, **write_concern)

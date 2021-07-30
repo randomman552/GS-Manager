@@ -46,17 +46,6 @@ export function NewServerForm(props) {
                 />
             </Form.Group>
 
-            <Form.Group className="flex flex-column flex-center">
-                <Form.Label htmlFor="working_directory">
-                    Working directory
-                </Form.Label>
-                <Form.Control
-                    id="working_directory"
-                    name="working_directory"
-                    type="text"
-                />
-            </Form.Group>
-
             <Button variant="primary" type="submit">
                 Create
             </Button>
