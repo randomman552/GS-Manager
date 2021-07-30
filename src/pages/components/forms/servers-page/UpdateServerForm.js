@@ -72,17 +72,6 @@ function GeneralSettingsForm(props) {
                     value={data.update_cmd}
                 />
             </Form.Group>
-            <Form.Group className="flex flex-column flex-center">
-                <Form.Label htmlFor="working_directory">
-                    Working directory
-                </Form.Label>
-                <Form.Control
-                    id="working_directory"
-                    name="working_directory"
-                    type="text"
-                    value={data.working_directory}
-                />
-            </Form.Group>
             <Form.Group>
                 <Button variant="primary" type="submit">
                 Update
@@ -378,7 +367,6 @@ UpdateServerForm.defaultProps = {
         name: "",
         start_cmd: "",
         update_cmd: "",
-        working_directory: "",
 
         mode: "",
         mode_map: {}
