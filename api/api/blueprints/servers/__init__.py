@@ -34,6 +34,7 @@ def create_server():
             try:
                 new_server = GameServer(**data)
                 new_server.save()
+                new_server.create_working_directory()
                 return rest.response(201)
             except ValidationError as e:
                 return rest.response(400, error=e.message)

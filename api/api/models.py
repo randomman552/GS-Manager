@@ -84,12 +84,13 @@ class GameServer(Document):
 
     @property
     def working_directory(self) -> str:
-        path = os.path.join(self.STORAGE_PATH, str(self.id))
+        return os.path.join(self.STORAGE_PATH, str(self.id))
+
+    def create_working_directory(self):
         try:
-            os.makedirs(path)
+            os.makedirs(self.working_directory)
         except FileExistsError:
             pass
-        return path
 
     def delete(self, signal_kwargs=None, **write_concern):
         shutil.rmtree(self.working_directory)
