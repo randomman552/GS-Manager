@@ -26,20 +26,18 @@ As such, we create a new user with no home directory and no sudo permissions wit
 sudo useradd -M gsmanager
 ```
 
-Then switch to this user with:
-```shell
-su - gsmanager
-```
-
 ### 4. Clone this repository
+Clone the repository with the following commands:
 ```shell
-git clone https://github.com/randomman552/GS-Manager.git
+cd /var/www
+sudo git clone https://github.com/randomman552/GS-Manager.git
 ```
 
 ### 5. Run install script
 This script sets up the virtual environment and installs requirements for python and npm.
 ```shell
-chmod +x install.sh && ./install.sh
+cd GS-Manager
+sudo chmod +x install.sh && sudo ./install.sh
 ```
 
 

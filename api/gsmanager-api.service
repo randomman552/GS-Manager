@@ -4,7 +4,7 @@ Description=Game Server Manager
 [Service]
 Type=simple
 User=gsmanager
-WorkingDirectory=/var/www/gsmanager/api
+WorkingDirectory=/var/www/GS-Manager/api
 ExecStart=./start.sh
 
 [Install]
