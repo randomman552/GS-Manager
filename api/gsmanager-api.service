@@ -1,0 +1,11 @@
+[Unit]
+Description=Game Server Manager
+
+[Service]
+Type=simple
+User=gsmanager
+WorkingDirectory=/var/www/gsmanager/api
+ExecStart=./start.sh
+
+[Install]
+WantedBy=multi-user.target
