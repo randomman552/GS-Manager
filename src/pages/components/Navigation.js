@@ -37,7 +37,7 @@ export function ServerNavigation(props) {
 }
 
 ServerNavigation.propTypes = {
-    servers: PropTypes.arrayOf(PropTypes.string).isRequired
+    servers: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 
