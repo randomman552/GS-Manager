@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-
+cd api
 # Setup python venv
-python3.9 -m venv api/venv venv
-source api/venv/bin/activate
-pip install -r api/requirements.txt
+python3.9 -m venv venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Create config file and allow execution of start.sh
+chmod +x start.sh
+python3.9 wsgi.py --config-only
+cd ..
 
 # Install npm dependencies and build production website
 npm i
 npm run build
 
 # Set directory ownership
-sudo chown gsmanager:gsmanager -R api
-
-# Set execute permission on start script
-chmod +x ./api/start.sh
+chown gsmanager:gsmanager -R api

@@ -37,7 +37,7 @@ def save_config(config: dict):
         json.dump(config, file, indent=4)
 
 
-if load_config(app):
+if load_config(app) or "--config-only" in sys.argv:
     sys.exit(f"Created config file: {config_path}")
 # endregion
 
