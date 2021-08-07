@@ -5,7 +5,7 @@ Description=Game Server Manager
 Type=simple
 User=gsmanager
 WorkingDirectory=/var/www/GS-Manager/api
-ExecStart=./start.sh
+ExecStart=/var/www/GS-Manager/api/start.sh
 
 [Install]
 WantedBy=multi-user.target
