@@ -1,7 +1,7 @@
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import PropTypes from 'prop-types';
-import "../styles/Navigation.css"
+import "./Navigation.css"
 
 export function ServerNavigation(props) {
     let servers = []
@@ -66,8 +66,8 @@ export function Navigation(props) {
                                 Logout
                             </NavDropdown.Item>
                             <NavDropdown.Divider/>
-                            <NavDropdown.Item as={Link} to="/user-management">
-                                User management
+                            <NavDropdown.Item as={Link} to="/settings">
+                                Settings
                             </NavDropdown.Item>
                         </NavDropdown>
                     </Nav>

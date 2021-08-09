@@ -1,11 +1,11 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom'
-import { LoginPage } from "./pages/LoginPage";
+import { LoginPage } from "./pages/login-page/LoginPage";
+import { ServersPage } from "./pages/servers-page/ServersPage";
+import { SettingsPage } from "./pages/settings-page/SettingsPage";
 import { apiFetch } from "./util";
-import { ServersPage } from "./pages/ServersPage";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
-import {UserManagementPage} from "./pages/UserManagementPage";
 
 export class App extends React.Component {
     constructor(props) {
@@ -174,9 +174,9 @@ export class App extends React.Component {
                         }}
                     />
                     <Route
-                        path="/user-management"
+                        path="/settings"
                         render={(props) => {
-                            return <UserManagementPage
+                            return <SettingsPage
                                 {...props}
                                 auth={auth}
                                 user={user}

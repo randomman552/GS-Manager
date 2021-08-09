@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Accordion, Button, Card, Form, Modal, Tab, Tabs} from "react-bootstrap";
 import PropTypes from "prop-types";
-import {BaseForm} from "../BaseForm";
+import {BaseForm} from "../../components/BaseForm";
 
 /**
  * Function factory which generates an onChange handler for the forms contained in this file.

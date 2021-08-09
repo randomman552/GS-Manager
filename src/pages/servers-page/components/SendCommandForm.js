@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Form} from "react-bootstrap";
 import PropTypes from "prop-types";
-import {BaseForm} from "../BaseForm";
+import {BaseForm} from "../../components/BaseForm";
 
 export function SendCommandForm(props) {
     return (

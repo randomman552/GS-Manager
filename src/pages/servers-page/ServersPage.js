@@ -4,12 +4,12 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
 import {Switch, Route, Redirect} from "react-router-dom";
 
-import {Navigation, ServerNavigation} from "./components/Navigation";
-import {apiFetch, deepCopy} from "../util";
-import {SendCommandForm} from "./components/forms/servers-page/SendCommandForm"
-import {UpdateServerForm} from "./components/forms/servers-page/UpdateServerForm"
-import {NewServerForm} from "./components/forms/servers-page/NewServerForm";
-import "./styles/ServersPage.css"
+import {Navigation, ServerNavigation} from "../components/Navigation";
+import {apiFetch, deepCopy} from "../../util";
+import {SendCommandForm} from "./components/SendCommandForm"
+import {UpdateServerForm} from "./components/UpdateServerForm"
+import {NewServerForm} from "./components/NewServerForm";
+import "./ServersPage.css"
 
 
 /**

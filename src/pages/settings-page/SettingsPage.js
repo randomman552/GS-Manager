@@ -1,7 +1,7 @@
-import {Navigation} from "./components/Navigation";
+import {Navigation} from "../components/Navigation";
 import PropTypes from "prop-types";
 
-export function UserManagementPage(props) {
+export function SettingsPage(props) {
     return (
         <article className="page">
             <Navigation
@@ -12,7 +12,7 @@ export function UserManagementPage(props) {
     )
 }
 
-UserManagementPage.propTypes = {
+SettingsPage.propTypes = {
     user: PropTypes.object,
     onLogout: PropTypes.func.isRequired,
     auth: PropTypes.object
