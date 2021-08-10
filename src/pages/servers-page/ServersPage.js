@@ -33,25 +33,21 @@ class ServerDashboard extends React.Component {
     startServer() {
         if (this.server) {
             const queryUrl = "/api/servers/" + this.server.id + "/start";
-            const auth = this.props.auth;
-            apiFetch(auth, null, queryUrl).then(r => {});
+            apiFetch(queryUrl).then(r => {});
         }
     }
 
     updateServer() {
         if (this.server) {
             const queryUrl = "/api/servers/" + this.server.id + "/update";
-            const auth = this.props.auth;
-            apiFetch(auth, null, queryUrl).then(r => {});
+            apiFetch(queryUrl).then(r => {});
         }
     }
 
     stopServer() {
         if (this.server) {
             const queryUrl = "/api/servers/" + this.server.id + "/stop";
-            const auth = this.props.auth;
-
-            apiFetch(auth, null, queryUrl).then(r => {});
+            apiFetch(queryUrl).then(r => {});
         }
     }
 
@@ -59,12 +55,11 @@ class ServerDashboard extends React.Component {
     sendCommand(data) {
         if (this.server && data.command) {
             const queryUrl = "/api/servers/" + this.server.id + "/command";
-            const auth = this.props.auth;
             const toSend = {
                 "command": data.command
             };
 
-            apiFetch(auth, toSend, queryUrl).then(r => {});
+            apiFetch(queryUrl, toSend).then(r => {});
         }
     }
 
@@ -75,9 +70,8 @@ class ServerDashboard extends React.Component {
     modifySettings(data) {
         if (this.server) {
             const queryUrl = "/api/servers/" + this.server.id;
-            const auth = this.props.auth;
 
-            apiFetch(auth, data, queryUrl, "put").then(data => {
+            apiFetch(queryUrl, data, "put").then(data => {
                 if (data.code === 200) {
                     this.closeSettings();
                 }
@@ -91,9 +85,8 @@ class ServerDashboard extends React.Component {
     deleteServer() {
         if (this.server) {
             const queryUrl = "/api/servers/" + this.server.id;
-            const auth = this.props.auth;
 
-            apiFetch(auth, null, queryUrl, "delete").then(data => {
+            apiFetch(queryUrl, null, "delete").then(data => {
                 if (data.code === 200) {
                     this.render = () => {
                         return (
@@ -129,14 +122,13 @@ class ServerDashboard extends React.Component {
         const server = this.server;
         if (server && data.name && data.arguments) {
             const queryUrl = "/api/servers/" + server.id;
-            const auth = this.props.auth;
 
             let mode_map = {}
             if (server.mode_map)
                 mode_map = deepCopy(server.mode_map)
             mode_map[data.name] = data.arguments
 
-            apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
+            apiFetch(queryUrl, {mode_map}, "put").then(data => {
 
             });
         }
@@ -150,7 +142,6 @@ class ServerDashboard extends React.Component {
         const server = this.server;
         if (server && data.originalName) {
             const queryUrl = "/api/servers/" + server.id;
-            const auth = this.props.auth;
 
             let mode_map = {};
             if (server.mode_map)
@@ -165,7 +156,7 @@ class ServerDashboard extends React.Component {
             delete mode_map[data.originalName];
             mode_map[data.name] = data.arguments;
 
-            apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
+            apiFetch(queryUrl, {mode_map}, "put").then(data => {
 
             });
         }
@@ -179,14 +170,13 @@ class ServerDashboard extends React.Component {
         const server = this.server;
         if (server && data.name) {
             const queryUrl = "/api/servers/" + server.id;
-            const auth = this.props.auth;
 
             let mode_map = {}
             if (server.mode_map)
                 mode_map = deepCopy(server.mode_map)
             delete mode_map[data.name]
 
-            apiFetch(auth, {mode_map}, queryUrl, "put").then(data => {
+            apiFetch(queryUrl, {mode_map}, "put").then(data => {
 
             });
         }
@@ -284,8 +274,7 @@ class ServerDashboard extends React.Component {
 }
 
 ServerDashboard.propTypes = {
-    server: PropTypes.object.isRequired,
-    auth: PropTypes.object.isRequired
+    server: PropTypes.object.isRequired
 }
 
 
@@ -302,10 +291,9 @@ class NoServerDashboard extends React.Component {
     }
 
     createServer(data) {
-        const auth = this.state.auth;
         const queryUrl = "/api/servers/";
 
-        apiFetch(auth, data, queryUrl, "put").then((data) => {
+        apiFetch(queryUrl, data, "put").then((data) => {
             console.log(data)
         });
     }
