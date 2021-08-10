@@ -71,7 +71,11 @@ class ServerDashboard extends React.Component {
         if (this.server) {
             const queryUrl = "/api/servers/" + this.server.id;
 
+<<<<<<< HEAD
             apiFetch(queryUrl, data, "put").then(data => {
+=======
+            apiFetch(queryUrl, data).then(data => {
+>>>>>>> master
                 if (data.code === 200) {
                     this.closeSettings();
                 }
