@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_user, logout_user
 
 from ... import rest
 from ...models import User
@@ -90,6 +90,29 @@ def update_user(user_id: str):
 def delete_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
     user.delete()
+    return rest.response(200)
+
+# endregion
+
+
+# region Login and logout endpoints
+
+@auth.route("/login", methods=["POST"])
+@login_required
+def login():
+    """
+    This endpoint sets a cookie to allow requests to be made without providing auth.
+    """
+    login_user(current_user)
+    return rest.response(200)
+
+
+@auth.route("/logout", methods=["GET", "POST"])
+def logout():
+    """
+    Endpoint to destroy current session cookie.
+    """
+    logout_user()
     return rest.response(200)
 
 # endregion

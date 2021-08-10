@@ -10,6 +10,17 @@ import './App.css';
 export class App extends React.Component {
     constructor(props) {
         super(props);
+        // Attempt login from cookie on load
+        apiFetch("/api/auth/").then(data => {
+            if (!data.error) {
+                this.setState({
+                    user: data.data
+                });
+            } else if (data.code === 401) {
+                this.logout();
+            }
+        });
+
         this.state = {
             user: null,
             servers: [],
@@ -31,15 +42,18 @@ export class App extends React.Component {
             "password": data.password
         };
 
-        apiFetch(auth, null, "/api/auth/")
-            .then(data => {
-            if (!data.error) {
-                this.setState({
-                    user: data.data
-                })
-            } else if (data.code === 401) {
-                this.showModal("Login Failed", "Incorrect username or password...");
-            }
+        apiFetch("/api/auth/login", null, "post", auth)
+            .then(() => {
+                apiFetch("/api/auth/")
+                    .then(data => {
+                    if (!data.error) {
+                        this.setState({
+                            user: data.data
+                        });
+                    } else if (data.code === 401) {
+                        this.showModal("Login Failed", "Incorrect username or password...");
+                    }
+                });
         });
     }
 
@@ -47,8 +61,10 @@ export class App extends React.Component {
      * Forget the currently remembered apikey.
      */
     logout() {
-        this.setState({
-            "user": null
+        apiFetch("/api/auth/logout").then(() => {
+            this.setState({
+                "user": null
+            });
         });
     }
 
@@ -59,7 +75,7 @@ export class App extends React.Component {
     queryApi() {
         const auth = this.getAuth();
         if (auth) {
-            apiFetch(auth, null, "/api/servers/").then(data => {
+            apiFetch("/api/servers/").then(data => {
                 if (!data.error) {
                     this.setState({
                         servers: data.data

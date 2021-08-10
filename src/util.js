@@ -1,12 +1,12 @@
 /**
  * Method to send a request to the api backend
- * @param auth Object containing authorisation information.
- * @param data Object containing data to send with request.
  * @param url {string} URL to send request to.
+ * @param data Object containing data to send with request.
  * @param method {string} HTTP method to use, defaults to 'post'.
+ * @param auth Object containing authorisation information.
  * @returns {Promise<any>} Promise of return data as object.
  */
-export async function apiFetch(auth, data, url, method="post") {
+export async function apiFetch(url, data, method = "post", auth = null) {
     data = {
         "auth": auth,
         "data": data
@@ -23,7 +23,7 @@ export async function apiFetch(auth, data, url, method="post") {
             body: JSON.stringify(data)
         }
     );
-    return await response.json()
+    return await response.json();
 }
 
 /**

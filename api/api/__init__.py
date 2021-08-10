@@ -86,6 +86,9 @@ def load_user_from_request(request: Request):
     else:
         if request.get_json():
             data = request.get_json().get("auth", dict())
+            if not data:
+                return None
+
             api_key = data.get("apikey", "")
             if api_key:
                 return User.objects(api_key=api_key).first()
