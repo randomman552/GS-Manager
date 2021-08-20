@@ -97,7 +97,7 @@ def delete_user(user_id: str):
 
 # region Login and logout endpoints
 
-@auth.route("/login", methods=["POST"])
+@auth.route("/login", methods=["GET", "POST"])
 @login_required
 def login():
     """

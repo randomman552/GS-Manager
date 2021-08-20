@@ -6,12 +6,13 @@ import { SettingsPage } from "./pages/settings-page/SettingsPage";
 import { apiFetch } from "./util";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
+import api from "./api/api";
 
 export class App extends React.Component {
     constructor(props) {
         super(props);
         // Attempt login from cookie on load
-        apiFetch("/api/auth/").then(data => {
+        api.auth.getCurrentUser().then(data => {
             if (!data.error) {
                 this.setState({
                     user: data.data
@@ -42,9 +43,9 @@ export class App extends React.Component {
             "password": data.password
         };
 
-        apiFetch("/api/auth/login", null, "post", auth)
+        api.auth.login(auth)
             .then(() => {
-                apiFetch("/api/auth/")
+                api.auth.getCurrentUser()
                     .then(data => {
                     if (!data.error) {
                         this.setState({
@@ -54,14 +55,14 @@ export class App extends React.Component {
                         this.showModal("Login Failed", "Incorrect username or password...");
                     }
                 });
-        });
+            });
     }
 
     /**
-     * Forget the currently remembered apikey.
+     * Destroy current session.
      */
     logout() {
-        apiFetch("/api/auth/logout").then(() => {
+        api.auth.logout().then(() => {
             this.setState({
                 "user": null
             });
