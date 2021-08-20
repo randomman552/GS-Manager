@@ -1,5 +1,8 @@
 import {Navigation} from "../components/Navigation";
 import PropTypes from "prop-types";
+import {SettingsPanel} from "./components/SettingsPanel";
+import {AdminSettingsPanel} from "./components/AdminSettingsPanel";
+import {Tab, Tabs} from "react-bootstrap";
 
 export function SettingsPage(props) {
     return (
@@ -8,6 +11,19 @@ export function SettingsPage(props) {
                 user={props.user}
                 onLogout={props.onLogout}
             />
+            <Tabs
+                defaultActiveKey="settings"
+                id="settings-tab-container"
+                className="container-md"
+            >
+                <Tab eventKey="settings" title="Settings" className="container-md">
+                    <SettingsPanel/>
+                </Tab>
+
+                <Tab eventKey="admin-settings" title="Admin Settings" className="container-md">
+                    <AdminSettingsPanel/>
+                </Tab>
+            </Tabs>
         </article>
     )
 }
