@@ -1,4 +1,5 @@
 import auth from "./segments/auth";
+import servers from "./segments/servers";
 
 /**
  * Object used to abstract away the querying of the backend api.
@@ -6,6 +7,7 @@ import auth from "./segments/auth";
  * - auth: Allows control over user accounts.
  */
 const api = {
+    servers,
     auth
 }
 

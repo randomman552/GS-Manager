@@ -1,4 +1,4 @@
-import {apiFetch} from "../../util";
+import {apiFetch} from "../util";
 
 const auth = {
     getCurrentUser() {
@@ -17,18 +17,24 @@ const auth = {
 
     // region Specific user controls (getting, updating, and deleting specific users)
     getUser(userID) {
-        const url = "/api/auth/users/" + userID;
-        return apiFetch(url);
+        if (userID) {
+            const url = "/api/auth/users/" + userID;
+            return apiFetch(url);
+        }
     },
 
     updateUser(userID, obj) {
-        const url = "/api/auth/users/" + userID;
-        return apiFetch(url, obj, "put");
+        if (userID) {
+            const url = "/api/auth/users/" + userID;
+            return apiFetch(url, obj, "put");
+        }
     },
 
     deleteUser(userID) {
-        const url = "/api/auth/users/" + userID;
-        return apiFetch(url,null, "delete");
+        if (userID) {
+            const url = "/api/auth/users/" + userID;
+            return apiFetch(url, null, "delete");
+        }
     },
     //endregion
 

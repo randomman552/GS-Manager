@@ -3,7 +3,6 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/login-page/LoginPage";
 import { ServersPage } from "./pages/servers-page/ServersPage";
 import { SettingsPage } from "./pages/settings-page/SettingsPage";
-import { apiFetch } from "./util";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
 import api from "./api/api";
@@ -76,7 +75,7 @@ export class App extends React.Component {
     queryApi() {
         const auth = this.getAuth();
         if (auth) {
-            apiFetch("/api/servers/").then(data => {
+            api.servers.getServers().then(data => {
                 if (!data.error) {
                     this.setState({
                         servers: data.data
