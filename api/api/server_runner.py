@@ -120,7 +120,7 @@ def stop_server(server: GameServer) -> bool:
     server_id = str(server.id)
     if __running.get(server_id):
         process = __running.pop(server_id)
-        process.kill()
+        process.terminate()
         return True
     return False
 
