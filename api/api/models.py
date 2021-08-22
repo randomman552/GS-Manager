@@ -8,6 +8,18 @@ from mongoengine import StringField, DictField, ListField, IntField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
+def _convert_to_dict(document: Document) -> dict:
+    """
+    Function used to convert a mongodb document to a compatible JSON dict.
+    This is used in all the data models contained in this file.
+    """
+    as_dict = document.to_mongo().to_dict()
+    as_dict["id"] = str(as_dict["_id"])
+    as_dict.pop("_id")
+
+    return as_dict
+
+
 class User(Document, UserMixin):
     name = StringField(required=True, unique=True)
     __password_hash = StringField(required=True, db_field="password")
@@ -30,6 +42,9 @@ class User(Document, UserMixin):
 
     def check_password(self, password: str) -> bool:
         return not self.is_anonymous and check_password_hash(self.__password_hash, password)
+
+    def to_dict(self):
+        return _convert_to_dict(self)
 
 
 class GameServer(Document):
@@ -95,3 +110,6 @@ class GameServer(Document):
     def delete(self, signal_kwargs=None, **write_concern):
         shutil.rmtree(self.working_directory)
         super().delete(signal_kwargs, **write_concern)
+
+    def to_dict(self):
+        return _convert_to_dict(self)

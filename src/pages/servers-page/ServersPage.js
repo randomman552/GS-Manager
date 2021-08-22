@@ -59,7 +59,7 @@ class ServerDashboard extends React.Component {
      */
     modifySettings(data) {
         if (this.server) {
-            api.servers.updateServer(this.server.id, data).then(data => {
+            api.servers.modifyServer(this.server.id, data).then(data => {
                 if (data.code === 200) {
                     this.closeSettings();
                 }
@@ -112,7 +112,7 @@ class ServerDashboard extends React.Component {
                 mode_map = deepCopy(server.mode_map)
             mode_map[data.name] = data.arguments
 
-            api.servers.updateServer(server.id, {mode_map}).then();
+            api.servers.modifyServer(server.id, {mode_map}).then();
         }
     }
 
@@ -136,7 +136,7 @@ class ServerDashboard extends React.Component {
             delete mode_map[data.originalName];
             mode_map[data.name] = data.arguments;
 
-            api.servers.updateServer(server.id, {mode_map}).then();
+            api.servers.modifyServer(server.id, {mode_map}).then();
         }
     }
 
@@ -152,7 +152,7 @@ class ServerDashboard extends React.Component {
                 mode_map = deepCopy(server.mode_map)
             delete mode_map[data.name]
 
-            api.servers.updateServer(server.id, {mode_map}).then();
+            api.servers.modifyServer(server.id, {mode_map}).then();
         }
     }
 

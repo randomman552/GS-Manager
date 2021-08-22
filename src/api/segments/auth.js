@@ -23,7 +23,7 @@ const auth = {
         }
     },
 
-    updateUser(userID, obj) {
+    modifyUser(userID, obj) {
         if (userID) {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url, obj, "put");

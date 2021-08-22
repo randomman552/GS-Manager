@@ -18,7 +18,7 @@ const servers = {
         }
     },
 
-    updateServer(serverID, data) {
+    modifyServer(serverID, data) {
         if (serverID) {
             const url = "/api/servers/" + serverID;
             return apiFetch(url, data, "put");
