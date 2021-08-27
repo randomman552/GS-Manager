@@ -66,6 +66,7 @@ def modify_server(server_id: str):
             if data:
                 server.update(**data)
                 server.save()
+                server.reload()
                 return rest.response(200, data=server.to_dict())
         return rest.response(400, error="No data provided.")
     return rest.response(409, error="Cannot edit server whilst it is running.")
