@@ -32,15 +32,18 @@ class ServerDashboard extends React.Component {
 
 
     startServer() {
-        api.servers.runStart(this.server.id).then();
+        if (this.server)
+            api.servers.runStart(this.server.id).then();
     }
 
     updateServer() {
-        api.servers.runUpdate(this.server.id).then()
+        if (this.server)
+            api.servers.runUpdate(this.server.id).then()
     }
 
     stopServer() {
-        api.servers.runStop(this.server.id).then()
+        if (this.server)
+            api.servers.runStop(this.server.id).then()
     }
 
 
@@ -198,6 +201,10 @@ class ServerDashboard extends React.Component {
     }
 
     render() {
+        if (!this.server)
+            return (
+                <NoServerDashboard/>
+            )
         const outputLines = this.renderOutputLines();
         const settingsModal = this.renderSettings();
         const running = this.server.status !== "stopped";
@@ -256,29 +263,13 @@ ServerDashboard.propTypes = {
  * Dashboard displayed on route normal /servers route.
  */
 class NoServerDashboard extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            user: this.props.user,
-            auth:this.props.auth
-        };
-    }
-
-    createServer(data) {
-        api.servers.createServer(data).then();
-    }
-
     render() {
         return (
             <div className="server-dashboard">
-                <NewServerForm onSubmit={(data) => this.createServer(data)} />
+                <NewServerForm onSubmit={(data) => api.servers.createServer(data)} />
             </div>
         );
     }
-}
-
-NoServerDashboard.propTypes = {
-    auth: PropTypes.object.isRequired
 }
 
 
