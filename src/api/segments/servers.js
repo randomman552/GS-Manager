@@ -1,12 +1,23 @@
-import {apiFetch} from "../util";
+import {apiFetch, StorageCache} from "../util";
 
 const servers = {
+    cache: new StorageCache(),
+
+    // region API requests
     getServers() {
-        return apiFetch("/api/servers/");
+        return apiFetch("/api/servers/").then(data => {
+            if (!data.error)
+                this.cache.fromArray(data.data);
+            return data;
+        });
     },
 
     createServer(data) {
-        return apiFetch("/api/servers/", data, "put");
+        return apiFetch("/api/servers/", data, "put").then(data => {
+            if (!data.error)
+                this.cache.updateObj(data.data)
+            return data;
+        });
     },
 
     // region Server information access methods
@@ -14,21 +25,33 @@ const servers = {
     getServer(serverID) {
         if (serverID) {
             const url = "/api/servers/" + serverID;
-            return apiFetch(url);
+            return apiFetch(url).then(data => {
+                if (!data.error)
+                    this.cache.updateObj(data.data)
+                return data;
+            });
         }
     },
 
     modifyServer(serverID, data) {
         if (serverID) {
             const url = "/api/servers/" + serverID;
-            return apiFetch(url, data, "put");
+            return apiFetch(url, data, "put").then(data => {
+                if (!data.error)
+                    this.cache.updateObj(data.data)
+                return data;
+            });
         }
     },
 
     deleteServer(serverID) {
         if (serverID) {
             const url = "/api/servers/" + serverID;
-            return apiFetch(url, null, "delete");
+            return apiFetch(url, null, "delete").then(data => {
+                if (!data.error)
+                    this.cache.deleteObj(data.data)
+                return data;
+            });
         }
     },
 
@@ -64,7 +87,8 @@ const servers = {
         }
     }
 
-    //endregion
+    // endregion
+    // endregion
 }
 
 export default servers;

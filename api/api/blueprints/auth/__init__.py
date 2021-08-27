@@ -73,7 +73,7 @@ def modify_user(user_id: str):
 def delete_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
     user.delete()
-    return rest.response(200, user.to_dict())
+    return rest.response(200, data=user.to_dict())
 
 # endregion
 

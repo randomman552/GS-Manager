@@ -16,6 +16,11 @@ export class App extends React.Component {
                 this.setState({
                     user: data.data
                 });
+                api.servers.getServers().then((data) => {
+                   this.setState({
+                       servers: api.servers.cache.asArray
+                   });
+                });
             } else if (data.code === 401) {
                 this.logout();
             }
@@ -50,6 +55,11 @@ export class App extends React.Component {
                         this.setState({
                             user: data.data
                         });
+                        api.servers.getServers().then((data) => {
+                           this.setState({
+                               servers: api.servers.cache.asArray
+                           });
+                        });
                     } else if (data.code === 401) {
                         this.showModal("Login Failed", "Incorrect username or password...");
                     }
@@ -66,24 +76,6 @@ export class App extends React.Component {
                 "user": null
             });
         });
-    }
-
-
-    /**
-     * Query api for servers and users.
-     */
-    queryApi() {
-        const auth = this.getAuth();
-        if (auth) {
-            api.servers.getServers().then(data => {
-                if (!data.error) {
-                    this.setState({
-                        servers: data.data
-                    });
-                }
-                return null;
-            });
-        }
     }
 
     /**
@@ -208,12 +200,15 @@ export class App extends React.Component {
 
 
     componentDidMount() {
-        this.queryApi();
-        this.interval = setInterval(() => this.queryApi(), 500);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.interval);
+        const serverUpdateFunc = (servers) => {
+            this.setState({
+                servers
+            });
+        }
+        api.servers.cache.addChangeListener(serverUpdateFunc);
+        this.componentWillUnmount = () => {
+            api.servers.cache.removeChangeListener(serverUpdateFunc)
+        }
     }
 }
 

@@ -25,3 +25,115 @@ export async function apiFetch(url, data, method = "post", auth = null) {
     );
     return await response.json();
 }
+
+/**
+ * Class used to cache objects from backend api.
+ * WARN: Object passed MUST have an ID attribute that can be searched for.
+ */
+export class StorageCache {
+    /**
+     * Underlying store of data objects.
+     * Store as id obj pairs in object.
+     * @type {{}}
+     * @private
+     */
+    _cache = {};
+    /**
+     * Functions that are called on data changing.
+     * @type {[function]}
+     * @private
+     */
+    _changeListeners = [];
+
+
+    /**
+     * All objects in cache in an array.
+     * @returns {*[]}
+     */
+    get asArray() {
+        const asArr = [];
+        for (const key in this._cache)
+            if (this._cache.hasOwnProperty(key))
+                asArr.push(this._cache[key]);
+        return asArr;
+    }
+
+    /**
+     * All objects in cache in an object.
+     * @returns {{}}
+     */
+    get asObject() {
+        return this._cache;
+    }
+
+    /**
+     * Get an object with a specific id.
+     * @param id
+     * @returns {*}
+     */
+    getObject(id) {
+        return this._cache[id];
+    }
+
+
+    /**
+     * Load data from an array.
+     * @param arr {[Object]}
+     */
+    fromArray(arr) {
+        this._cache = {}
+        for (const obj of arr)
+            this._cache[obj.id] = obj;
+    }
+
+    /**
+     * Load data from an object.
+     */
+    fromObj(obj) {
+        this._cache = obj;
+    }
+
+
+    callChangeListeners() {
+        for (const func of this._changeListeners)
+            func(this.asArray);
+    }
+
+    addChangeListener(func) {
+        this._changeListeners.push(func);
+    }
+
+    removeChangeListener(func) {
+        for (let i = 0; i < this._changeListeners.length; i++) {
+            if (this._changeListeners[i] === func)
+                this._changeListeners.splice(i, i);
+        }
+    }
+
+
+    /**
+     * Add an object to the cache.
+     * @param obj
+     */
+    addObj(obj) {
+        this._cache[obj.id] = obj;
+        this.callChangeListeners();
+    }
+
+    /**
+     * Update an object in the cache.
+     * @param obj
+     */
+    updateObj(obj) {
+        this.addObj(obj);
+    }
+
+    /**
+     * Delete an object from the cache.
+     * @param obj
+     */
+    deleteObj(obj) {
+        delete this._cache[obj.id];
+        this.callChangeListeners();
+    }
+}
