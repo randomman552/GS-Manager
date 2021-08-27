@@ -32,7 +32,7 @@ def create_server():
                 new_server.save()
                 new_server.reload()
                 new_server.create_working_directory()
-                return rest.response(201, new_server.to_dict())
+                return rest.response(201, data=new_server.to_dict())
             except ValidationError as e:
                 return rest.response(400, error=e.message)
             except NotUniqueError as e:
@@ -77,7 +77,7 @@ def delete_server(server_id: str):
     """Endpoint for deleting an existing server."""
     server = GameServer.objects(id=server_id).first_or_404()
     server.delete()
-    return rest.response(200, server.to_dict())
+    return rest.response(200, data=server.to_dict())
 
 # endregion
 
