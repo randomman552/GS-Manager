@@ -2,7 +2,7 @@ import auth from "./segments/auth";
 import servers from "./segments/servers";
 import io from "socket.io-client"
 
-const socket = io.connect("/", {port: 5000});
+const socket = io.connect("/");
 
 setTimeout(() => {
     socket.emit("test", "message")
