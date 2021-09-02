@@ -5,6 +5,7 @@ import os
 from flask import Flask, Request
 from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
+from flask_socketio import SocketIO
 from mongoengine import Q
 
 from .blueprints import *
@@ -131,6 +132,19 @@ def error_404(error):
     error = str(error)
     return rest.response(404, error)
 # endregion
+# endregion
+
+
+# region SocketIO setup
+
+socketIO = SocketIO(app, cors_allowed_origins="*")
+
+
+@socketIO.on("test")
+def on_test(message):
+    print(f"Received test: '{message}'")
+
+
 # endregion
 
 

@@ -5,11 +5,12 @@ import PropTypes from 'prop-types';
 import {Switch, Route, Redirect} from "react-router-dom";
 
 import {Navigation, ServerNavigation} from "../components/Navigation";
-import {apiFetch, deepCopy} from "../../util";
+import {deepCopy} from "../../util";
 import {SendCommandForm} from "./components/SendCommandForm"
 import {UpdateServerForm} from "./components/UpdateServerForm"
 import {NewServerForm} from "./components/NewServerForm";
 import "./ServersPage.css"
+import api from "../../api/api";
 
 
 /**
@@ -31,35 +32,27 @@ class ServerDashboard extends React.Component {
 
 
     startServer() {
-        if (this.server) {
-            const queryUrl = "/api/servers/" + this.server.id + "/start";
-            apiFetch(queryUrl).then(r => {});
-        }
+        if (this.server)
+            api.servers.runStart(this.server.id).then();
     }
 
     updateServer() {
-        if (this.server) {
-            const queryUrl = "/api/servers/" + this.server.id + "/update";
-            apiFetch(queryUrl).then(r => {});
-        }
+        if (this.server)
+            api.servers.runUpdate(this.server.id).then()
     }
 
     stopServer() {
-        if (this.server) {
-            const queryUrl = "/api/servers/" + this.server.id + "/stop";
-            apiFetch(queryUrl).then(r => {});
-        }
+        if (this.server)
+            api.servers.runStop(this.server.id).then()
     }
 
 
     sendCommand(data) {
         if (this.server && data.command) {
-            const queryUrl = "/api/servers/" + this.server.id + "/command";
             const toSend = {
                 "command": data.command
             };
-
-            apiFetch(queryUrl, toSend).then(r => {});
+            api.servers.runCommand(toSend).then();
         }
     }
 
@@ -69,9 +62,7 @@ class ServerDashboard extends React.Component {
      */
     modifySettings(data) {
         if (this.server) {
-            const queryUrl = "/api/servers/" + this.server.id;
-
-            apiFetch(queryUrl, data, "put").then(data => {
+            api.servers.modifyServer(this.server.id, data).then(data => {
                 if (data.code === 200) {
                     this.closeSettings();
                 }
@@ -84,9 +75,7 @@ class ServerDashboard extends React.Component {
      */
     deleteServer() {
         if (this.server) {
-            const queryUrl = "/api/servers/" + this.server.id;
-
-            apiFetch(queryUrl, null, "delete").then(data => {
+            api.servers.deleteServer(this.server.id).then(data => {
                 if (data.code === 200) {
                     this.render = () => {
                         return (
@@ -121,16 +110,12 @@ class ServerDashboard extends React.Component {
     addMode(data) {
         const server = this.server;
         if (server && data.name && data.arguments) {
-            const queryUrl = "/api/servers/" + server.id;
-
             let mode_map = {}
             if (server.mode_map)
                 mode_map = deepCopy(server.mode_map)
             mode_map[data.name] = data.arguments
 
-            apiFetch(queryUrl, {mode_map}, "put").then(data => {
-
-            });
+            api.servers.modifyServer(server.id, {mode_map}).then();
         }
     }
 
@@ -141,8 +126,6 @@ class ServerDashboard extends React.Component {
     editMode(data) {
         const server = this.server;
         if (server && data.originalName) {
-            const queryUrl = "/api/servers/" + server.id;
-
             let mode_map = {};
             if (server.mode_map)
                 mode_map = deepCopy(server.mode_map);
@@ -156,9 +139,7 @@ class ServerDashboard extends React.Component {
             delete mode_map[data.originalName];
             mode_map[data.name] = data.arguments;
 
-            apiFetch(queryUrl, {mode_map}, "put").then(data => {
-
-            });
+            api.servers.modifyServer(server.id, {mode_map}).then();
         }
     }
 
@@ -169,16 +150,12 @@ class ServerDashboard extends React.Component {
     deleteMode(data) {
         const server = this.server;
         if (server && data.name) {
-            const queryUrl = "/api/servers/" + server.id;
-
             let mode_map = {}
             if (server.mode_map)
                 mode_map = deepCopy(server.mode_map)
             delete mode_map[data.name]
 
-            apiFetch(queryUrl, {mode_map}, "put").then(data => {
-
-            });
+            api.servers.modifyServer(server.id, {mode_map}).then();
         }
     }
 
@@ -224,6 +201,10 @@ class ServerDashboard extends React.Component {
     }
 
     render() {
+        if (!this.server)
+            return (
+                <NoServerDashboard/>
+            )
         const outputLines = this.renderOutputLines();
         const settingsModal = this.renderSettings();
         const running = this.server.status !== "stopped";
@@ -282,33 +263,13 @@ ServerDashboard.propTypes = {
  * Dashboard displayed on route normal /servers route.
  */
 class NoServerDashboard extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            user: this.props.user,
-            auth:this.props.auth
-        };
-    }
-
-    createServer(data) {
-        const queryUrl = "/api/servers/";
-
-        apiFetch(queryUrl, data, "put").then((data) => {
-            console.log(data)
-        });
-    }
-
     render() {
         return (
             <div className="server-dashboard">
-                <NewServerForm onSubmit={(data) => this.createServer(data)} />
+                <NewServerForm onSubmit={(data) => api.servers.createServer(data)} />
             </div>
         );
     }
-}
-
-NoServerDashboard.propTypes = {
-    auth: PropTypes.object.isRequired
 }
 
 

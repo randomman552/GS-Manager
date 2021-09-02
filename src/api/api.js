@@ -1,11 +1,23 @@
 import auth from "./segments/auth";
+import servers from "./segments/servers";
+import io from "socket.io-client"
+
+const socket = io.connect("/");
+
+setTimeout(() => {
+    socket.emit("test", "message")
+}, 1000)
+
 
 /**
  * Object used to abstract away the querying of the backend api.
  * Contains the following api segments:
- * - auth: Allows control over user accounts.
+ * - auth
+ * - servers
  */
 const api = {
+    socket,
+    servers,
     auth
 }
 
