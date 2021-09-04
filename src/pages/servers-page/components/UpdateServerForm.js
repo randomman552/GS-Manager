@@ -293,7 +293,7 @@ export function UpdateServerForm(props) {
             <Modal.Header>
                 <h2>Server Settings</h2>
             </Modal.Header>
-            <Tabs defaultActiveKey="general">
+            <Tabs defaultActiveKey="general" fill justify>
                 <Tab eventKey="general" title="General">
                     <GeneralSettingsForm
                         data={props.data}

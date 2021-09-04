@@ -15,6 +15,7 @@ export function SettingsPage(props) {
                 defaultActiveKey="settings"
                 id="settings-tab-container"
                 className="container-md"
+                fill justfiy
             >
                 <Tab eventKey="settings" title="Settings" className="container-md">
                     <SettingsPanel/>
