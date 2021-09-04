@@ -1,12 +1,5 @@
 import auth from "./segments/auth";
 import servers from "./segments/servers";
-import io from "socket.io-client"
-
-const socket = io.connect("/");
-
-setTimeout(() => {
-    socket.emit("test", "message")
-}, 1000)
 
 
 /**
@@ -16,7 +9,6 @@ setTimeout(() => {
  * - servers
  */
 const api = {
-    socket,
     servers,
     auth
 }

@@ -1,7 +1,12 @@
 import {apiFetch, StorageCache} from "../util";
+import io from "socket.io-client"
+
+const socket = io("/servers");
+
 
 const servers = {
     cache: new StorageCache(),
+    socket,
 
     // region API requests
     getServers() {
@@ -28,6 +33,20 @@ const servers = {
             return apiFetch(url).then(data => {
                 if (!data.error)
                     this.cache.updateObj(data.data)
+                return data;
+            });
+        }
+    },
+
+    getServerOutput(serverID) {
+        if (serverID) {
+            const url = "/api/servers/" + serverID;
+            return apiFetch(url).then(data => {
+                if (!data.error) {
+                    const server = this.cache.getObject(serverID);
+                    server.output = data.data;
+                    this.cache.updateObj(server);
+                }
                 return data;
             });
         }
@@ -108,5 +127,23 @@ const servers = {
     // endregion
     // endregion
 }
+
+
+// region SocketIO event handlers
+
+socket.on("output", (json) => {
+    const server = servers.cache.getObject(json.server_id);
+    server.output.push(json.output);
+    servers.cache.updateObj(server);
+});
+
+socket.on("status", (json) => {
+    const server = servers.cache.getObject(json.server_id);
+    server.status = json.status;
+    servers.cache.updateObj(server);
+});
+
+// endregion
+
 
 export default servers;
