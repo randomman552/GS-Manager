@@ -69,21 +69,39 @@ const servers = {
     runStart(serverID) {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/start";
-            return apiFetch(url);
+            return apiFetch(url).then(data => {
+                if (!data.error) {
+                    const server = this.cache.getObject(serverID);
+                    server.status = "started";
+                    this.cache.updateObj(server);
+                }
+            });
         }
     },
 
     runUpdate(serverID) {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/update";
-            return apiFetch(url);
+            return apiFetch(url).then(data => {
+                if (!data.error) {
+                    const server = this.cache.getObject(serverID);
+                    server.status = "updating";
+                    this.cache.updateObj(server);
+                }
+            });
         }
     },
 
     runStop(serverID) {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/stop";
-            return apiFetch(url);
+            return apiFetch(url).then(data => {
+                if (!data.error) {
+                    const server = this.cache.getObject(serverID);
+                    server.status = "stopped";
+                    this.cache.updateObj(server);
+                }
+            });
         }
     }
 
