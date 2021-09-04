@@ -1,0 +1,9 @@
+.user-listing {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-listing .user-entry {
+    display: grid;
+    grid-template-columns: 20% 60% 20%;
+}

@@ -4,6 +4,8 @@ import {SettingsPanel} from "./components/SettingsPanel";
 import {AdminSettingsPanel} from "./components/AdminSettingsPanel";
 import {Tab, Tabs} from "react-bootstrap";
 
+import "./SettingsPage.css"
+
 export function SettingsPage(props) {
     return (
         <article className="page">
@@ -17,11 +19,11 @@ export function SettingsPage(props) {
                 className="container-md"
                 fill justfiy
             >
-                <Tab eventKey="settings" title="Settings" className="container-md">
+                <Tab eventKey="settings" title="Settings" className="container-md text-center">
                     <SettingsPanel/>
                 </Tab>
 
-                <Tab eventKey="admin-settings" title="Admin Settings" className="container-md">
+                <Tab eventKey="admin-settings" title="Admin" className="container-md text-center">
                     <AdminSettingsPanel/>
                 </Tab>
             </Tabs>

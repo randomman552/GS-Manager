@@ -21,6 +21,7 @@ export class App extends React.Component {
                        servers: api.servers.cache.asArray
                    });
                 });
+                api.auth.getUsers().then();
             } else if (data.code === 401) {
                 this.logout();
             }
@@ -60,6 +61,7 @@ export class App extends React.Component {
                                servers: api.servers.cache.asArray
                            });
                         });
+                        api.auth.getUsers().then();
                     } else if (data.code === 401) {
                         this.showModal("Login Failed", "Incorrect username or password...");
                     }
