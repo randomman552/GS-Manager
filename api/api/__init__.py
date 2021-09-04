@@ -10,9 +10,11 @@ from mongoengine import Q
 from .blueprints import *
 from .models import User, GameServer
 from . import server_runner as runner
+from .socketIO import socketIO
 from . import rest
 
 app = Flask(__name__)
+socketIO.init_app(app)
 config_path = os.path.join(app.root_path, "config.json")
 
 

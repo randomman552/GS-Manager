@@ -1,12 +1,31 @@
 from flask import Blueprint, request, abort
-from flask_login import login_required
+from flask_login import login_required, current_user
 from mongoengine import ValidationError, NotUniqueError
 
-from ...models import GameServer
+from ...models import GameServer, User
 from ... import server_runner as runner
+from ...socketIO import socketIO
 from ... import rest
 
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
+
+
+# region SocketIO interaction
+
+@socketIO.on("input", namespace="/servers")
+def input_to_server(json):
+    server_id = json.get("server_id")
+    input_text = json.get("input_text")
+    api_key = json.get("api_key")
+    server = GameServer.objects(id=server_id).first()
+    if server:
+        api_key_user = User.objects(api_key=api_key).first()
+        if api_key_user and api_key_user.is_authenticated:
+            runner.run_command(input_text, server)
+        if current_user.is_authenticated:
+            runner.run_command(input_text, server)
+
+# endregion
 
 
 # region Server list getting and creation methods.
@@ -15,12 +34,8 @@ servers = Blueprint("servers", __name__, static_folder="static", template_folder
 @login_required
 def get_servers():
     all_servers = GameServer.objects().all()
-    servers_list = [server.to_mongo().to_dict() for server in all_servers]
+    servers_list = [server.to_dict() for server in all_servers]
 
-    # Pop off unneeded attributes
-    for server in servers_list:
-        server["id"] = str(server.get("_id"))
-        server.pop("_id")
     return rest.response(200, data=servers_list)
 
 
@@ -34,8 +49,9 @@ def create_server():
             try:
                 new_server = GameServer(**data)
                 new_server.save()
+                new_server.reload()
                 new_server.create_working_directory()
-                return rest.response(201)
+                return rest.response(201, data=new_server.to_dict())
             except ValidationError as e:
                 return rest.response(400, error=e.message)
             except NotUniqueError as e:
@@ -50,20 +66,27 @@ def create_server():
 @servers.route("/<server_id>", methods=["GET", "POST"])
 @login_required
 def server_details(server_id: str):
+    """Endpoint to get details of the given server (except terminal output)"""
     server = GameServer.objects(id=server_id).first_or_404()
+    return rest.response(200, data=server.to_dict())
 
-    server_dict = server.to_mongo().to_dict()
-    server_dict.pop("_id")
-    return rest.response(200, data=server_dict)
+
+@servers.route("/<server_id>/output", methods=["GET", "POST"])
+@login_required
+def server_output(server_id: str):
+    """Endpoint to get terminal output of a given server"""
+    server = GameServer.objects(id=server_id).first_or_404()
+    return rest.response(200, data=server.output)
 
 
 @servers.route("/<server_id>", methods=["PUT"])
 @login_required
-def update_server(server_id: str):
+def modify_server(server_id: str):
     """
-    Endpoint for creating new servers.
+    Endpoint for modifying existing servers.
     """
     server = GameServer.objects(id=server_id).first_or_404()
+
     if not server.is_running:
         json = request.get_json()
         if json:
@@ -71,7 +94,8 @@ def update_server(server_id: str):
             if data:
                 server.update(**data)
                 server.save()
-                return rest.response(200, data=data)
+                server.reload()
+                return rest.response(200, data=server.to_dict())
         return rest.response(400, error="No data provided.")
     return rest.response(409, error="Cannot edit server whilst it is running.")
 
@@ -82,7 +106,7 @@ def delete_server(server_id: str):
     """Endpoint for deleting an existing server."""
     server = GameServer.objects(id=server_id).first_or_404()
     server.delete()
-    return rest.response(200)
+    return rest.response(200, data=server.to_dict())
 
 # endregion
 
@@ -139,7 +163,7 @@ def stop_server(server_id: str):
 
 @servers.route("/<server_id>/update", methods=["GET", "POST"])
 @login_required
-def run_server_update(server_id: str):
+def update_server(server_id: str):
     """
     Endpoint to run the server update command.
     """

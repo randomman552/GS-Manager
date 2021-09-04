@@ -3,7 +3,6 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/login-page/LoginPage";
 import { ServersPage } from "./pages/servers-page/ServersPage";
 import { SettingsPage } from "./pages/settings-page/SettingsPage";
-import { apiFetch } from "./util";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
 import api from "./api/api";
@@ -16,6 +15,11 @@ export class App extends React.Component {
             if (!data.error) {
                 this.setState({
                     user: data.data
+                });
+                api.servers.getServers().then((data) => {
+                   this.setState({
+                       servers: api.servers.cache.asArray
+                   });
                 });
             } else if (data.code === 401) {
                 this.logout();
@@ -51,6 +55,11 @@ export class App extends React.Component {
                         this.setState({
                             user: data.data
                         });
+                        api.servers.getServers().then((data) => {
+                           this.setState({
+                               servers: api.servers.cache.asArray
+                           });
+                        });
                     } else if (data.code === 401) {
                         this.showModal("Login Failed", "Incorrect username or password...");
                     }
@@ -67,24 +76,6 @@ export class App extends React.Component {
                 "user": null
             });
         });
-    }
-
-
-    /**
-     * Query api for servers and users.
-     */
-    queryApi() {
-        const auth = this.getAuth();
-        if (auth) {
-            apiFetch("/api/servers/").then(data => {
-                if (!data.error) {
-                    this.setState({
-                        servers: data.data
-                    });
-                }
-                return null;
-            });
-        }
     }
 
     /**
@@ -209,12 +200,15 @@ export class App extends React.Component {
 
 
     componentDidMount() {
-        this.queryApi();
-        this.interval = setInterval(() => this.queryApi(), 500);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.interval);
+        const serverUpdateFunc = (servers) => {
+            this.setState({
+                servers
+            });
+        }
+        api.servers.cache.addChangeListener(serverUpdateFunc);
+        this.componentWillUnmount = () => {
+            api.servers.cache.removeChangeListener(serverUpdateFunc)
+        }
     }
 }
 

@@ -1,34 +1,66 @@
-import {apiFetch} from "../../util";
+import {apiFetch, StorageCache} from "../util";
 
 const auth = {
+    cache: new StorageCache(),
+
     getCurrentUser() {
-        return apiFetch("/api/auth/");
+        return apiFetch("/api/auth/").then(data => {
+            if (!data.error)
+                this.cache.updateObj(data.data);
+            return data;
+        });
     },
 
     // region User creation and retrieval.
     getUsers() {
-        return apiFetch("/api/auth/users");
+        return apiFetch("/api/auth/users").then(data => {
+            if (!data.error)
+                this.cache.fromArray(data.data);
+            return data;
+        });
     },
 
     createUser(obj) {
-        return apiFetch("/api/auth/users", obj, "put");
+        return apiFetch("/api/auth/users", obj, "put").then(data => {
+            if (!data.error)
+                this.cache.updateObj(data.data);
+            return data;
+        });
     },
     //endregion
 
     // region Specific user controls (getting, updating, and deleting specific users)
     getUser(userID) {
-        const url = "/api/auth/users/" + userID;
-        return apiFetch(url);
+        if (userID) {
+            const url = "/api/auth/users/" + userID;
+            return apiFetch(url).then(data => {
+                if (!data.error)
+                    this.cache.updateObj(data.data);
+                return data;
+            });
+        }
     },
 
-    updateUser(userID, obj) {
-        const url = "/api/auth/users/" + userID;
-        return apiFetch(url, obj, "put");
+    modifyUser(userID, obj) {
+        if (userID) {
+            const url = "/api/auth/users/" + userID;
+            return apiFetch(url, obj, "put").then(data => {
+                if (!data.error)
+                    this.cache.updateObj(data.data);
+                return data;
+            });
+        }
     },
 
     deleteUser(userID) {
-        const url = "/api/auth/users/" + userID;
-        return apiFetch(url,null, "delete");
+        if (userID) {
+            const url = "/api/auth/users/" + userID;
+            return apiFetch(url, null, "delete").then(data => {
+                if (!data.error)
+                    this.cache.deleteObj(data.data);
+                return data;
+            });
+        }
     },
     //endregion
 
