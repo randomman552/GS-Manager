@@ -12,13 +12,7 @@ class AdminUserSettings extends React.Component {
 
 
     render() {
-        api.auth.getUsers().then((data => {
-            this.setState({
-                users: data.data
-            })
-        }));
-
-        const users = this.state.users;
+        const users = api.auth.cache.asArray;
         let usersDisplay = users.map((user => {
             return (
                 <tr className="user-entry">
