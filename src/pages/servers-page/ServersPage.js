@@ -1,10 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 import {Card, Button} from "react-bootstrap";
 import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
-import {Switch, Route, Redirect} from "react-router-dom";
+import {Switch, Route, Redirect, Link} from "react-router-dom";
 
-import {Navigation, ServerNavigation} from "../components/Navigation";
+import {Navigation} from "../components/Navigation";
 import {deepCopy} from "../../util";
 import {SendCommandForm} from "./components/SendCommandForm"
 import {UpdateServerForm} from "./components/UpdateServerForm"
@@ -203,7 +203,7 @@ class ServerDashboard extends React.Component {
     render() {
         if (!this.server)
             return (
-                <NoServerDashboard/>
+                <Redirect to="/servers"/>
             )
         const outputLines = this.renderOutputLines();
         const settingsModal = this.renderSettings();
@@ -262,14 +262,45 @@ ServerDashboard.propTypes = {
 /**
  * Dashboard displayed on route normal /servers route.
  */
-class NoServerDashboard extends React.Component {
-    render() {
+function NoServerDashboard(props) {
+    const [show, setShow] = useState(false);
+
+    const servers = props.servers.map((server) => {
+        const serverRunning = server.status !== "stopped";
+
         return (
-            <div className="server-dashboard">
-                <NewServerForm onSubmit={(data) => api.servers.createServer(data)} />
-            </div>
+            <article className="server">
+                <Link className="server-name" to={"/servers/" + server.id}>{server.name}</Link>
+                <div className="controls">
+                    <Button variant="success" disabled={serverRunning} onClick={() => api.servers.runStart(server.id)}>Start</Button>
+                    <Button variant="warning" disabled={serverRunning} onClick={() => api.servers.runUpdate(server.id)}>Update</Button>
+                    <Button variant="danger" disabled={!serverRunning} onClick={() => api.servers.runStop(server.id)}>Stop</Button>
+                </div>
+                <Link className={"server-status " + server.status} to={"/servers/" + server.id}>{server.status}</Link>
+            </article>
         );
-    }
+    })
+
+    return (
+        <div className="server-dashboard">
+            <NewServerForm
+                show={show}
+                setShow={(show) => setShow(show)}
+                onSubmit={(data) => {setShow(false); api.servers.createServer(data).then()}}
+            />
+            <article className="servers-grid">
+                {servers}
+                <article className="server new-server" onClick={() => setShow(true)}>
+                    <div className="plus">+</div>
+                    <p>Add new server</p>
+                </article>
+            </article>
+        </div>
+    );
+}
+
+NoServerDashboard.propTypes = {
+    servers: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 
@@ -285,9 +316,6 @@ export function ServersPage(props) {
                 activeKey="/servers"
                 user={user}
                 onLogout={onLogout}
-            />
-            <ServerNavigation
-                servers={servers}
             />
             <Switch>
                 <Route
@@ -316,7 +344,7 @@ export function ServersPage(props) {
                 <Route
                     exact path="/servers"
                     render={(props) => {
-                        return (<NoServerDashboard {...props} auth={auth} />)
+                        return (<NoServerDashboard {...props} auth={auth} servers={servers} />)
                     }}
                 />
             </Switch>
