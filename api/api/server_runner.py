@@ -1,10 +1,10 @@
 import shlex
-import threading
 import time
 
 from subprocess import Popen, PIPE, STDOUT
 
 from .models import GameServer
+from .socketIO import socketIO
 
 __running = dict()
 
@@ -22,6 +22,7 @@ def __read_stdout(server_id: str) -> None:
             process = __running.get(server_id)
             line = process.stdout.readline().decode("utf-8")
             if line:
+                socketIO.emit("output", {"server_id": server_id, "output": line}, namespace="/servers")
                 GameServer.objects(id=server_id).update(push__output=line)
             server.save()
     except (ValueError, AttributeError):
@@ -45,6 +46,12 @@ def __poll_process(server_id: str) -> None:
         set__status="stopped",
         push__output=f"Exited with code '{process.returncode}'"
     )
+    socketIO.emit(
+        "output",
+        {"server_id": server_id, "output": f"Exited with code '{process.returncode}'"},
+        namespace="/servers"
+    )
+    socketIO.emit("status", {"server_id": server_id, "status": "stopped"}, namespace="/servers")
 
 
 def __create_process(working_directory: str, command: str) -> Popen:
@@ -67,11 +74,14 @@ def __start_watcher_threads(server_id: str) -> None:
     Helper function to start threads to watch the server process with the given id.
     :param server_id: The id of the server to watch.
     """
-    out_watcher = threading.Thread(name=f"{server_id} stdout watcher", target=__read_stdout, args=(server_id,))
-    poll_watcher = threading.Thread(name=f"{server_id} process watcher", target=__poll_process, args=(server_id,))
+    # out_watcher = threading.Thread(name=f"{server_id} stdout watcher", target=__read_stdout, args=(server_id,))
+    # poll_watcher = threading.Thread(name=f"{server_id} process watcher", target=__poll_process, args=(server_id,))
+    #
+    # out_watcher.start()
+    # poll_watcher.start()
 
-    out_watcher.start()
-    poll_watcher.start()
+    socketIO.start_background_task(__read_stdout, server_id)
+    socketIO.start_background_task(__poll_process, server_id)
 
 
 def start_server(server: GameServer) -> bool:
@@ -88,6 +98,8 @@ def start_server(server: GameServer) -> bool:
 
         server.status = "started"
         server.output = [server.current_start_cmd]
+        socketIO.emit("output", {"server_id": server_id, "output": server.current_start_cmd}, namespace="/servers")
+        socketIO.emit("status", {"server_id": server_id, "status": "started"}, namespace="/servers")
         server.save()
         return True
     return False
@@ -107,6 +119,8 @@ def update_server(server: GameServer) -> bool:
 
         server.status = "updating"
         server.output = [server.update_cmd]
+        socketIO.emit("output", {"server_id": server_id, "output": server.update_cmd}, namespace="/servers")
+        socketIO.emit("status", {"server_id": server_id, "status": "updating"}, namespace="/servers")
         server.save()
         return True
     return False
@@ -138,6 +152,7 @@ def run_command(cmd: str, server: GameServer) -> bool:
         process.stdin.write(cmd.encode("utf-8"))
         process.stdin.flush()
         server.output.append(cmd)
+        socketIO.emit("output", {"server_id": server_id, "output": cmd}, namespace="/servers")
         server.save()
         return True
     return False

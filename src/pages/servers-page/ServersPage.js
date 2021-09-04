@@ -52,7 +52,7 @@ class ServerDashboard extends React.Component {
             const toSend = {
                 "command": data.command
             };
-            api.servers.runCommand(toSend).then();
+            api.servers.runCommand(this.server.id, toSend).then();
         }
     }
 

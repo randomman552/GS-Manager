@@ -1,12 +1,31 @@
 from flask import Blueprint, request, abort
-from flask_login import login_required
+from flask_login import login_required, current_user
 from mongoengine import ValidationError, NotUniqueError
 
-from ...models import GameServer
+from ...models import GameServer, User
 from ... import server_runner as runner
+from ...socketIO import socketIO
 from ... import rest
 
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
+
+
+# region SocketIO interaction
+
+@socketIO.on("input", namespace="/servers")
+def input_to_server(json):
+    server_id = json.get("server_id")
+    input_text = json.get("input_text")
+    api_key = json.get("api_key")
+    server = GameServer.objects(id=server_id).first()
+    if server:
+        api_key_user = User.objects(api_key=api_key).first()
+        if api_key_user and api_key_user.is_authenticated:
+            runner.run_command(input_text, server)
+        if current_user.is_authenticated:
+            runner.run_command(input_text, server)
+
+# endregion
 
 
 # region Server list getting and creation methods.
@@ -47,8 +66,17 @@ def create_server():
 @servers.route("/<server_id>", methods=["GET", "POST"])
 @login_required
 def server_details(server_id: str):
+    """Endpoint to get details of the given server (except terminal output)"""
     server = GameServer.objects(id=server_id).first_or_404()
     return rest.response(200, data=server.to_dict())
+
+
+@servers.route("/<server_id>/output", methods=["GET", "POST"])
+@login_required
+def server_output(server_id: str):
+    """Endpoint to get terminal output of a given server"""
+    server = GameServer.objects(id=server_id).first_or_404()
+    return rest.response(200, data=server.output)
 
 
 @servers.route("/<server_id>", methods=["PUT"])
