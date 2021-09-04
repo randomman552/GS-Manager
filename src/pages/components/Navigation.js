@@ -3,43 +3,6 @@ import {Link} from "react-router-dom";
 import PropTypes from 'prop-types';
 import "./Navigation.css"
 
-export function ServerNavigation(props) {
-    let servers = []
-    if (props.servers) {
-        servers = props.servers.map((server) => {
-            const name = server.name;
-            const id = server.id;
-            const url = "/servers/" + id;
-            return (
-                <Nav.Item key={id}>
-                    <Nav.Link as={Link} className="text-capitalize" eventKey={id} to={url}>{name}</Nav.Link>
-                </Nav.Item>
-            )
-        });
-    }
-
-    const locationSplit = decodeURI(window.location.pathname).split("/");
-    const activeKey = locationSplit[locationSplit.length - 1];
-
-    return (
-        <header>
-            <Nav
-                variant="pills"
-                activeKey={activeKey}
-                className="flex-column bg-white sidebar"
-            >
-                <Nav.Item>
-                    {servers}
-                </Nav.Item>
-            </Nav>
-        </header>
-    )
-}
-
-ServerNavigation.propTypes = {
-    servers: PropTypes.arrayOf(PropTypes.object).isRequired
-}
-
 
 export function Navigation(props) {
     const loggedInMessage = (props.user) ? "Logged in as: " + props.user.name : "Logged in";
