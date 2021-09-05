@@ -1,8 +1,6 @@
-import shlex
-import time
 import os
 import signal
-
+import time
 from subprocess import Popen, PIPE, STDOUT, TimeoutExpired
 
 from .models import GameServer
@@ -63,10 +61,11 @@ def __create_process(working_directory: str, command: str) -> Popen:
     :param command: The command to execute.
     """
     return Popen(
-        shlex.split(command),
+        command,
         stdin=PIPE,
         stdout=PIPE,
         stderr=STDOUT,
+        shell=True,
         start_new_session=True,
         cwd=working_directory
     )
