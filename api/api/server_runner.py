@@ -76,7 +76,6 @@ def __start_watcher_threads(server_id: str) -> None:
     Helper function to start threads to watch the server process with the given id.
     :param server_id: The id of the server to watch.
     """
-
     socketIO.start_background_task(__read_stdout, server_id)
     socketIO.start_background_task(__poll_process, server_id)
 
@@ -136,7 +135,7 @@ def stop_server(server: GameServer) -> bool:
         # Attempt to kill the process with SIGINT, if this fails try SIGKILL
         try:
             os.killpg(pgid, signal.SIGINT)
-            process.wait(5)
+            process.wait(10)
         except TimeoutExpired:
             # If SIGKILL fails, try SIGTERM
             try:
