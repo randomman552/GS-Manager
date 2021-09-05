@@ -95,6 +95,8 @@ class GameServer(Document):
             command += " " + self.default_args
         if self.mode_map and self.mode:
             command += " " + self.mode_map.get(self.mode, self.unspecified_args)
+        else:
+            command += " " + self.unspecified_args
         return command
 
     @property
