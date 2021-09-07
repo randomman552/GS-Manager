@@ -89,10 +89,8 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/start";
             return apiFetch(url).then(data => {
-                if (!data.error) {
-                    const server = this.cache.getObject(serverID);
-                    server.status = "started";
-                    this.cache.updateObj(server);
+                if (data.code === 200) {
+                    this.cache.updateObj(data.data);
                 }
             });
         }
@@ -102,10 +100,8 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/update";
             return apiFetch(url).then(data => {
-                if (!data.error) {
-                    const server = this.cache.getObject(serverID);
-                    server.status = "updating";
-                    this.cache.updateObj(server);
+                if (data.code === 200) {
+                    this.cache.updateObj(data.data);
                 }
             });
         }
