@@ -132,7 +132,7 @@ def server_command(server_id: str):
 
     if command:
         if runner.run_command(command, server):
-            return rest.response(202)
+            return rest.response(200, data=server.to_dict())
         return rest.response(409, error="Server is not running")
     return rest.response(400, error="No command provided")
 
@@ -145,7 +145,7 @@ def start_server(server_id: str):
     """
     server = GameServer.objects(id=server_id).first_or_404()
     if runner.start_server(server):
-        return rest.response(202)
+        return rest.response(200,data=server.to_dict())
     return rest.response(409, error="Server is already running/updating")
 
 
@@ -157,7 +157,7 @@ def stop_server(server_id: str):
     """
     server = GameServer.objects(id=server_id).first_or_404()
     if runner.stop_server(server):
-        return rest.response(202)
+        return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is not running")
 
 
@@ -169,7 +169,7 @@ def update_server(server_id: str):
     """
     server = GameServer.objects(id=server_id).first_or_404()
     if runner.update_server(server):
-        return rest.response(202)
+        return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is already running/updating")
 
 # endregion

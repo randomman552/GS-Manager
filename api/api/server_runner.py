@@ -1,7 +1,7 @@
-import shlex
+import os
+import signal
 import time
-
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT, TimeoutExpired
 
 from .models import GameServer
 from .socketIO import socketIO
@@ -61,10 +61,12 @@ def __create_process(working_directory: str, command: str) -> Popen:
     :param command: The command to execute.
     """
     return Popen(
-        shlex.split(command),
+        command,
         stdin=PIPE,
         stdout=PIPE,
         stderr=STDOUT,
+        shell=True,
+        start_new_session=True,
         cwd=working_directory
     )
 
@@ -74,12 +76,6 @@ def __start_watcher_threads(server_id: str) -> None:
     Helper function to start threads to watch the server process with the given id.
     :param server_id: The id of the server to watch.
     """
-    # out_watcher = threading.Thread(name=f"{server_id} stdout watcher", target=__read_stdout, args=(server_id,))
-    # poll_watcher = threading.Thread(name=f"{server_id} process watcher", target=__poll_process, args=(server_id,))
-    #
-    # out_watcher.start()
-    # poll_watcher.start()
-
     socketIO.start_background_task(__read_stdout, server_id)
     socketIO.start_background_task(__poll_process, server_id)
 
@@ -133,8 +129,22 @@ def stop_server(server: GameServer) -> bool:
     """
     server_id = str(server.id)
     if __running.get(server_id):
-        process = __running.pop(server_id)
-        process.terminate()
+        process: Popen = __running.pop(server_id)
+        pgid = os.getpgid(process.pid)
+
+        # Attempt to kill the process with SIGINT, if this fails try SIGKILL
+        try:
+            os.killpg(pgid, signal.SIGINT)
+            process.wait(10)
+        except TimeoutExpired:
+            # If SIGKILL fails, try SIGTERM
+            try:
+                os.killpg(pgid, signal.SIGKILL)
+                process.wait(5)
+            except TimeoutExpired:
+                # Finally try SIGTERM
+                os.killpg(pgid, signal.SIGTERM)
+                process.wait()
         return True
     return False
 
