@@ -25,6 +25,14 @@ class User(Document, UserMixin):
     __password_hash = StringField(required=True, db_field="password")
     api_key = StringField()
 
+    def __init__(self, **kwargs):
+        if "password" in kwargs:
+            password = kwargs.pop("password")
+            super().__init__(**kwargs)
+            self.password = password
+            return
+        super().__init__(**kwargs)
+
     def get_id(self):
         if self.api_key is None:
             self.api_key = str(uuid.uuid4())
@@ -44,7 +52,16 @@ class User(Document, UserMixin):
         return not self.is_anonymous and check_password_hash(self.__password_hash, password)
 
     def to_dict(self):
-        return _convert_to_dict(self)
+        as_dict = _convert_to_dict(self)
+        as_dict.pop("password")
+        return as_dict
+
+    def update(self, **kwargs):
+        if "password" in kwargs:
+            self.password = kwargs.pop("password")
+            if len(kwargs) == 0:
+                return
+        super().update(**kwargs)
 
 
 class GameServer(Document):

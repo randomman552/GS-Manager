@@ -64,6 +64,7 @@ def modify_user(user_id: str):
         data = json.get("data")
         if data:
             user.update(**data)
+            user.reload()
             return rest.response(200, data=user.to_dict())
     return rest.response(400, error="No data provided.")
 
