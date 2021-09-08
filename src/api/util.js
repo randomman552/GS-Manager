@@ -84,6 +84,7 @@ export class StorageCache {
         this._cache = {}
         for (const obj of arr)
             this._cache[obj.id] = obj;
+        this.callChangeListeners();
     }
 
     /**
@@ -91,6 +92,7 @@ export class StorageCache {
      */
     fromObj(obj) {
         this._cache = obj;
+        this.callChangeListeners();
     }
 
 
