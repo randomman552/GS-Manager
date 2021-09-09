@@ -59,6 +59,7 @@ class User(Document, UserMixin):
     def update(self, **kwargs):
         if "password" in kwargs:
             self.password = kwargs.pop("password")
+            self.save()
             if len(kwargs) == 0:
                 return
         super().update(**kwargs)
