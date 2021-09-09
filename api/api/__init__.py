@@ -113,26 +113,7 @@ def load_user(api_key):
 # region Register routes/blueprints
 app.register_blueprint(auth)
 app.register_blueprint(servers)
-
-
-# region Error handlers
-@app.errorhandler(400)
-def error_400(error):
-    error = str(error)
-    return rest.response(400, error)
-
-
-@app.errorhandler(401)
-def error_401(error):
-    error = str(error)
-    return rest.response(401, error)
-
-
-@app.errorhandler(404)
-def error_404(error):
-    error = str(error)
-    return rest.response(404, error)
-# endregion
+app.register_blueprint(errors)
 # endregion
 
 
