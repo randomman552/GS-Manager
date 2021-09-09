@@ -106,8 +106,8 @@ class AdminUserSettings extends React.Component {
 
                 <ConfirmDeleteModal
                     show={this.state.showDeleteModal}
-                    onHide={this.hideDeleteModal}
-                    onCancel={this.hideDeleteModal}
+                    onHide={() => {this.hideDeleteModal()}}
+                    onCancel={() => {this.hideDeleteModal()}}
 
                     onConfirm={() => {
                         this.deleteUser(this.state.deleteModalUserID);
