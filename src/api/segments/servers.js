@@ -11,7 +11,7 @@ const servers = {
     // region API requests
     getServers() {
         return apiFetch("/api/servers/").then(data => {
-            if (!data.error)
+            if (data.code >= 200 && data.code < 300)
                 this.cache.fromArray(data.data);
             return data;
         });
@@ -19,7 +19,7 @@ const servers = {
 
     createServer(data) {
         return apiFetch("/api/servers/", data, "put").then(data => {
-            if (!data.error)
+            if (data.code >= 200 && data.code < 300)
                 this.cache.updateObj(data.data)
             return data;
         });
@@ -31,7 +31,7 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID;
             return apiFetch(url).then(data => {
-                if (!data.error)
+                if (data.code >= 200 && data.code < 300)
                     this.cache.updateObj(data.data)
                 return data;
             });
@@ -42,7 +42,7 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID;
             return apiFetch(url).then(data => {
-                if (!data.error) {
+                if (data.code >= 200 && data.code < 300) {
                     const server = this.cache.getObject(serverID);
                     server.output = data.data;
                     this.cache.updateObj(server);
@@ -56,7 +56,7 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID;
             return apiFetch(url, data, "put").then(data => {
-                if (!data.error)
+                if (data.code >= 200 && data.code < 300)
                     this.cache.updateObj(data.data)
                 return data;
             });
@@ -67,7 +67,7 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID;
             return apiFetch(url, null, "delete").then(data => {
-                if (!data.error)
+                if (data.code >= 200 && data.code < 300)
                     this.cache.deleteObj(data.data)
                 return data;
             });
@@ -89,7 +89,7 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/start";
             return apiFetch(url).then(data => {
-                if (data.code === 200) {
+                if (data.code >= 200 && data.code < 300) {
                     this.cache.updateObj(data.data);
                 }
             });
@@ -100,7 +100,7 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/update";
             return apiFetch(url).then(data => {
-                if (data.code === 200) {
+                if (data.code >= 200 && data.code < 300) {
                     this.cache.updateObj(data.data);
                 }
             });
@@ -111,10 +111,8 @@ const servers = {
         if (serverID) {
             const url = "/api/servers/" + serverID + "/stop";
             return apiFetch(url).then(data => {
-                if (!data.error) {
-                    const server = this.cache.getObject(serverID);
-                    server.status = "stopped";
-                    this.cache.updateObj(server);
+                if (data.code >= 200 && data.code < 300) {
+                    this.cache.updateObj(data.data);
                 }
             });
         }

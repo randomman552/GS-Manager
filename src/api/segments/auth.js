@@ -5,7 +5,7 @@ const auth = {
 
     getCurrentUser() {
         return apiFetch("/api/auth/").then(data => {
-            if (!data.error)
+            if (data.code >= 200 && data.code < 300)
                 this.cache.updateObj(data.data);
             return data;
         });
@@ -14,7 +14,7 @@ const auth = {
     // region User creation and retrieval.
     getUsers() {
         return apiFetch("/api/auth/users").then(data => {
-            if (!data.error)
+            if (data.code >= 200 && data.code < 300)
                 this.cache.fromArray(data.data);
             return data;
         });
@@ -22,7 +22,7 @@ const auth = {
 
     createUser(obj) {
         return apiFetch("/api/auth/users", obj, "put").then(data => {
-            if (!data.error)
+            if (data.code >= 200 && data.code < 300)
                 this.cache.updateObj(data.data);
             return data;
         });
@@ -34,7 +34,7 @@ const auth = {
         if (userID) {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url).then(data => {
-                if (!data.error)
+                if (data.code >= 200 && data.code < 300)
                     this.cache.updateObj(data.data);
                 return data;
             });
@@ -45,7 +45,7 @@ const auth = {
         if (userID) {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url, obj, "put").then(data => {
-                if (!data.error)
+                if (data.code >= 200 && data.code < 300)
                     this.cache.updateObj(data.data);
                 return data;
             });
@@ -56,7 +56,7 @@ const auth = {
         if (userID) {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url, null, "delete").then(data => {
-                if (!data.error)
+                if (data.code >= 200 && data.code < 300)
                     this.cache.deleteObj(data.data);
                 return data;
             });
