@@ -3,7 +3,6 @@ import api from "../../../api/api";
 import {Button} from "react-bootstrap";
 import {UserForm} from "./UserForm";
 import {ConfirmDeleteModal} from "./ConfirmDeleteModal";
-import {logDOM} from "@testing-library/react";
 
 class AdminUserSettings extends React.Component {
     constructor(props) {
