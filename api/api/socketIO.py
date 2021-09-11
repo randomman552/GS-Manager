@@ -4,7 +4,7 @@ from flask_socketio import SocketIO
 
 
 async_mode = "gevent_uwsgi"
-if os.getenv("FLASK_ENV").lower() == "development":
+if str(os.getenv("FLASK_ENV")).lower() == "development":
     print("Development mode specified...")
     print("Using threading for SocketIO...")
     async_mode = "threading"
