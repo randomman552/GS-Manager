@@ -1,9 +1,9 @@
 from flask import Blueprint, request
 from flask_login import current_user, login_required, login_user, logout_user
 
-from ... import rest
-from ...models import User
-from ...decorators import admin_required
+from .. import rest
+from ..models import User
+from ..decorators import admin_required
 
 auth = Blueprint("auth", __name__, static_folder="static", template_folder="templates", url_prefix="/api/auth")
 

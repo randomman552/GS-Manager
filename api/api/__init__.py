@@ -7,11 +7,12 @@ from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
 from mongoengine import Q
 
-from .blueprints import *
 from .models import User, AnonymousUser, GameServer
 from . import server_runner as runner
 from .socketIO import socketIO
 from . import rest
+
+from .blueprints import auth_bp, servers_bp, errors_bp
 
 app = Flask(__name__)
 socketIO.init_app(app)
@@ -112,9 +113,9 @@ def load_user(api_key):
 
 
 # region Register routes/blueprints
-app.register_blueprint(auth)
-app.register_blueprint(servers)
-app.register_blueprint(errors)
+app.register_blueprint(auth_bp)
+app.register_blueprint(servers_bp)
+app.register_blueprint(errors_bp)
 # endregion
 
 

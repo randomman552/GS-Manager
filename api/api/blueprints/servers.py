@@ -2,10 +2,10 @@ from flask import Blueprint, request, abort
 from flask_login import login_required, current_user
 from mongoengine import ValidationError, NotUniqueError
 
-from ...models import GameServer, User
-from ... import server_runner as runner
-from ...socketIO import socketIO
-from ... import rest
+from ..models import GameServer, User
+from ..socketIO import socketIO
+from .. import server_runner as runner
+from .. import rest
 
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
 
