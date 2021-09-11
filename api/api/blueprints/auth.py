@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, abort
 from flask_login import current_user, login_required, login_user, logout_user
 
 from .. import rest
@@ -69,13 +69,15 @@ def modify_user(user_id: str):
             user.update(**data)
             user.reload()
             return rest.response(200, data=user.to_dict())
-    return rest.response(400, error="No data provided.")
+    abort(400, "JSON provided was empty")
 
 
 @auth.route("/users/<user_id>", methods=["DELETE"])
 @login_required
 def delete_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
+    if user.is_admin and len(User.objects(is_admin=True)) == 1:
+        abort(400, "Cannot delete the last admin account")
     user.delete()
     return rest.response(200, data=user.to_dict())
 
