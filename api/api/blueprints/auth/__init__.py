@@ -3,6 +3,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 
 from ... import rest
 from ...models import User
+from ...decorators import admin_required
 
 auth = Blueprint("auth", __name__, static_folder="static", template_folder="templates", url_prefix="/api/auth")
 
@@ -28,6 +29,7 @@ def users():
 
 @auth.route("/users", methods=["PUT"])
 @login_required
+@admin_required
 def create_user():
     """
     Route to add a new user
@@ -56,6 +58,7 @@ def get_user(user_id: str):
 
 @auth.route("/users/<user_id>", methods=["PUT"])
 @login_required
+@admin_required
 def modify_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
 

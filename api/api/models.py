@@ -2,9 +2,9 @@ import os
 import shutil
 import uuid
 
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from flask_mongoengine import Document
-from mongoengine import StringField, DictField, ListField, IntField
+from mongoengine import StringField, DictField, ListField, BooleanField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -22,6 +22,7 @@ def _convert_to_dict(document: Document) -> dict:
 
 class User(Document, UserMixin):
     name = StringField(required=True, unique=True)
+    is_admin = BooleanField(default=False)
     __password_hash = StringField(required=True, db_field="password")
     api_key = StringField()
 
@@ -63,6 +64,12 @@ class User(Document, UserMixin):
             if len(kwargs) == 0:
                 return
         super().update(**kwargs)
+
+
+class AnonymousUser(AnonymousUserMixin):
+    @property
+    def is_admin(self):
+        return False
 
 
 class GameServer(Document):

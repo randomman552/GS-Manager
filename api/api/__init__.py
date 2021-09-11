@@ -8,7 +8,7 @@ from flask_mongoengine import MongoEngine
 from mongoengine import Q
 
 from .blueprints import *
-from .models import User, GameServer
+from .models import User, AnonymousUser, GameServer
 from . import server_runner as runner
 from .socketIO import socketIO
 from . import rest
@@ -70,6 +70,7 @@ if len(User.objects().all()) == 0:
 # region Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.request_loader
