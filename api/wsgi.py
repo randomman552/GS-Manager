@@ -1,6 +1,10 @@
 #!/usr/bin/env python3.9
-from gevent import monkey
-monkey.patch_all()
+import os
+
+if not str(os.getenv("FLASK_ENV")).lower() == "development":
+    print("Setting up for production environment...")
+    from gevent import monkey
+    monkey.patch_all()
 
 from api import app, socketIO
 
