@@ -61,6 +61,16 @@ export function UserForm(props) {
                         />
                         <Form.Control.Feedback type="invalid">Must be at least 8 characters long</Form.Control.Feedback>
                     </Form.Group>
+
+                    <Form.Group  className="flex flex-column flex-center">
+                        <Form.Check
+                            type="checkbox"
+                            id="is_admin"
+                            name="is_admin"
+                            label="Admin User"
+                            checked={data.is_admin}
+                        />
+                    </Form.Group>
                 </Modal.Body>
 
                 <Modal.Footer>
