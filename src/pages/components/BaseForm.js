@@ -14,8 +14,11 @@ import PropTypes from "prop-types";
 export function onChangeFactory(data, setter) {
     return (event) => {
         const target = event.target;
-        const value = target.value;
         const name = target.name;
+
+        let value = target.value;
+        if (target.hasOwnProperty("checked"))
+            value = target.checked
 
         setter({
             ...data,
@@ -41,8 +44,11 @@ export class BaseForm extends React.Component {
 
     handleChange(event) {
         const target = event.target;
-        const value = target.value;
         const name = target.name;
+
+        let value = target.value;
+        if (target.hasOwnProperty("checked"))
+            value = target.checked
 
         this.setState({
             [name]: value
