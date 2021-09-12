@@ -57,6 +57,7 @@ def populate_database():
         new_user = User()
         new_user.name = "admin"
         new_user.password = "password"
+        new_user.is_admin = True
         new_user.save()
 
     create_users()
