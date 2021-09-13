@@ -238,18 +238,20 @@ class ServerDashboard extends React.Component {
                             />
                         </article>
                         <article className="server-controls">
+                            <h2
+                                className={"text-center text-capitalize server-status " + this.server.status}
+                            >
+                                {this.server.status}
+                            </h2>
                             <Button disabled={running} variant="success" onClick={() => this.startServer()}>
                                 Start
                             </Button>
-
                             <Button disabled={running} variant="warning" onClick={() => this.updateServer()}>
                                 Update
                             </Button>
-
                             <Button disabled={!running} variant="danger" onClick={() => this.stopServer()}>
                                 Stop
                             </Button>
-
                             <Button disabled={running} variant="secondary" onClick={() => this.openSettings()}>
                                 Settings
                             </Button>
