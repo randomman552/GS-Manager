@@ -81,6 +81,15 @@
     .server-dashboard .server-console-container {
         max-width: 100%;
     }
+
+    .server-info-body {
+        flex-direction: column;
+    }
+
+    .server-dashboard .server-controls {
+        padding: 10px;
+        min-width: 100%;
+    }
 }
 
 /* endregion */
