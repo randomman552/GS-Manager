@@ -1,0 +1,142 @@
+.messages {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    width: 400px;
+    padding-top: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+}
+
+/** Message styles **/
+.messages > .message {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    min-height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    margin: 3px;
+    padding: 3px;
+	box-shadow: 0 0 10px #888888;
+}
+
+.messages > .message .content {
+    width: calc(100% - 30px);
+}
+
+.messages > .message .close {
+    position: absolute;
+    top: 0;
+    right: 5px;
+}
+
+
+
+/** Status indicator styles **/
+.messages > .message .status-indicator {
+    left: 2px;
+    position: absolute;
+    height: calc(100% - 4px);
+    width: 10px;
+    background-color: #6c757d;
+}
+
+.messages > .message.success .status-indicator {
+    background-color: #28a745;
+}
+
+.messages > .message.info .status-indicator {
+    background-color: #17a2b8;
+}
+
+.messages > .message.warning .status-indicator {
+    background-color: #ffc107;
+}
+
+.messages > .message.danger .status-indicator {
+    background-color: #dc3545;
+}
+
+/** Animation **/
+@keyframes fade-in-side {
+   0% {
+       opacity: 0;
+       right: -100%;
+   }
+   100% {
+       opacity: 1;
+       right: 0;
+   }
+}
+
+@keyframes fade-out-side {
+   0% {
+       opacity: 1;
+       right: 0;
+   }
+   100% {
+       opacity: 0;
+       right: -100%;
+   }
+}
+
+@keyframes fade-in-top {
+   0% {
+       opacity: 0;
+       top: -100%;
+   }
+   100% {
+       opacity: 1;
+       top: 0;
+   }
+}
+
+@keyframes fade-out-top {
+   0% {
+       opacity: 1;
+       top: 0;
+   }
+   100% {
+       opacity: 0;
+       top: -100%;
+   }
+}
+
+.fade-in {
+    animation-name: fade-in-side;
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+.fade-out {
+    animation-name: fade-out-side;
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+
+/** Smaller screen display **/
+@media only screen and (max-width: 450px) {
+    .messages {
+        right: unset;
+        z-index: 4;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .fade-in {
+        animation-name: fade-in-top;
+    }
+
+    .fade-out {
+        animation-name: fade-out-top;
+    }
+}
