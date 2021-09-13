@@ -66,11 +66,11 @@ class AdminUserSettings extends React.Component {
         let usersDisplay = users.map((user => {
             return (
                 <tr className="user-entry" key={user.id}>
-                    <td headers="userID">
-                        {user.id}
-                    </td>
                     <td headers="username">
                         {user.name}
+                    </td>
+                    <td headers="admin">
+                        {(user.is_admin) ? "yes" : "no"}
                     </td>
                     <td headers="options">
                         <Button
@@ -117,11 +117,11 @@ class AdminUserSettings extends React.Component {
                 <h1>Users</h1>
                 <table className="user-listing">
                     <div className="user-entry">
-                        <th className="user-name font-weight-bold" id="userID">
-                            User ID
-                        </th>
                         <th className="user-name font-weight-bold" id="username">
                             Username
+                        </th>
+                        <th className="user-admin font-weight-bold" id="admin">
+                            Has Admin?
                         </th>
                         <th className="user-options font-weight-bold" id="options">
                             Options
