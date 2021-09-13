@@ -77,7 +77,7 @@
     gap: 5px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
     .server-dashboard .server-console-container {
         max-width: 100%;
     }
@@ -158,18 +158,6 @@
     font-weight: bolder;
 }
 
-.servers-grid .server .server-status.stopped {
-    color: #dc3545;
-}
-
-.servers-grid .server .server-status.started {
-    color: #28a745;
-}
-
-.servers-grid .server .server-status.updating {
-    color: #ffc107;
-}
-
 .servers-grid .server.new-server .plus {
     font-size: 60px;
     display: flex;
@@ -180,6 +168,26 @@
     height: 100%;
 }
 
+@media (max-width: 480px) {
+    .servers-grid .server {
+        width: 350px;
+    }
+}
+
+/* endregion */
+
+/* region Server status colors */
+.server-status.stopped {
+    color: #dc3545;
+}
+
+.server-status.started {
+    color: #28a745;
+}
+
+.server-status.updating {
+    color: #ffc107;
+}
 /* endregion */
 
 .mode-display {
