@@ -81,6 +81,7 @@ def modify_user(user_id: str):
 
 @auth.route("/users/<user_id>", methods=["DELETE"])
 @login_required
+@admin_required
 def delete_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
 
