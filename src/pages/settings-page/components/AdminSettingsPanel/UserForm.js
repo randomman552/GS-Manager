@@ -1,4 +1,4 @@
-import {BaseForm, onChangeFactory} from "../../components/BaseForm";
+import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
 import PropTypes from "prop-types";
 import {Button, Form, Modal} from "react-bootstrap";
 import React, {useState} from "react";

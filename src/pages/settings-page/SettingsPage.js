@@ -1,7 +1,7 @@
 import {Navigation} from "../components/Navigation";
 import PropTypes from "prop-types";
-import {SettingsPanel} from "./components/SettingsPanel";
-import {AdminSettingsPanel} from "./components/AdminSettingsPanel";
+import {SettingsPanel} from "./components/UserSettingsPanel/SettingsPanel";
+import {AdminSettingsPanel} from "./components/AdminSettingsPanel/AdminSettingsPanel";
 import {Tab, Tabs} from "react-bootstrap";
 
 import "./SettingsPage.css"
@@ -19,11 +19,22 @@ export function SettingsPage(props) {
                 className="container-md"
                 fill justfiy
             >
-                <Tab eventKey="settings" title="Settings" className="container-md text-center">
-                    <SettingsPanel/>
+                <Tab
+                    eventKey="settings"
+                    title="Settings"
+                    className="container-md text-center"
+                >
+                    <SettingsPanel
+                        user={props.user}
+                    />
                 </Tab>
 
-                <Tab eventKey="admin-settings" title="Admin" className="container-md text-center" disabled={!props.user.is_admin}>
+                <Tab
+                     eventKey="admin-settings"
+                     title="Admin"
+                     className="container-md text-center"
+                     disabled={!props.user.is_admin}
+                >
                     <AdminSettingsPanel/>
                 </Tab>
             </Tabs>

@@ -11,6 +11,22 @@ const auth = {
         });
     },
 
+    modifyCurrentUser(obj) {
+        return apiFetch("/api/auth/", obj, "put").then(data => {
+            if (data.code >= 200 && data.code < 300)
+                this.cache.updateObj(data.data);
+            return data;
+        })
+    },
+
+    deleteCurrentUser() {
+        return apiFetch("/api/auth/", null, "delete").then(data => {
+            if (data.code >= 200 && data.code < 300)
+                this.cache.deleteObj(data.data);
+            return data;
+        })
+    },
+
     // region User creation and retrieval.
     getUsers() {
         return apiFetch("/api/auth/users").then(data => {

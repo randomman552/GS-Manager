@@ -12,10 +12,39 @@ auth = Blueprint("auth", __name__, static_folder="static", template_folder="temp
 
 @auth.route("/", methods=["GET", "POST"])
 @login_required
-def current_auth():
+def get_current_user():
     """
     Endpoint to return current auth details.
     """
+    return rest.response(200, data=current_user.to_dict())
+
+
+@auth.route("/", methods=["PUT"])
+@login_required
+def modify_current_user():
+    """
+    Endpoint to edit current auth details.
+    """
+    json = request.get_json()
+    if json:
+        data = json.get("data")
+        if data:
+            # Abort if the user is attempting to make themselves an admin or change their api key
+            if "is_admin" in data or "api_key" in data:
+                abort(403, "Cannot make self an admin")
+            current_user.update(**data)
+            current_user.reload()
+            return rest.response(200, data=current_user.to_dict())
+    abort(400, "JSON provided was empty")
+
+
+@auth.route("/", methods=["DELETE"])
+@login_required
+def delete_current_user():
+    """
+    Endpoint to delete current auth details.
+    """
+    current_user.delete()
     return rest.response(200, data=current_user.to_dict())
 
 
