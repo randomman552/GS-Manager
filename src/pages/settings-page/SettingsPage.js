@@ -23,7 +23,7 @@ export function SettingsPage(props) {
                     <SettingsPanel/>
                 </Tab>
 
-                <Tab eventKey="admin-settings" title="Admin" className="container-md text-center">
+                <Tab eventKey="admin-settings" title="Admin" className="container-md text-center" disabled={!props.user.is_admin}>
                     <AdminSettingsPanel/>
                 </Tab>
             </Tabs>
