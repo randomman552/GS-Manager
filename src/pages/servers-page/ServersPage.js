@@ -11,6 +11,7 @@ import {UpdateServerForm} from "./components/UpdateServerForm"
 import {NewServerForm} from "./components/NewServerForm";
 import "./ServersPage.css"
 import api from "../../api/api";
+import {addMessage} from "../components/MessageDisplay";
 
 
 /**
@@ -33,17 +34,23 @@ class ServerDashboard extends React.Component {
 
     startServer() {
         if (this.server)
-            api.servers.runStart(this.server.id).then();
+            api.servers.runStart(this.server.id).then(() => {
+                addMessage("Server started", "success", 5000);
+            });
     }
 
     updateServer() {
         if (this.server)
-            api.servers.runUpdate(this.server.id).then()
+            api.servers.runUpdate(this.server.id).then(() => {
+                addMessage("Server updating", "warning", 5000);
+            });
     }
 
     stopServer() {
         if (this.server)
-            api.servers.runStop(this.server.id).then()
+            api.servers.runStop(this.server.id).then(() => {
+                addMessage("Server stopped", "danger", 5000);
+            });
     }
 
 
@@ -269,12 +276,42 @@ function NoServerDashboard(props) {
         const serverRunning = server.status !== "stopped";
 
         return (
-            <article className="server">
+            <article className="server" key={server.name}>
                 <Link className="server-name" to={"/servers/" + server.id}>{server.name}</Link>
                 <div className="controls">
-                    <Button variant="success" disabled={serverRunning} onClick={() => api.servers.runStart(server.id)}>Start</Button>
-                    <Button variant="warning" disabled={serverRunning} onClick={() => api.servers.runUpdate(server.id)}>Update</Button>
-                    <Button variant="danger" disabled={!serverRunning} onClick={() => api.servers.runStop(server.id)}>Stop</Button>
+                    <Button variant="success" disabled={serverRunning} onClick={() => {
+                        api.servers.runStart(server.id).then(() => {
+                            addMessage(
+                                "Server '" + server.name + "' started",
+                                "success",
+                                5000
+                            );
+                        });
+                    }}>
+                        Start
+                    </Button>
+                    <Button variant="warning" disabled={serverRunning} onClick={() => {
+                        api.servers.runUpdate(server.id).then(() => {
+                            addMessage(
+                                "Server '" + server.name + "' updating",
+                                "warning",
+                                5000
+                            );
+                        });
+                    }}>
+                        Update
+                    </Button>
+                    <Button variant="danger" disabled={!serverRunning} onClick={() => {
+                        api.servers.runStop(server.id).then(() => {
+                            addMessage(
+                                "Server '" + server.name + "' stopped",
+                                "danger",
+                                5000
+                            );
+                        });
+                    }}>
+                        Stop
+                    </Button>
                 </div>
                 <Link className={"server-status " + server.status} to={"/servers/" + server.id}>{server.status}</Link>
             </article>

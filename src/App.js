@@ -6,6 +6,7 @@ import { SettingsPage } from "./pages/settings-page/SettingsPage";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
 import api from "./api/api";
+import MessageDisplay from "./pages/components/MessageDisplay";
 
 export class App extends React.Component {
     constructor(props) {
@@ -153,6 +154,7 @@ export class App extends React.Component {
         if (!this.state.user) {
             return (
                 <div id="app">
+                    <MessageDisplay/>
                     {modal}
                     <Switch>
                         <Route exact path="/login" render={ () => {
@@ -170,6 +172,7 @@ export class App extends React.Component {
 
         return (
             <div id="app">
+                <MessageDisplay/>
                 <Switch>
                     <Route
                         path="/servers"
