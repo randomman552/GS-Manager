@@ -65,6 +65,10 @@ class User(Document, UserMixin):
                 return
         super().update(**kwargs)
 
+    @property
+    def is_only_admin(self):
+        return self.is_admin and len(User.objects(is_admin=True)) == 1
+
 
 class AnonymousUser(AnonymousUserMixin):
     @property

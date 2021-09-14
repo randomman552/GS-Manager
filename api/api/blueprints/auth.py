@@ -31,7 +31,7 @@ def modify_current_user():
         if data:
             # Abort if the user is attempting to make themselves an admin or change their api key
             if "is_admin" in data or "api_key" in data:
-                abort(403, "Cannot make self an admin")
+                abort(403, "Editing of those fields is forbidden via this route")
             current_user.update(**data)
             current_user.reload()
             return rest.response(200, data=current_user.to_dict())
@@ -44,6 +44,9 @@ def delete_current_user():
     """
     Endpoint to delete current auth details.
     """
+    if current_user.is_only_admin:
+        abort(400, "Cannot remove only admin")
+
     current_user.delete()
     return rest.response(200, data=current_user.to_dict())
 
@@ -95,10 +98,8 @@ def modify_user(user_id: str):
     if json:
         data = json.get("data")
         if data:
-            # If current working on an admin user
-            # And there is only one admin user
             # Prevent removal of only admin
-            if user.is_admin and len(User.objects(is_admin=True)) == 1:
+            if user.is_only_admin:
                 if not data.get("is_admin", True):
                     abort(400, "Cannot remove only admin")
 
@@ -115,7 +116,7 @@ def delete_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
 
     # Prevent removal of only admin
-    if user.is_admin and len(User.objects(is_admin=True)) == 1:
+    if user.is_only_admin:
         abort(400, "Cannot remove only admin")
 
     user.delete()
