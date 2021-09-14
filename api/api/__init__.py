@@ -51,21 +51,16 @@ db.init_app(app)
 # endregion
 
 
-# region Initialise database with default values (admin account and permissions)
-def populate_database():
-    def create_users():
-        new_user = User()
-        new_user.name = "admin"
-        new_user.password = "password"
-        new_user.is_admin = True
-        new_user.save()
+# region Initialise database with default values (admin account)
 
-    create_users()
+if len(User.objects(is_admin=True).all()) == 0:
+    new_user = User()
+    new_user.name = "admin"
+    new_user.password = "password"
+    new_user.is_admin = True
+    new_user.save()
     print("Database population complete!")
 
-
-if len(User.objects().all()) == 0:
-    populate_database()
 # endregion
 
 
