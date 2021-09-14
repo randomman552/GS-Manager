@@ -29,7 +29,9 @@ export function SettingsPanel(props) {
             />
             <ConfirmDeleteModal
                 onConfirm={() => {
-                    api.auth.deleteCurrentUser().then();
+                    api.auth.deleteCurrentUser().then(() => {
+                        setShow("none");
+                    });
                 }}
                 show={show === "confirmDelete"}
                 onCancel={() => setShow("none")}
@@ -37,7 +39,7 @@ export function SettingsPanel(props) {
             />
 
             {/* User options */}
-            <h2 className="greeting">Hello '{props.user.name}'!</h2>
+            <h2 className="greeting text-capitalize">Hello {props.user.name}</h2>
 
             <Button
                 variant="primary"
