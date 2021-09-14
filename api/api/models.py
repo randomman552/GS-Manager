@@ -2,9 +2,9 @@ import os
 import shutil
 import uuid
 
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from flask_mongoengine import Document
-from mongoengine import StringField, DictField, ListField, IntField
+from mongoengine import StringField, DictField, ListField, BooleanField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -22,8 +22,17 @@ def _convert_to_dict(document: Document) -> dict:
 
 class User(Document, UserMixin):
     name = StringField(required=True, unique=True)
+    is_admin = BooleanField(default=False)
     __password_hash = StringField(required=True, db_field="password")
     api_key = StringField()
+
+    def __init__(self, **kwargs):
+        if "password" in kwargs:
+            password = kwargs.pop("password")
+            super().__init__(**kwargs)
+            self.password = password
+            return
+        super().__init__(**kwargs)
 
     def get_id(self):
         if self.api_key is None:
@@ -44,7 +53,27 @@ class User(Document, UserMixin):
         return not self.is_anonymous and check_password_hash(self.__password_hash, password)
 
     def to_dict(self):
-        return _convert_to_dict(self)
+        as_dict = _convert_to_dict(self)
+        as_dict.pop("password")
+        return as_dict
+
+    def update(self, **kwargs):
+        if "password" in kwargs:
+            self.password = kwargs.pop("password")
+            self.save()
+            if len(kwargs) == 0:
+                return
+        super().update(**kwargs)
+
+    @property
+    def is_only_admin(self):
+        return self.is_admin and len(User.objects(is_admin=True)) == 1
+
+
+class AnonymousUser(AnonymousUserMixin):
+    @property
+    def is_admin(self):
+        return False
 
 
 class GameServer(Document):

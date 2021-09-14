@@ -6,6 +6,7 @@ import { SettingsPage } from "./pages/settings-page/SettingsPage";
 import { Modal, Button } from "react-bootstrap";
 import './App.css';
 import api from "./api/api";
+import MessageDisplay from "./pages/components/MessageDisplay";
 
 export class App extends React.Component {
     constructor(props) {
@@ -153,6 +154,7 @@ export class App extends React.Component {
         if (!this.state.user) {
             return (
                 <div id="app">
+                    <MessageDisplay/>
                     {modal}
                     <Switch>
                         <Route exact path="/login" render={ () => {
@@ -170,6 +172,7 @@ export class App extends React.Component {
 
         return (
             <div id="app">
+                <MessageDisplay/>
                 <Switch>
                     <Route
                         path="/servers"
@@ -207,9 +210,35 @@ export class App extends React.Component {
                 servers
             });
         }
+        const userUpdateFunc = () => {
+            if (!this.state.user)
+                return;
+
+            // Update user object
+            const user = api.auth.cache.getObject(this.state.user.id);
+            this.setState({
+                user
+            });
+
+            if (user) {
+                // Re-log after api-key change
+                api.auth.login(this.getAuth()).then(data => {
+                    if (data.code !== 200)
+                        this.logout();
+                });
+            } else {
+                // Log out if user deleted
+                this.logout();
+            }
+        }
+
         api.servers.cache.addChangeListener(serverUpdateFunc);
+        api.auth.cache.addChangeListener(userUpdateFunc);
+
+        // Remove change listeners on component unmount
         this.componentWillUnmount = () => {
-            api.servers.cache.removeChangeListener(serverUpdateFunc)
+            api.servers.cache.removeChangeListener(serverUpdateFunc);
+            api.auth.cache.removeChangeListener(userUpdateFunc);
         }
     }
 }

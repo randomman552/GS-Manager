@@ -157,8 +157,8 @@ def run_command(cmd: str, server: GameServer) -> bool:
     server_id = str(server.id)
     process = __running.get(server_id)
     if process:
-        if not cmd.endswith("\r\n"):
-            cmd = f"{cmd}\r\n"
+        if not cmd.endswith("\n"):
+            cmd = f"{cmd}\n"
         process.stdin.write(cmd.encode("utf-8"))
         process.stdin.flush()
         server.output.append(cmd)

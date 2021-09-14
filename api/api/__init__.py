@@ -7,11 +7,12 @@ from flask_login import LoginManager
 from flask_mongoengine import MongoEngine
 from mongoengine import Q
 
-from .blueprints import *
-from .models import User, GameServer
+from .models import User, AnonymousUser, GameServer
 from . import server_runner as runner
 from .socketIO import socketIO
 from . import rest
+
+from .blueprints import auth_bp, servers_bp, errors_bp
 
 app = Flask(__name__)
 socketIO.init_app(app)
@@ -50,26 +51,23 @@ db.init_app(app)
 # endregion
 
 
-# region Initialise database with default values (admin account and permissions)
-def populate_database():
-    def create_users():
-        new_user = User()
-        new_user.name = "admin"
-        new_user.password = "password"
-        new_user.save()
+# region Initialise database with default values (admin account)
 
-    create_users()
+if len(User.objects(is_admin=True).all()) == 0:
+    new_user = User()
+    new_user.name = "admin"
+    new_user.password = "password"
+    new_user.is_admin = True
+    new_user.save()
     print("Database population complete!")
 
-
-if len(User.objects().all()) == 0:
-    populate_database()
 # endregion
 
 
 # region Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.request_loader
@@ -111,28 +109,9 @@ def load_user(api_key):
 
 
 # region Register routes/blueprints
-app.register_blueprint(auth)
-app.register_blueprint(servers)
-
-
-# region Error handlers
-@app.errorhandler(400)
-def error_400(error):
-    error = str(error)
-    return rest.response(400, error)
-
-
-@app.errorhandler(401)
-def error_401(error):
-    error = str(error)
-    return rest.response(401, error)
-
-
-@app.errorhandler(404)
-def error_404(error):
-    error = str(error)
-    return rest.response(404, error)
-# endregion
+app.register_blueprint(auth_bp)
+app.register_blueprint(servers_bp)
+app.register_blueprint(errors_bp)
 # endregion
 
 

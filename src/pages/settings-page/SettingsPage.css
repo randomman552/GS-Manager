@@ -5,5 +5,5 @@
 
 .user-listing .user-entry {
     display: grid;
-    grid-template-columns: 20% 60% 20%;
+    grid-template-columns: auto 33% 33%;
 }

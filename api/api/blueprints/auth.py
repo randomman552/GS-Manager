@@ -1,8 +1,9 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, abort
 from flask_login import current_user, login_required, login_user, logout_user
 
-from ... import rest
-from ...models import User
+from .. import rest
+from ..models import User
+from ..decorators import admin_required
 
 auth = Blueprint("auth", __name__, static_folder="static", template_folder="templates", url_prefix="/api/auth")
 
@@ -11,10 +12,42 @@ auth = Blueprint("auth", __name__, static_folder="static", template_folder="temp
 
 @auth.route("/", methods=["GET", "POST"])
 @login_required
-def current_auth():
+def get_current_user():
     """
     Endpoint to return current auth details.
     """
+    return rest.response(200, data=current_user.to_dict())
+
+
+@auth.route("/", methods=["PUT"])
+@login_required
+def modify_current_user():
+    """
+    Endpoint to edit current auth details.
+    """
+    json = request.get_json()
+    if json:
+        data = json.get("data")
+        if data:
+            # Abort if the user is attempting to make themselves an admin or change their api key
+            if "is_admin" in data or "api_key" in data:
+                abort(403, "Editing of those fields is forbidden via this route")
+            current_user.update(**data)
+            current_user.reload()
+            return rest.response(200, data=current_user.to_dict())
+    abort(400, "JSON provided was empty")
+
+
+@auth.route("/", methods=["DELETE"])
+@login_required
+def delete_current_user():
+    """
+    Endpoint to delete current auth details.
+    """
+    if current_user.is_only_admin:
+        abort(400, "Cannot remove only admin")
+
+    current_user.delete()
     return rest.response(200, data=current_user.to_dict())
 
 
@@ -28,6 +61,7 @@ def users():
 
 @auth.route("/users", methods=["PUT"])
 @login_required
+@admin_required
 def create_user():
     """
     Route to add a new user
@@ -56,6 +90,7 @@ def get_user(user_id: str):
 
 @auth.route("/users/<user_id>", methods=["PUT"])
 @login_required
+@admin_required
 def modify_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
 
@@ -63,15 +98,27 @@ def modify_user(user_id: str):
     if json:
         data = json.get("data")
         if data:
+            # Prevent removal of only admin
+            if user.is_only_admin:
+                if not data.get("is_admin", True):
+                    abort(400, "Cannot remove only admin")
+
             user.update(**data)
+            user.reload()
             return rest.response(200, data=user.to_dict())
-    return rest.response(400, error="No data provided.")
+    abort(400, "JSON provided was empty")
 
 
 @auth.route("/users/<user_id>", methods=["DELETE"])
 @login_required
+@admin_required
 def delete_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
+
+    # Prevent removal of only admin
+    if user.is_only_admin:
+        abort(400, "Cannot remove only admin")
+
     user.delete()
     return rest.response(200, data=user.to_dict())
 

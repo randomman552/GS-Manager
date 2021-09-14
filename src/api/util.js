@@ -1,3 +1,5 @@
+import {addMessage} from "../pages/components/MessageDisplay";
+
 /**
  * Method to send a request to the api backend
  * @param url {string} URL to send request to.
@@ -22,8 +24,17 @@ export async function apiFetch(url, data, method = "post", auth = null) {
             method: method,
             body: JSON.stringify(data)
         }
-    );
-    return await response.json();
+    ).then(res => res.json()).then((json) => {
+        // If response fails, report the error to the user.
+        if (json.code >= 400 && json.code < 600) {
+            let error = json.error
+            if (error.includes(":"))
+                error = error.split(":")[1]
+            addMessage(error, "danger", 5000);
+        }
+        return json;
+    });
+    return await response;
 }
 
 /**
@@ -84,6 +95,7 @@ export class StorageCache {
         this._cache = {}
         for (const obj of arr)
             this._cache[obj.id] = obj;
+        this.callChangeListeners();
     }
 
     /**
@@ -91,6 +103,7 @@ export class StorageCache {
      */
     fromObj(obj) {
         this._cache = obj;
+        this.callChangeListeners();
     }
 
 
