@@ -1,4 +1,3 @@
-import {Navigation} from "../components/Navigation";
 import PropTypes from "prop-types";
 import {SettingsPanel} from "./components/UserSettingsPanel/SettingsPanel";
 import {AdminSettingsPanel} from "./components/AdminSettingsPanel/AdminSettingsPanel";
@@ -9,10 +8,6 @@ import "./SettingsPage.css"
 export function SettingsPage(props) {
     return (
         <article className="page">
-            <Navigation
-                user={props.user}
-                onLogout={props.onLogout}
-            />
             <Tabs
                 defaultActiveKey="settings"
                 id="settings-tab-container"
@@ -44,6 +39,5 @@ export function SettingsPage(props) {
 
 SettingsPage.propTypes = {
     user: PropTypes.object,
-    onLogout: PropTypes.func.isRequired,
     auth: PropTypes.object
 }

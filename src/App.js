@@ -7,6 +7,7 @@ import { Modal, Button } from "react-bootstrap";
 import './App.css';
 import api from "./api/api";
 import MessageDisplay from "./pages/components/MessageDisplay";
+import {Navigation} from "./pages/components/Navigation";
 
 export class App extends React.Component {
     constructor(props) {
@@ -172,6 +173,10 @@ export class App extends React.Component {
 
         return (
             <div id="app">
+                <Navigation
+                    user={user}
+                    onLogout={() => {this.logout()}}
+                />
                 <MessageDisplay/>
                 <Switch>
                     <Route
@@ -181,8 +186,6 @@ export class App extends React.Component {
                                 {...props}
                                 auth={auth}
                                 servers={servers}
-                                user={user}
-                                onLogout={() => this.logout()}
                             />
                         }}
                     />
@@ -193,7 +196,6 @@ export class App extends React.Component {
                                 {...props}
                                 auth={auth}
                                 user={user}
-                                onLogout={() => this.logout()}
                             />
                         }}
                     />
