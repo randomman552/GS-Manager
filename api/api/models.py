@@ -52,9 +52,16 @@ class User(Document, UserMixin):
     def check_password(self, password: str) -> bool:
         return not self.is_anonymous and check_password_hash(self.__password_hash, password)
 
-    def to_dict(self):
+    def to_dict(self, include_sensitive: bool = False) -> dict:
+        """
+        Convert this user to a dict for JSON transfer.
+        :param include_sensitive: If True, will include fields containing sensitive data.
+        :return: dict representing the user.
+        """
         as_dict = _convert_to_dict(self)
-        as_dict.pop("password")
+        if not include_sensitive:
+            as_dict.pop("password", "")
+            as_dict.pop("api_key", "")
         return as_dict
 
     def update(self, **kwargs):
