@@ -16,7 +16,7 @@ from .blueprints import auth_bp, servers_bp, errors_bp
 
 app = Flask(__name__)
 socketIO.init_app(app)
-config_path = os.path.join(app.root_path, "config.json")
+config_path = os.path.join(os.getcwd(), "storage/config.json")
 
 
 # region Load config
