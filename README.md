@@ -11,7 +11,7 @@ This installation relies on you already having set up and understanding how to c
 ### 1. Run install script
 Get the installation script with the following command:
 ```shell
-wget https://github.com/randomman552/GS-Manager/archive/refs/tags/latest/setup.sh
+wget https://github.com/randomman552/GS-Manager/releases/download/latest/setup.sh
 ```
 
 Run the script from its download location using the following command:
