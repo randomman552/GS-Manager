@@ -14,12 +14,10 @@ from . import rest
 
 from .blueprints import auth_bp, servers_bp, errors_bp
 
-app = Flask(__name__)
-socketIO.init_app(app)
+# region Config loading functions
 config_path = os.path.join(os.getcwd(), "storage/config.json")
 
 
-# region Load config
 def load_config(app):
     try:
         app.config.from_json(config_path)
@@ -39,10 +37,14 @@ def save_config(config: dict):
     with open(config_path, "w") as file:
         json.dump(config, file, indent=4)
 
+# endregion
 
+
+app = Flask(__name__)
 if load_config(app) or "--config-only" in sys.argv:
     sys.exit(f"Created config file: {config_path}")
-# endregion
+
+socketIO.init_app(app)
 
 
 # region MongoEngine setup
