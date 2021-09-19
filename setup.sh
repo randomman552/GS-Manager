@@ -10,6 +10,11 @@ then
   DEV_BRANCH=true
 fi
 
+if echo $* | grep -e "--replace" -q
+then
+  REPLACE_CONFIG=true
+fi
+
 # Install dependencies
 echo "Installing dependencies..."
 apt update
