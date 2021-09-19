@@ -11,6 +11,9 @@ export function ConfirmDeleteModal(props) {
             <Modal.Header>
                 <Modal.Title>Confirm Deletion?</Modal.Title>
             </Modal.Header>
+            <Modal.Body>
+                This action is irreversible!
+            </Modal.Body>
             <Modal.Footer>
                 <Button variant="danger" onClick={props.onConfirm}>Confirm</Button>
                 <Button variant="secondary" onClick={props.onCancel}>Cancel</Button>
