@@ -4,7 +4,6 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import PropTypes from 'prop-types';
 import {Switch, Route, Redirect, Link} from "react-router-dom";
 
-import {Navigation} from "../components/Navigation";
 import {deepCopy} from "../../util";
 import {SendCommandForm} from "./components/SendCommandForm"
 import {UpdateServerForm} from "./components/UpdateServerForm"
@@ -345,17 +344,10 @@ NoServerDashboard.propTypes = {
 
 export function ServersPage(props) {
     const servers = props.servers;
-    const user = props.user;
-    const onLogout = props.onLogout;
     const auth = props.auth;
 
     return (
         <article className="page">
-            <Navigation
-                activeKey="/servers"
-                user={user}
-                onLogout={onLogout}
-            />
             <Switch>
                 <Route
                     path="/servers/:serverID"
@@ -393,8 +385,6 @@ export function ServersPage(props) {
 
 ServersPage.propTypes = {
     servers: PropTypes.array,
-    user: PropTypes.object,
-    onLogout: PropTypes.func.isRequired,
     auth: PropTypes.object
 }
 

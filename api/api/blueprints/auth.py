@@ -15,8 +15,9 @@ auth = Blueprint("auth", __name__, static_folder="static", template_folder="temp
 def get_current_user():
     """
     Endpoint to return current auth details.
+    Includes api_key attribute skipped by other routes.
     """
-    return rest.response(200, data=current_user.to_dict())
+    return rest.response(200, data=current_user.to_dict(True))
 
 
 @auth.route("/", methods=["PUT"])
@@ -24,6 +25,7 @@ def get_current_user():
 def modify_current_user():
     """
     Endpoint to edit current auth details.
+    :return: User details after modification.
     """
     json = request.get_json()
     if json:
@@ -34,7 +36,7 @@ def modify_current_user():
                 abort(403, "Editing of those fields is forbidden via this route")
             current_user.update(**data)
             current_user.reload()
-            return rest.response(200, data=current_user.to_dict())
+            return rest.response(200, data=current_user.to_dict(True))
     abort(400, "JSON provided was empty")
 
 
@@ -43,12 +45,13 @@ def modify_current_user():
 def delete_current_user():
     """
     Endpoint to delete current auth details.
+    :return: User details that were deleted.
     """
     if current_user.is_only_admin:
         abort(400, "Cannot remove only admin")
 
     current_user.delete()
-    return rest.response(200, data=current_user.to_dict())
+    return rest.response(200, data=current_user.to_dict(True))
 
 
 @auth.route("/users", methods=["GET", "POST"])
