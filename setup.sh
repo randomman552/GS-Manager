@@ -4,6 +4,12 @@ DEV_BRANCH=false
 # Defines whether we replace the old NGINX and service config files
 REPLACE_CONFIG=false
 
+# Check arguments
+if echo $* | grep -e "--develop" -q
+then
+  DEV_BRANCH=true
+fi
+
 # Install dependencies
 echo "Installing dependencies..."
 apt update
