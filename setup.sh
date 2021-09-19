@@ -99,3 +99,6 @@ sudo su gsmanager -c "bash -c 'source venv/bin/activate && pip install -r requir
 # Create config file and allow execution of start.sh
 chmod +x start.sh
 sudo su gsmanager -c "bash -c 'source venv/bin/activate && python3.9 wsgi.py --config-only'"
+
+echo "Restarting service"
+systemctl restart gsmanager
