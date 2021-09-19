@@ -28,6 +28,7 @@ export function UserForm(props) {
                 onSubmit={props.onSubmit}
                 onChange={onChangeFactory(data, setData)}
                 onReset={() => {props.onHide(); setData(props.data)}}
+                autofill="new-password"
             >
                 <Modal.Body>
                     <Form.Group className="flex flex-column flex-center">
