@@ -15,7 +15,8 @@ from . import rest
 from .blueprints import auth_bp, servers_bp, errors_bp
 
 # region Config loading functions
-config_path = os.path.join(os.getcwd(), "storage/config.json")
+storage_path = os.path.join(os.getcwd(), "storage")
+config_path = os.path.join(storage_path, "config.json")
 
 
 def load_config(app):
@@ -34,7 +35,10 @@ def load_config(app):
 
 
 def save_config(config: dict):
-    os.makedirs(config_path)
+    try:
+        os.makedirs(storage_path)
+    except FileExistsError:
+        pass
     with open(config_path, "w") as file:
         json.dump(config, file, indent=4)
 
