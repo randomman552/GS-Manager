@@ -34,6 +34,7 @@ def load_config(app):
 
 
 def save_config(config: dict):
+    os.makedirs(config_path)
     with open(config_path, "w") as file:
         json.dump(config, file, indent=4)
 
