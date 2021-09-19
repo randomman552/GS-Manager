@@ -16,6 +16,6 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: false
-          title: "Latest setup file"
+          title: "Latest build"
           files: |
             setup.sh
