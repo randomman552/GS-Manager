@@ -242,16 +242,16 @@ class ServerDashboard extends React.Component {
                             >
                                 {this.server.status}
                             </h2>
-                            <Button disabled={running} variant="success" onClick={() => this.startServer()}>
+                            <Button disabled={running} variant="success" onClick={() => this.startServer()} block>
                                 Start
                             </Button>
-                            <Button disabled={running} variant="warning" onClick={() => this.updateServer()}>
+                            <Button disabled={running} variant="warning" onClick={() => this.updateServer()} block>
                                 Update
                             </Button>
-                            <Button disabled={!running} variant="danger" onClick={() => this.stopServer()}>
+                            <Button disabled={!running} variant="danger" onClick={() => this.stopServer()} block>
                                 Stop
                             </Button>
-                            <Button disabled={running} variant="secondary" onClick={() => this.openSettings()}>
+                            <Button disabled={running} variant="secondary" onClick={() => this.openSettings()} block>
                                 Settings
                             </Button>
                         </article>

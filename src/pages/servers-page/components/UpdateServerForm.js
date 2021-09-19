@@ -9,13 +9,14 @@ function GeneralSettingsForm(props) {
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const onDelete = (confirmDelete) ? props.onDelete : () => {setConfirmDelete(true)};
-    const deleteText = (confirmDelete) ? "Confirm delete" : "Delete";
+    const deleteText = (confirmDelete) ? "Confirm delete? (this is irreversible)" : "Delete";
 
     return (
         <BaseForm
             onSubmit={props.onSubmit}
             onChange={onChangeFactory(data, setData)}
             className="modal-body text-center"
+            autofill="off"
         >
             <Form.Group className="flex flex-column flex-center">
                     <Form.Label htmlFor="name">
@@ -53,13 +54,10 @@ function GeneralSettingsForm(props) {
                 />
             </Form.Group>
             <Form.Group>
-                <Button variant="primary" type="submit">
-                Update
-            </Button>
-            </Form.Group>
-
-            <Form.Group>
-                <Button variant="danger" onClick={onDelete}>
+                <Button variant="primary" type="submit" block>
+                    Update
+                </Button>
+                <Button variant="danger" type="reset" onClick={onDelete} block>
                     {deleteText}
                 </Button>
             </Form.Group>
@@ -148,6 +146,7 @@ function ModeSettingsForm(props) {
             <BaseForm
                 onSubmit={props.onAdd}
                 className="mode-display"
+                autofill="off"
             >
                 <Form.Control
                     id="new-mode-name"
@@ -207,6 +206,7 @@ function ArgumentSettingsForm(props) {
             <BaseForm
                 onSubmit={props.onSubmit}
                 onChange={onChangeFactory(data, setData)}
+                autofill="off"
             >
                 <Form.Group>
                     <Form.Label
@@ -251,7 +251,7 @@ function ArgumentSettingsForm(props) {
                     </Form.Control>
                 </Form.Group>
 
-                <Button type="submit">Update</Button>
+                <Button type="submit" block>Update</Button>
             </BaseForm>
         </div>
     );
