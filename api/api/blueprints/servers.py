@@ -1,17 +1,16 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request
 from flask_login import login_required, current_user
 from mongoengine import ValidationError, NotUniqueError
 
-from ..models import GameServer, User, Category
+from ..models import GameServer, User
 from ..socketIO import socketIO
 from .. import server_runner as runner
 from .. import rest
 
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
 
-# region Server routes
-# region SocketIO interaction
 
+# region SocketIO interaction
 @socketIO.on("input", namespace="/servers")
 def input_to_server(json):
     server_id = json.get("server_id")
@@ -24,8 +23,6 @@ def input_to_server(json):
             runner.run_command(input_text, server)
         if current_user.is_authenticated:
             runner.run_command(input_text, server)
-
-
 # endregion
 
 
@@ -167,6 +164,4 @@ def update_server(server_id: str):
         return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is already running/updating")
 
-
-# endregion
 # endregion

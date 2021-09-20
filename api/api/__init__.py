@@ -12,7 +12,7 @@ from . import server_runner as runner
 from .socketIO import socketIO
 from . import rest
 
-from .blueprints import auth_bp, servers_bp, errors_bp
+from .blueprints import auth_bp, servers_bp, errors_bp, categories_bp
 
 # region Config loading functions
 storage_path = os.path.join(os.getcwd(), "storage")
@@ -119,6 +119,7 @@ def load_user(api_key):
 app.register_blueprint(auth_bp)
 app.register_blueprint(servers_bp)
 app.register_blueprint(errors_bp)
+app.register_blueprint(categories_bp)
 # endregion
 
 
