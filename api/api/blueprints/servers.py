@@ -2,14 +2,14 @@ from flask import Blueprint, request, abort
 from flask_login import login_required, current_user
 from mongoengine import ValidationError, NotUniqueError
 
-from ..models import GameServer, User
+from ..models import GameServer, User, Category
 from ..socketIO import socketIO
 from .. import server_runner as runner
 from .. import rest
 
 servers = Blueprint("servers", __name__, static_folder="static", template_folder="templates", url_prefix="/api/servers")
 
-
+# region Server routes
 # region SocketIO interaction
 
 @socketIO.on("input", namespace="/servers")
@@ -24,6 +24,7 @@ def input_to_server(json):
             runner.run_command(input_text, server)
         if current_user.is_authenticated:
             runner.run_command(input_text, server)
+
 
 # endregion
 
@@ -42,21 +43,18 @@ def get_servers():
 @servers.route("/", methods=["PUT"])
 @login_required
 def create_server():
-    json = request.get_json()
-    if json:
-        data = json.get("data")
-        if data:
-            try:
-                new_server = GameServer(**data)
-                new_server.save()
-                new_server.reload()
-                new_server.create_working_directory()
-                return rest.response(201, data=new_server.to_dict())
-            except ValidationError as e:
-                return rest.response(400, error=e.message)
-            except NotUniqueError as e:
-                return rest.response(400, error=str(e))
-        return rest.response(400, error="No data provided.")
+    data = rest.get_json_data()
+    try:
+        new_server = GameServer(**data)
+        new_server.save()
+        new_server.reload()
+        new_server.create_working_directory()
+        return rest.response(201, data=new_server.to_dict())
+    except ValidationError as e:
+        return rest.response(400, error=e.message)
+    except NotUniqueError as e:
+        return rest.response(400, error=str(e))
+
 
 # endregion
 
@@ -66,7 +64,7 @@ def create_server():
 @servers.route("/<server_id>", methods=["GET", "POST"])
 @login_required
 def server_details(server_id: str):
-    """Endpoint to get details of the given server (except terminal output)"""
+    """Endpoint to get details of the given server"""
     server = GameServer.objects(id=server_id).first_or_404()
     return rest.response(200, data=server.to_dict())
 
@@ -88,15 +86,11 @@ def modify_server(server_id: str):
     server = GameServer.objects(id=server_id).first_or_404()
 
     if not server.is_running:
-        json = request.get_json()
-        if json:
-            data = json.get("data")
-            if data:
-                server.update(**data)
-                server.save()
-                server.reload()
-                return rest.response(200, data=server.to_dict())
-        return rest.response(400, error="No data provided.")
+        data = rest.get_json_data()
+        server.update(**data)
+        server.save()
+        server.reload()
+        return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Cannot edit server whilst it is running.")
 
 
@@ -107,6 +101,7 @@ def delete_server(server_id: str):
     server = GameServer.objects(id=server_id).first_or_404()
     server.delete()
     return rest.response(200, data=server.to_dict())
+
 
 # endregion
 
@@ -145,7 +140,7 @@ def start_server(server_id: str):
     """
     server = GameServer.objects(id=server_id).first_or_404()
     if runner.start_server(server):
-        return rest.response(200,data=server.to_dict())
+        return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is already running/updating")
 
 
@@ -172,4 +167,6 @@ def update_server(server_id: str):
         return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is already running/updating")
 
+
+# endregion
 # endregion
