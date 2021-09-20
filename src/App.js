@@ -20,7 +20,7 @@ export class App extends React.Component {
                 });
                 api.servers.getServers().then((data) => {
                    this.setState({
-                       servers: api.servers.cache.asArray
+                       servers: api.servers.servers.asArray
                    });
                 });
                 api.auth.getUsers().then();
@@ -60,7 +60,7 @@ export class App extends React.Component {
                         });
                         api.servers.getServers().then((data) => {
                            this.setState({
-                               servers: api.servers.cache.asArray
+                               servers: api.servers.servers.asArray
                            });
                         });
                         api.auth.getUsers().then();
@@ -217,7 +217,7 @@ export class App extends React.Component {
                 return;
 
             // Update user object
-            const user = api.auth.cache.getObject(this.state.user.id);
+            const user = api.auth.users.getObject(this.state.user.id);
             this.setState({
                 user
             });
@@ -234,13 +234,13 @@ export class App extends React.Component {
             }
         }
 
-        api.servers.cache.addChangeListener(serverUpdateFunc);
-        api.auth.cache.addChangeListener(userUpdateFunc);
+        api.servers.servers.addChangeListener(serverUpdateFunc);
+        api.auth.users.addChangeListener(userUpdateFunc);
 
         // Remove change listeners on component unmount
         this.componentWillUnmount = () => {
-            api.servers.cache.removeChangeListener(serverUpdateFunc);
-            api.auth.cache.removeChangeListener(userUpdateFunc);
+            api.servers.servers.removeChangeListener(serverUpdateFunc);
+            api.auth.users.removeChangeListener(userUpdateFunc);
         }
     }
 }

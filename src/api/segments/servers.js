@@ -5,14 +5,14 @@ const socket = io("/servers");
 
 
 const servers = {
-    cache: new StorageCache(),
+    servers: new StorageCache(),
     socket,
 
     // region API requests
     getServers() {
         return apiFetch("/api/servers/").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.fromArray(data.data);
+                this.servers.fromArray(data.data);
             return data;
         });
     },
@@ -20,7 +20,7 @@ const servers = {
     createServer(data) {
         return apiFetch("/api/servers/", data, "put").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.updateObj(data.data)
+                this.servers.updateObj(data.data)
             return data;
         });
     },
@@ -32,7 +32,7 @@ const servers = {
             const url = "/api/servers/" + serverID;
             return apiFetch(url).then(data => {
                 if (data.code >= 200 && data.code < 300)
-                    this.cache.updateObj(data.data)
+                    this.servers.updateObj(data.data)
                 return data;
             });
         }
@@ -43,9 +43,9 @@ const servers = {
             const url = "/api/servers/" + serverID;
             return apiFetch(url).then(data => {
                 if (data.code >= 200 && data.code < 300) {
-                    const server = this.cache.getObject(serverID);
+                    const server = this.servers.getObject(serverID);
                     server.output = data.data;
-                    this.cache.updateObj(server);
+                    this.servers.updateObj(server);
                 }
                 return data;
             });
@@ -57,7 +57,7 @@ const servers = {
             const url = "/api/servers/" + serverID;
             return apiFetch(url, data, "put").then(data => {
                 if (data.code >= 200 && data.code < 300)
-                    this.cache.updateObj(data.data)
+                    this.servers.updateObj(data.data)
                 return data;
             });
         }
@@ -68,7 +68,7 @@ const servers = {
             const url = "/api/servers/" + serverID;
             return apiFetch(url, null, "delete").then(data => {
                 if (data.code >= 200 && data.code < 300)
-                    this.cache.deleteObj(data.data)
+                    this.servers.deleteObj(data.data)
                 return data;
             });
         }
@@ -90,7 +90,7 @@ const servers = {
             const url = "/api/servers/" + serverID + "/start";
             return apiFetch(url).then(data => {
                 if (data.code >= 200 && data.code < 300) {
-                    this.cache.updateObj(data.data);
+                    this.servers.updateObj(data.data);
                 }
             });
         }
@@ -101,7 +101,7 @@ const servers = {
             const url = "/api/servers/" + serverID + "/update";
             return apiFetch(url).then(data => {
                 if (data.code >= 200 && data.code < 300) {
-                    this.cache.updateObj(data.data);
+                    this.servers.updateObj(data.data);
                 }
             });
         }
@@ -112,7 +112,7 @@ const servers = {
             const url = "/api/servers/" + serverID + "/stop";
             return apiFetch(url).then(data => {
                 if (data.code >= 200 && data.code < 300) {
-                    this.cache.updateObj(data.data);
+                    this.servers.updateObj(data.data);
                 }
             });
         }
@@ -126,15 +126,15 @@ const servers = {
 // region SocketIO event handlers
 
 socket.on("output", (json) => {
-    const server = servers.cache.getObject(json.server_id);
+    const server = servers.servers.getObject(json.server_id);
     server.output.push(json.output);
-    servers.cache.updateObj(server);
+    servers.servers.updateObj(server);
 });
 
 socket.on("status", (json) => {
-    const server = servers.cache.getObject(json.server_id);
+    const server = servers.servers.getObject(json.server_id);
     server.status = json.status;
-    servers.cache.updateObj(server);
+    servers.servers.updateObj(server);
 });
 
 // endregion

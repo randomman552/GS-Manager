@@ -1,12 +1,12 @@
 import {apiFetch, StorageCache} from "../util";
 
 const auth = {
-    cache: new StorageCache(),
+    users: new StorageCache(),
 
     getCurrentUser() {
         return apiFetch("/api/auth/").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.updateObj(data.data);
+                this.users.updateObj(data.data);
             return data;
         });
     },
@@ -14,7 +14,7 @@ const auth = {
     modifyCurrentUser(obj) {
         return apiFetch("/api/auth/", obj, "put").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.updateObj(data.data);
+                this.users.updateObj(data.data);
             return data;
         })
     },
@@ -22,7 +22,7 @@ const auth = {
     deleteCurrentUser() {
         return apiFetch("/api/auth/", null, "delete").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.deleteObj(data.data);
+                this.users.deleteObj(data.data);
             return data;
         })
     },
@@ -31,7 +31,7 @@ const auth = {
     getUsers() {
         return apiFetch("/api/auth/users").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.fromArray(data.data);
+                this.users.fromArray(data.data);
             return data;
         });
     },
@@ -39,7 +39,7 @@ const auth = {
     createUser(obj) {
         return apiFetch("/api/auth/users", obj, "put").then(data => {
             if (data.code >= 200 && data.code < 300)
-                this.cache.updateObj(data.data);
+                this.users.updateObj(data.data);
             return data;
         });
     },
@@ -51,7 +51,7 @@ const auth = {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url).then(data => {
                 if (data.code >= 200 && data.code < 300)
-                    this.cache.updateObj(data.data);
+                    this.users.updateObj(data.data);
                 return data;
             });
         }
@@ -62,7 +62,7 @@ const auth = {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url, obj, "put").then(data => {
                 if (data.code >= 200 && data.code < 300)
-                    this.cache.updateObj(data.data);
+                    this.users.updateObj(data.data);
                 return data;
             });
         }
@@ -73,7 +73,7 @@ const auth = {
             const url = "/api/auth/users/" + userID;
             return apiFetch(url, null, "delete").then(data => {
                 if (data.code >= 200 && data.code < 300)
-                    this.cache.deleteObj(data.data);
+                    this.users.deleteObj(data.data);
                 return data;
             });
         }

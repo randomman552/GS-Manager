@@ -146,9 +146,9 @@ class AdminUserSettings extends React.Component {
                 users
             });
         }
-        api.auth.cache.addChangeListener(userUpdateFunc);
+        api.auth.users.addChangeListener(userUpdateFunc);
         this.componentWillUnmount = () => {
-            api.auth.cache.removeChangeListener(userUpdateFunc)
+            api.auth.users.removeChangeListener(userUpdateFunc)
         }
         api.auth.getUsers().then();
     }
