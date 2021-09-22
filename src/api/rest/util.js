@@ -6,7 +6,7 @@ import {addMessage} from "../../pages/components/MessageDisplay";
  * @param data Object containing data to send with request.
  * @param method {string} HTTP method to use, defaults to 'post'.
  * @param auth Object containing authorisation information.
- * @returns {Promise<{code: number, error: string, data:any, wasSuccess: boolean}>} Promise of return data as object.
+ * @returns {Promise<{code: number, error: string, data:any, success: boolean}>} Promise of return data as object.
  */
 export async function apiFetch(url, data, method = "post", auth = null) {
     data = {
