@@ -18,12 +18,12 @@ export class App extends React.Component {
                 this.setState({
                     user: data.data
                 });
-                api.servers.getServers().then((data) => {
+                api.servers.get().then(() => {
                    this.setState({
-                       servers: api.servers.servers.asArray
+                       servers: api.servers.data.asArray
                    });
                 });
-                api.auth.getUsers().then();
+                api.auth.get().then();
             } else if (data.code === 401) {
                 this.logout();
             }
@@ -58,12 +58,12 @@ export class App extends React.Component {
                         this.setState({
                             user: data.data
                         });
-                        api.servers.getServers().then((data) => {
+                        api.servers.get().then(() => {
                            this.setState({
-                               servers: api.servers.servers.asArray
+                               servers: api.servers.data.asArray
                            });
                         });
-                        api.auth.getUsers().then();
+                        api.auth.get().then();
                     } else if (data.code === 401) {
                         this.showModal("Login Failed", "Incorrect username or password...");
                     }
@@ -217,15 +217,15 @@ export class App extends React.Component {
                 return;
 
             // Update user object
-            const user = api.auth.users.getObject(this.state.user.id);
+            const user = api.auth.data.get(this.state.user.id);
             this.setState({
                 user
             });
 
             if (user) {
                 // Re-log after api-key change
-                api.auth.login(this.getAuth()).then(data => {
-                    if (data.code !== 200)
+                api.auth.login(this.getAuth()).then(json => {
+                    if (!json.success)
                         this.logout();
                 });
             } else {
@@ -234,13 +234,13 @@ export class App extends React.Component {
             }
         }
 
-        api.servers.servers.addChangeListener(serverUpdateFunc);
-        api.auth.users.addChangeListener(userUpdateFunc);
+        api.servers.addChangeListener(serverUpdateFunc);
+        api.auth.addChangeListener(userUpdateFunc);
 
         // Remove change listeners on component unmount
         this.componentWillUnmount = () => {
-            api.servers.servers.removeChangeListener(serverUpdateFunc);
-            api.auth.users.removeChangeListener(userUpdateFunc);
+            api.servers.removeChangeListener(serverUpdateFunc);
+            api.auth.removeChangeListener(userUpdateFunc);
         }
     }
 }

@@ -33,21 +33,21 @@ class ServerDashboard extends React.Component {
 
     startServer() {
         if (this.server)
-            api.servers.runStart(this.server.id).then(() => {
+            api.servers.start(this.server.id).then(() => {
                 addMessage("Server started", "success", 5000);
             });
     }
 
     updateServer() {
         if (this.server)
-            api.servers.runUpdate(this.server.id).then(() => {
+            api.servers.update(this.server.id).then(() => {
                 addMessage("Server updating", "warning", 5000);
             });
     }
 
     stopServer() {
         if (this.server)
-            api.servers.runStop(this.server.id).then(() => {
+            api.servers.stop(this.server.id).then(() => {
                 addMessage("Server stopped", "danger", 5000);
             });
     }
@@ -58,7 +58,7 @@ class ServerDashboard extends React.Component {
             const toSend = {
                 "command": data.command
             };
-            api.servers.runCommand(this.server.id, toSend).then();
+            api.servers.sendCommand(this.server.id, toSend).then();
         }
     }
 
@@ -68,7 +68,7 @@ class ServerDashboard extends React.Component {
      */
     modifySettings(data) {
         if (this.server) {
-            api.servers.modifyServer(this.server.id, data).then(data => {
+            api.servers.modify(this.server.id, data).then(data => {
                 if (data.code === 200) {
                     this.closeSettings();
                 }
@@ -81,7 +81,7 @@ class ServerDashboard extends React.Component {
      */
     deleteServer() {
         if (this.server) {
-            api.servers.deleteServer(this.server.id).then(data => {
+            api.servers.delete(this.server.id).then(data => {
                 if (data.code === 200) {
                     this.render = () => {
                         return (
@@ -121,7 +121,7 @@ class ServerDashboard extends React.Component {
                 mode_map = deepCopy(server.mode_map)
             mode_map[data.name] = data.arguments
 
-            api.servers.modifyServer(server.id, {mode_map}).then();
+            api.servers.modify(server.id, {mode_map}).then();
         }
     }
 
@@ -145,7 +145,7 @@ class ServerDashboard extends React.Component {
             delete mode_map[data.originalName];
             mode_map[data.name] = data.arguments;
 
-            api.servers.modifyServer(server.id, {mode_map}).then();
+            api.servers.modify(server.id, {mode_map}).then();
         }
     }
 
@@ -161,7 +161,7 @@ class ServerDashboard extends React.Component {
                 mode_map = deepCopy(server.mode_map)
             delete mode_map[data.name]
 
-            api.servers.modifyServer(server.id, {mode_map}).then();
+            api.servers.modify(server.id, {mode_map}).then();
         }
     }
 
@@ -281,34 +281,40 @@ function NoServerDashboard(props) {
                 <Link className="server-name" to={"/servers/" + server.id}>{server.name}</Link>
                 <div className="controls">
                     <Button variant="success" disabled={serverRunning} onClick={() => {
-                        api.servers.runStart(server.id).then(() => {
-                            addMessage(
-                                "Server '" + server.name + "' started",
-                                "success",
-                                5000
-                            );
+                        api.servers.start(server.id).then((json) => {
+                            if (json.success) {
+                                addMessage(
+                                    "Server '" + server.name + "' started",
+                                    "success",
+                                    5000
+                                );
+                            }
                         });
                     }}>
                         Start
                     </Button>
                     <Button variant="warning" disabled={serverRunning} onClick={() => {
-                        api.servers.runUpdate(server.id).then(() => {
-                            addMessage(
-                                "Server '" + server.name + "' updating",
-                                "warning",
-                                5000
-                            );
+                        api.servers.update(server.id).then((json) => {
+                            if (json.success) {
+                                addMessage(
+                                    "Server '" + server.name + "' updating",
+                                    "warning",
+                                    5000
+                                );
+                            }
                         });
                     }}>
                         Update
                     </Button>
                     <Button variant="danger" disabled={!serverRunning} onClick={() => {
-                        api.servers.runStop(server.id).then(() => {
-                            addMessage(
-                                "Server '" + server.name + "' stopped",
-                                "danger",
-                                5000
-                            );
+                        api.servers.stop(server.id).then((json) => {
+                            if (json.success) {
+                                addMessage(
+                                    "Server '" + server.name + "' stopped",
+                                    "danger",
+                                    5000
+                                );
+                            }
                         });
                     }}>
                         Stop
@@ -324,7 +330,7 @@ function NoServerDashboard(props) {
             <NewServerForm
                 show={show}
                 setShow={(show) => setShow(show)}
-                onSubmit={(data) => {setShow(false); api.servers.createServer(data).then()}}
+                onSubmit={(data) => {setShow(false); api.servers.create(data).then()}}
             />
             <article className="servers-grid">
                 {servers}
