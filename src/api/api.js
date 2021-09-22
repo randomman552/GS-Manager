@@ -1,5 +1,6 @@
 import auth from "./segments/auth";
 import servers from "./segments/servers";
+import categories from "./segments/categories";
 
 
 /**
@@ -10,7 +11,8 @@ import servers from "./segments/servers";
  */
 const api = {
     servers,
-    auth
+    auth,
+    categories
 }
 
 export default api;
