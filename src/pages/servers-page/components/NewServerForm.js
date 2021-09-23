@@ -44,16 +44,14 @@ export function NewServerForm(props) {
                     </Form.Group>
 
                     <Form.Group className="flex flex-column flex-center">
-                        <Form.Label className="required-star" htmlFor="update_cmd">
+                        <Form.Label htmlFor="update_cmd">
                             Update command
                         </Form.Label>
                         <Form.Control
                             id="update_cmd"
                             name="update_cmd"
                             type="text"
-                            required
                         />
-                        <Form.Control.Feedback type="invalid">Required</Form.Control.Feedback>
                     </Form.Group>
                 </Modal.Body>
 
