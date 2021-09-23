@@ -2,7 +2,7 @@ import React from "react";
 import api from "../../../../api/api";
 import {Button} from "react-bootstrap";
 import {UserForm} from "./UserForm";
-import {ConfirmDeleteModal} from "../ConfirmDeleteModal";
+import {ConfirmDeleteModal} from "../../../components/ConfirmDeleteModal";
 
 class AdminUserSettings extends React.Component {
     constructor(props) {
