@@ -5,14 +5,19 @@ import api from "../../../api/api";
 import {addMessage} from "../../components/MessageDisplay";
 import {NewServerForm} from "./NewServerForm";
 import PropTypes from "prop-types";
+import {NewCategoryForm} from "./NewCategoryForm";
+import {ConfirmDeleteModal} from "../../components/ConfirmDeleteModal";
 
 
+/**
+ * Component to represent a server in a grid format.
+ */
 function ServerDetails(props) {
     const server = props.server;
     const serverRunning = server.status !== "stopped";
 
         return (
-            <article className="server" key={server.name}>
+            <article className="server">
                 <Link className="server-name" to={"/servers/" + server.id}>{server.name}</Link>
                 <div className="controls">
                     <Button variant="success" disabled={serverRunning} onClick={() => {
@@ -66,31 +71,104 @@ ServerDetails.propTypes = {
 
 
 /**
+ * Component to represent a category.
+ * A category is a group of servers which will be displayed using the ServerDetails component.
+ */
+function CategoryListing(props) {
+    // Show variable has 3 states, "", "new", and "delete"
+    // This alternates between the ConfirmDelete modal, NewServerForm modal, and no modal.
+    const [show, setShow] = useState("");
+    const categoryName = (props.category) ? props.category.name : "Unassigned";
+
+    const serverObjs = props.servers.filter((server) => {
+        if (props.category)
+            return server.category === props.category.id;
+        return !server.category;
+    });
+
+    let servers = serverObjs.map((server) => {
+        return (<ServerDetails server={server} key={server.id} />);
+    });
+
+    return (
+        <article className="servers-grid">
+            <NewServerForm
+                show={show === "new"}
+                setShow={(show) => {
+                    setShow((show) ? "new" : "")
+                }}
+                onSubmit={(data) => {
+                    setShow("");
+                    if (props.category)
+                        data.category = props.category.id;
+                    api.servers.create(data).then()
+                }}
+            />
+            <ConfirmDeleteModal
+                show={show === "delete"}
+                onCancel={() => setShow("")}
+                onHide={() => setShow("")}
+                onConfirm={() => {
+                    api.categories.delete(props.category.id).then();
+                }}
+            />
+            <header className="category-header">
+                <h2>{categoryName}</h2>
+                <Button
+                    variant="link"
+                    disabled={!props.category}
+                    className="delete-button"
+                    onClick={() => setShow("delete")}
+                >
+                    Delete
+                </Button>
+            </header>
+            {servers}
+            <article className="server new-server" onClick={() => setShow("new")}>
+                <div className="plus">+</div>
+                <p>Add new server</p>
+            </article>
+        </article>
+    )
+}
+
+CategoryListing.propTypes = {
+    category: PropTypes.object.isRequired,
+    servers: PropTypes.arrayOf(PropTypes.object).isRequired
+}
+
+
+/**
  * Dashboard displayed on normal /servers route.
  */
 export function ServerListing(props) {
     const [show, setShow] = useState(false);
 
-    const servers = props.servers.map((server) => {
-        return (<ServerDetails server={server}/>)
-    })
+    const categories = props.categories.map((category) => {
+        return (<CategoryListing servers={props.servers} category={category} key={category.id}/>);
+    });
+    categories.unshift(<CategoryListing category={null} servers={props.servers} key="unassigned"/>)
 
     return (
         <div className="server-dashboard">
-            <NewServerForm
+            <NewCategoryForm
                 show={show}
-                setShow={(show) => setShow(show)}
+                setShow={setShow}
                 onSubmit={(data) => {
                     setShow(false);
-                    api.servers.create(data).then()
+                    api.categories.create(data).then();
                 }}
             />
-            <article className="servers-grid">
-                {servers}
-                <article className="server new-server" onClick={() => setShow(true)}>
-                    <div className="plus">+</div>
-                    <p>Add new server</p>
-                </article>
+            <article className="categories-grid">
+                {categories}
+                <header className="category-header">
+                    <Button
+                        variant="link"
+                        onClick={() => {setShow(true)}}
+                    >
+                        Add New Category
+                    </Button>
+                </header>
             </article>
         </div>
     );

@@ -11,6 +11,10 @@ function GeneralSettingsForm(props) {
     const onDelete = (confirmDelete) ? props.onDelete : () => {setConfirmDelete(true)};
     const deleteText = (confirmDelete) ? "Confirm delete? (this is irreversible)" : "Delete";
 
+    const categoryOptions = props.categories.map((category) => {
+        return (<option value={category.id}>{category.name}</option>)
+    })
+
     return (
         <BaseForm
             onSubmit={props.onSubmit}
@@ -19,18 +23,32 @@ function GeneralSettingsForm(props) {
             autofill="off"
         >
             <Form.Group className="flex flex-column flex-center">
-                    <Form.Label htmlFor="name">
-                        Name
-                    </Form.Label>
-                    <Form.Control
-                        id="name"
-                        name="name"
-                        type="text"
-                        minLength="3"
-                        value={data.name}
-                    />
-                    <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
-                </Form.Group>
+                <Form.Label htmlFor="name">
+                    Name
+                </Form.Label>
+                <Form.Control
+                    id="name"
+                    name="name"
+                    type="text"
+                    minLength="3"
+                    value={data.name}
+                />
+                <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+                <Form.Label htmlFor="category">
+                    Category
+                </Form.Label>
+                <Form.Control
+                    id="category"
+                    name="category"
+                    as="select"
+                    value={data.category}
+                >
+                    <option value="">None</option>
+                    {categoryOptions}
+                </Form.Control>
+            </Form.Group>
             <Form.Group className="flex flex-column flex-center">
                 <Form.Label htmlFor="start_cmd">
                     Start command
@@ -66,6 +84,7 @@ function GeneralSettingsForm(props) {
 }
 
 GeneralSettingsForm.propTypes = {
+    categories: PropTypes.arrayOf(PropTypes.object).isRequired,
     data: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired
@@ -276,6 +295,7 @@ export function UpdateServerForm(props) {
             <Tabs defaultActiveKey="general" fill justify>
                 <Tab eventKey="general" title="General">
                     <GeneralSettingsForm
+                        categories={props.categories}
                         data={props.data}
                         onSubmit={props.onGeneralSubmit}
                         onDelete={props.onDelete}
@@ -328,6 +348,8 @@ export function UpdateServerForm(props) {
 }
 
 UpdateServerForm.propTypes = {
+    categories: PropTypes.arrayOf(PropTypes.object).isRequired,
+
     data: PropTypes.object,
     show: PropTypes.bool,
     onClose: PropTypes.func.isRequired,

@@ -167,6 +167,29 @@
     height: 100%;
 }
 
+.categories-grid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+}
+
+.category-header {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #888888;
+    border-top: 1px solid #888888;
+    text-transform: capitalize;
+}
+
+.category-header .delete-button {
+    position: absolute;
+    right: 5%;
+    top: 5px;
+}
+
 @media (max-width: 480px) {
     .servers-grid .server {
         width: 350px;

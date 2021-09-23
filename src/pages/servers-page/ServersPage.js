@@ -41,6 +41,7 @@ export class ServersPage extends React.Component {
                                     {...props}
                                     key={serverID}
                                     server={curServer}
+                                    categories={categories}
                                 />
                             )
                         }}

@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_login import login_required, current_user
 from mongoengine import ValidationError, NotUniqueError
 
-from ..models import GameServer, User
+from ..models import GameServer, User, Category
 from ..socketIO import socketIO
 from .. import server_runner as runner
 from .. import rest

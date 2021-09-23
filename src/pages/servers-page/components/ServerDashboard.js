@@ -168,6 +168,7 @@ export class ServerDashboard extends React.Component {
 
         return (
             <UpdateServerForm
+                categories={this.props.categories}
                 show={show}
 
                 onGeneralSubmit={(data) => this.modifySettings(data)}
@@ -260,5 +261,6 @@ export class ServerDashboard extends React.Component {
 }
 
 ServerDashboard.propTypes = {
-    server: PropTypes.object.isRequired
+    server: PropTypes.object.isRequired,
+    categories: PropTypes.arrayOf(PropTypes.object).isRequired
 }
