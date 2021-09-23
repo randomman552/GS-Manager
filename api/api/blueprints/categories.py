@@ -5,7 +5,7 @@ from mongoengine import ValidationError, NotUniqueError
 from .. import rest
 from ..models import Category
 
-categories = Blueprint("categories", __name__, url_prefix="/api/category")
+categories = Blueprint("categories", __name__, url_prefix="/api/categories")
 
 
 @categories.route("/", methods=["GET", "POST"])

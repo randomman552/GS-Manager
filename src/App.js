@@ -13,25 +13,18 @@ export class App extends React.Component {
     constructor(props) {
         super(props);
         // Attempt login from cookie on load
-        api.auth.getCurrentUser().then(data => {
-            if (!data.error) {
+        api.auth.getCurrentUser().then(json => {
+            if (json.success) {
                 this.setState({
-                    user: data.data
+                    user: json.data
                 });
-                api.servers.get().then(() => {
-                   this.setState({
-                       servers: api.servers.data.asArray
-                   });
-                });
-                api.auth.get().then();
-            } else if (data.code === 401) {
+            } else if (json.code === 401) {
                 this.logout();
             }
         });
 
         this.state = {
             user: null,
-            servers: [],
             modal: {
                 "title": null,
                 "message": null
@@ -53,18 +46,13 @@ export class App extends React.Component {
         api.auth.login(auth)
             .then(() => {
                 api.auth.getCurrentUser()
-                    .then(data => {
-                    if (!data.error) {
+                    .then(json => {
+                    if (!json.error) {
                         this.setState({
-                            user: data.data
-                        });
-                        api.servers.get().then(() => {
-                           this.setState({
-                               servers: api.servers.data.asArray
-                           });
+                            user: json.data
                         });
                         api.auth.get().then();
-                    } else if (data.code === 401) {
+                    } else if (json.code === 401) {
                         this.showModal("Login Failed", "Incorrect username or password...");
                     }
                 });
@@ -207,12 +195,7 @@ export class App extends React.Component {
 
 
     componentDidMount() {
-        const serverUpdateFunc = (servers) => {
-            this.setState({
-                servers
-            });
-        }
-        const userUpdateFunc = () => {
+        this.onUserChange = () => {
             if (!this.state.user)
                 return;
 
@@ -234,14 +217,11 @@ export class App extends React.Component {
             }
         }
 
-        api.servers.addChangeListener(serverUpdateFunc);
-        api.auth.addChangeListener(userUpdateFunc);
+        api.auth.addChangeListener(this.onUserChange);
+    }
 
-        // Remove change listeners on component unmount
-        this.componentWillUnmount = () => {
-            api.servers.removeChangeListener(serverUpdateFunc);
-            api.auth.removeChangeListener(userUpdateFunc);
-        }
+    componentWillUnmount() {
+        api.auth.removeChangeListener(this.onUserChange);
     }
 }
 

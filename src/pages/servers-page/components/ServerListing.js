@@ -7,14 +7,9 @@ import {NewServerForm} from "./NewServerForm";
 import PropTypes from "prop-types";
 
 
-/**
- * Dashboard displayed on route normal /servers route.
- */
-export function ServerListing(props) {
-    const [show, setShow] = useState(false);
-
-    const servers = props.servers.map((server) => {
-        const serverRunning = server.status !== "stopped";
+function ServerDetails(props) {
+    const server = props.server;
+    const serverRunning = server.status !== "stopped";
 
         return (
             <article className="server" key={server.name}>
@@ -63,6 +58,21 @@ export function ServerListing(props) {
                 <Link className={"server-status " + server.status} to={"/servers/" + server.id}>{server.status}</Link>
             </article>
         );
+}
+
+ServerDetails.propTypes = {
+    server: PropTypes.object.isRequired
+}
+
+
+/**
+ * Dashboard displayed on normal /servers route.
+ */
+export function ServerListing(props) {
+    const [show, setShow] = useState(false);
+
+    const servers = props.servers.map((server) => {
+        return (<ServerDetails server={server}/>)
     })
 
     return (
@@ -87,5 +97,6 @@ export function ServerListing(props) {
 }
 
 ServerListing.propTypes = {
-    servers: PropTypes.arrayOf(PropTypes.object).isRequired
+    servers: PropTypes.arrayOf(PropTypes.object).isRequired,
+    categories: PropTypes.arrayOf(PropTypes.object).isRequired
 }
