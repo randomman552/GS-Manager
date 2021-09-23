@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid
 
+import mongoengine
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_mongoengine import Document
 from mongoengine import StringField, DictField, ListField, BooleanField, ReferenceField
@@ -95,7 +96,7 @@ class GameServer(Document):
     STORAGE_PATH = os.path.join(os.getcwd(), "storage")
 
     name = StringField(required=True, unique=True, min_length=3)
-    category = ReferenceField(Category)
+    category = ReferenceField(Category, reverse_delete_rule=mongoengine.CASCADE)
     status = StringField(default="stopped")
     output = ListField(StringField())
 
@@ -157,6 +158,14 @@ class GameServer(Document):
     def delete(self, signal_kwargs=None, **write_concern):
         shutil.rmtree(self.working_directory)
         super().delete(signal_kwargs, **write_concern)
+
+    def update(self, **kwargs):
+        if "category" in kwargs:
+            if not kwargs["category"]:
+                kwargs["category"] = None
+            else:
+                kwargs["category"] = Category.objects(id=kwargs["category"]).first()
+        super().update(**kwargs)
 
     def to_dict(self):
         as_dict = _convert_to_dict(self)
