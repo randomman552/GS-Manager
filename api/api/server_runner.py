@@ -9,6 +9,20 @@ from .socketIO import socketIO
 __running = dict()
 
 
+def __on_server_exit(server_id: str):
+    process: Popen = __running.pop(server_id)
+    GameServer.objects(id=server_id).update(
+        set__status="stopped",
+        push__output=f"Exited with code '{process.returncode}'"
+    )
+    socketIO.emit(
+        "output",
+        {"server_id": server_id, "output": f"Exited with code '{process.returncode}'"},
+        namespace="/servers"
+    )
+    socketIO.emit("status", {"server_id": server_id, "status": "stopped"}, namespace="/servers")
+
+
 def __read_stdout(server_id: str) -> None:
     """
     Internal helper function called on a separate thread to read from the STDOUT
@@ -37,17 +51,9 @@ def __poll_process(server_id: str) -> None:
     """
     process: Popen = __running.get(server_id)
     process.wait()
-    # Inform of server closure
-    GameServer.objects(id=server_id).update(
-        set__status="stopped",
-        push__output=f"Exited with code '{process.returncode}'"
-    )
-    socketIO.emit(
-        "output",
-        {"server_id": server_id, "output": f"Exited with code '{process.returncode}'"},
-        namespace="/servers"
-    )
-    socketIO.emit("status", {"server_id": server_id, "status": "stopped"}, namespace="/servers")
+    # Inform of server closure if process was not killed by us
+    if process.returncode >= 0:
+        __on_server_exit(server_id)
 
 
 def __create_process(working_directory: str, command: str) -> Popen:
@@ -125,7 +131,7 @@ def stop_server(server: GameServer) -> bool:
     """
     server_id = str(server.id)
     if __running.get(server_id):
-        process: Popen = __running.pop(server_id)
+        process: Popen = __running.get(server_id)
         pgid = os.getpgid(process.pid)
 
         try:
@@ -146,6 +152,7 @@ def stop_server(server: GameServer) -> bool:
             # If process lookup error occurs, the process is no longer running.
             # So we can return true
             pass
+        __on_server_exit(server_id)
         return True
     return False
 

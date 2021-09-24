@@ -149,6 +149,8 @@ def stop_server(server_id: str):
     """
     server = GameServer.objects(id=server_id).first_or_404()
     if runner.stop_server(server):
+        # Reload server so status is up to date
+        server.reload()
         return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is not running")
 
