@@ -1,8 +1,8 @@
 import React from "react";
-import api from "../../../api/api";
-import {addMessage} from "../../components/MessageDisplay";
+import api from "../../../../api/api";
+import {addMessage} from "../../../components/MessageDisplay";
 import {Redirect} from "react-router-dom";
-import {deepCopy} from "../../../util";
+import {deepCopy} from "../../../../util";
 import {UpdateServerForm} from "./UpdateServerForm";
 import {Button, Card} from "react-bootstrap";
 import ScrollToBottom from "react-scroll-to-bottom";

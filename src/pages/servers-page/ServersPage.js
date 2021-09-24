@@ -1,8 +1,8 @@
 import React from "react";
 import {Route, Switch} from "react-router-dom";
 import "./ServersPage.css"
-import {ServerListing} from "./components/ServerListing";
-import {ServerDashboard} from "./components/ServerDashboard";
+import {ServerListing} from "./components/listing/ServerListing";
+import {ServerDashboard} from "./components/dashboard/ServerDashboard";
 import api from "../../api/api";
 
 

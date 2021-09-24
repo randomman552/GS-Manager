@@ -184,7 +184,7 @@
     text-transform: capitalize;
 }
 
-.category-header .delete-button {
+.category-header .options {
     position: absolute;
     right: 5%;
     top: 5px;

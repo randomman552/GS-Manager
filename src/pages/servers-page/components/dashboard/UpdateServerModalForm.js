@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Accordion, Button, Card, Form, Modal, Tab, Tabs} from "react-bootstrap";
 import PropTypes from "prop-types";
-import {BaseForm, onChangeFactory} from "../../components/BaseForm";
+import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
 
 
 function GeneralSettingsForm(props) {

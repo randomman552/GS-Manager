@@ -1,22 +1,27 @@
 import {Button, Form, Modal} from "react-bootstrap";
-import {BaseForm} from "../../components/BaseForm";
-import React from "react";
+import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
+import React, {useState} from "react";
 import PropTypes from "prop-types";
-import {NewServerForm} from "./NewServerForm";
 
 
-export function NewCategoryForm(props) {
+export function CategoryForm(props) {
+    const title = (props.data) ? "Edit category" : "New category";
+    const submitText = (props.data) ? "Update" : "Create";
+
     return (
         <Modal
             show={props.show}
-            onHide={() => {props.setShow(false)}}
+            onHide={props.onHide}
             backdrop={true}
         >
             <Modal.Header closeButton>
-                <Modal.Title>New category</Modal.Title>
+                <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
 
-            <BaseForm onSubmit={props.onSubmit} className="flex flex-column">
+            <BaseForm
+                onSubmit={props.onSubmit}
+                className="flex flex-column"
+            >
                 <Modal.Body>
                     <Form.Group className="flex flex-column flex-center">
                         <Form.Label className="required-star" htmlFor="name">
@@ -28,6 +33,7 @@ export function NewCategoryForm(props) {
                             type="text"
                             required
                             minLength="3"
+                            defaultValue={(props.data) ? props.data.name : null}
                         />
                         <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
                     </Form.Group>
@@ -35,7 +41,7 @@ export function NewCategoryForm(props) {
 
                 <Modal.Footer>
                     <Button variant="primary" type="submit">
-                        Create
+                        {submitText}
                     </Button>
                 </Modal.Footer>
             </BaseForm>
@@ -43,8 +49,9 @@ export function NewCategoryForm(props) {
     );
 }
 
-NewServerForm.propTypes = {
+CategoryForm.propTypes = {
+    data: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
-    show: PropTypes.bool,
-    setShow: PropTypes.func
+    onHide: PropTypes.func,
+    show: PropTypes.bool
 }

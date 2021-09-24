@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import {Button} from "react-bootstrap";
-import api from "../../../api/api";
-import {addMessage} from "../../components/MessageDisplay";
+import api from "../../../../api/api";
+import {addMessage} from "../../../components/MessageDisplay";
 import {NewServerForm} from "./NewServerForm";
 import PropTypes from "prop-types";
 import {NewCategoryForm} from "./NewCategoryForm";
-import {ConfirmDeleteModal} from "../../components/ConfirmDeleteModal";
+import {ConfirmDeleteModal} from "../../../components/ConfirmDeleteModal";
 
 
 /**
@@ -81,14 +81,22 @@ function CategoryListing(props) {
     let categoryHeader = (props.category) ? (
             <header className="category-header">
                 <h2>{props.category.name}</h2>
-                <Button
-                    variant="link"
-                    disabled={!props.category}
-                    className="delete-button"
-                    onClick={() => setShow("delete")}
-                >
-                    Delete
-                </Button>
+                <div className="options">
+                    <Button
+                        variant="link"
+                        disabled={!props.category}
+                        onClick={() => setShow("edit")}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        variant="link"
+                        disabled={!props.category}
+                        onClick={() => setShow("delete")}
+                    >
+                        Delete
+                    </Button>
+                </div>
             </header>
     ) : null;
 
