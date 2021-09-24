@@ -78,7 +78,19 @@ function CategoryListing(props) {
     // Show variable has 3 states, "", "new", and "delete"
     // This alternates between the ConfirmDelete modal, NewServerForm modal, and no modal.
     const [show, setShow] = useState("");
-    const categoryName = (props.category) ? props.category.name : "Unassigned";
+    let categoryHeader = (props.category) ? (
+            <header className="category-header">
+                <h2>{props.category.name}</h2>
+                <Button
+                    variant="link"
+                    disabled={!props.category}
+                    className="delete-button"
+                    onClick={() => setShow("delete")}
+                >
+                    Delete
+                </Button>
+            </header>
+    ) : null;
 
     const serverObjs = props.servers.filter((server) => {
         if (props.category)
@@ -112,17 +124,7 @@ function CategoryListing(props) {
                     api.categories.delete(props.category.id).then();
                 }}
             />
-            <header className="category-header">
-                <h2>{categoryName}</h2>
-                <Button
-                    variant="link"
-                    disabled={!props.category}
-                    className="delete-button"
-                    onClick={() => setShow("delete")}
-                >
-                    Delete
-                </Button>
-            </header>
+            {categoryHeader}
             {servers}
             <article className="server new-server" onClick={() => setShow("new")}>
                 <div className="plus">+</div>
