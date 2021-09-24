@@ -1,8 +1,8 @@
 import {Button} from "react-bootstrap";
-import {ChangeUsernameForm} from "./ChangeUsernameForm";
+import {ChangeUsernameModal} from "./ChangeUsernameModal";
 import api from "../../../../api/api";
 import {useState} from "react";
-import {ChangePasswordForm} from "./ChangePasswordForm";
+import {ChangePasswordModal} from "./ChangePasswordModal";
 import {ConfirmDeleteModal} from "../../../components/ConfirmDeleteModal";
 
 export function SettingsPanel(props) {
@@ -11,7 +11,7 @@ export function SettingsPanel(props) {
     return (
         <div className="flex flex-column flex-center">
             {/* Modal forms */}
-            <ChangeUsernameForm
+            <ChangeUsernameModal
                 onSubmit={(data) => {
                     api.auth.modifyCurrentUser(data).then();
                 }}
@@ -19,7 +19,7 @@ export function SettingsPanel(props) {
                 onHide={() => {setShow("none")}}
                 data={props.user}
             />
-            <ChangePasswordForm
+            <ChangePasswordModal
                 onSubmit={(data) => {
                     api.auth.modifyCurrentUser(data).then();
                 }}

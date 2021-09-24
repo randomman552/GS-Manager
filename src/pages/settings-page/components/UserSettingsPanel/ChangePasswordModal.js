@@ -1,12 +1,10 @@
-import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
+import {BaseForm} from "../../../components/BaseForm";
 import PropTypes from "prop-types";
 import {Button, Form, Modal} from "react-bootstrap";
-import React, {useState} from "react";
+import React from "react";
 
-export function ChangeUsernameForm(props) {
-    const [data, setData] = useState(props.data);
-
-    const modalTitle = "Edit username";
+export function ChangePasswordModal(props) {
+    const modalTitle = "Edit password";
     const submitText = "Update";
 
     return (
@@ -21,24 +19,22 @@ export function ChangeUsernameForm(props) {
 
             <BaseForm
                 onSubmit={props.onSubmit}
-                onChange={onChangeFactory(data, setData)}
-                onReset={() => {props.onHide(); setData(props.data)}}
+                onReset={() => {props.onHide()}}
             >
                 <Modal.Body>
                     <Form.Group className="flex flex-column flex-center">
-                        <Form.Label htmlFor="name">
-                            Username
+                        <Form.Label htmlFor="password">
+                            Password
                         </Form.Label>
                         <Form.Control
-                            id="name"
-                            name="name"
-                            type="text"
-                            minLength="3"
-                            placeholder="Username"
-                            required
-                            value={data.name}
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            required={true}
+                            minLength="8"
                         />
-                        <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">Must be at least 8 characters long</Form.Control.Feedback>
                     </Form.Group>
                 </Modal.Body>
 
@@ -51,7 +47,7 @@ export function ChangeUsernameForm(props) {
     )
 }
 
-ChangeUsernameForm.propTypes = {
+ChangePasswordModal.propTypes = {
     data: PropTypes.object,
 
     onSubmit: PropTypes.func.isRequired,
@@ -60,7 +56,7 @@ ChangeUsernameForm.propTypes = {
     onHide: PropTypes.func
 };
 
-ChangeUsernameForm.defaultProps = {
+ChangePasswordModal.defaultProps = {
     data: {},
 
     show: false,

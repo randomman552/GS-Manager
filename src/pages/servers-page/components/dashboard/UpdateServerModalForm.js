@@ -5,7 +5,6 @@ import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
 
 
 function GeneralSettingsForm(props) {
-    const [data, setData] = useState(props.data);
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const onDelete = (confirmDelete) ? props.onDelete : () => {setConfirmDelete(true)};
@@ -18,7 +17,6 @@ function GeneralSettingsForm(props) {
     return (
         <BaseForm
             onSubmit={props.onSubmit}
-            onChange={onChangeFactory(data, setData)}
             className="modal-body text-center"
             autofill="off"
         >
@@ -31,7 +29,7 @@ function GeneralSettingsForm(props) {
                     name="name"
                     type="text"
                     minLength="3"
-                    value={data.name}
+                    defaultValue={props.data.name}
                 />
                 <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
             </Form.Group>
@@ -43,7 +41,7 @@ function GeneralSettingsForm(props) {
                     id="category"
                     name="category"
                     as="select"
-                    value={data.category}
+                    defaultValue={props.data.category}
                 >
                     <option value="">None</option>
                     {categoryOptions}
@@ -57,7 +55,7 @@ function GeneralSettingsForm(props) {
                     id="start_cmd"
                     name="start_cmd"
                     type="text"
-                    value={data.start_cmd}
+                    defaultValue={props.data.start_cmd}
                 />
             </Form.Group>
             <Form.Group className="flex flex-column flex-center">
@@ -68,7 +66,7 @@ function GeneralSettingsForm(props) {
                     id="update_cmd"
                     name="update_cmd"
                     type="text"
-                    value={data.update_cmd}
+                    defaultValue={props.data.update_cmd}
                 />
             </Form.Group>
             <Form.Group>
@@ -92,11 +90,10 @@ GeneralSettingsForm.propTypes = {
 
 
 function ModeSettingsForm(props) {
-    const mode_map = props.data.mode_map;
+    const modeMap = props.data.mode_map;
     const [editing, setEditing] = useState(null);
-    const [data, setData] = useState({});
 
-    let modes = Object.keys(mode_map).map((key) => {
+    let modes = Object.keys(modeMap).map((key) => {
         if (editing === key) {
             return (
                 <tr key={key} className="mode-display">
@@ -106,7 +103,7 @@ function ModeSettingsForm(props) {
                         placeholder="Name"
                         type="text"
                         className="text-center"
-                        value={data.name}
+                        defaultValue={key}
                     />
                     <Form.Control
                         name="arguments"
@@ -114,7 +111,7 @@ function ModeSettingsForm(props) {
                         placeholder="Arguments"
                         type="text"
                         className="text-center"
-                        value={data.arguments}
+                        defaultValue={modeMap[key]}
 
                     />
                     <td headers="mode-options" className="flex-center">
@@ -131,14 +128,10 @@ function ModeSettingsForm(props) {
         return (
             <tr key={key} className="mode-display">
                 <td headers="mode-name" className="flex-center">{key}</td>
-                <td headers="mode-arguments" className="flex-center">{mode_map[key]}</td>
+                <td headers="mode-arguments" className="flex-center">{modeMap[key]}</td>
                 <td headers="mode-options" className="flex-center">
                     <Button variant="link" type="reset" onClick={() => {
                         setEditing(key)
-                        setData({
-                            name: key,
-                            arguments: mode_map[key]
-                        })
                     }}>
                         Edit
                     </Button>
@@ -185,9 +178,8 @@ function ModeSettingsForm(props) {
             </BaseForm>
             {/* Edit mode form */}
             <BaseForm
-                onSubmit={(data) => props.onEdit({originalName: editing, arguments: mode_map[editing], ...data})}
+                onSubmit={(data) => props.onEdit({originalName: editing, arguments: modeMap[editing], ...data})}
                 onReset={() => {setEditing(null)}}
-                onChange={onChangeFactory(data, setData)}
             >
                 <table className="modes-table">
                     <thead className="mode-display">
@@ -213,7 +205,6 @@ ModeSettingsForm.propTypes = {
 
 
 function ArgumentSettingsForm(props) {
-    const [data, setData] = useState(props.data);
     const modeMap = props.data.mode_map;
 
     const modeOptions = Object.keys(modeMap).map((key) => {
@@ -224,7 +215,6 @@ function ArgumentSettingsForm(props) {
         <div id="argument-editing-form" className="text-center">
             <BaseForm
                 onSubmit={props.onSubmit}
-                onChange={onChangeFactory(data, setData)}
                 autofill="off"
             >
                 <Form.Group>
@@ -236,7 +226,7 @@ function ArgumentSettingsForm(props) {
                     <Form.Control
                         name="default_args"
                         id="edit-default-args"
-                        value={data.default_args}
+                        defaultValue={props.data.default_args}
                     />
                 </Form.Group>
 
@@ -249,7 +239,7 @@ function ArgumentSettingsForm(props) {
                     <Form.Control
                         name="unspecified_args"
                         id="edit-unspecified-args"
-                        value={data.unspecified_args}
+                        defaultValue={props.data.unspecified_args}
                     />
                 </Form.Group>
 
@@ -263,7 +253,7 @@ function ArgumentSettingsForm(props) {
                         name="mode"
                         id="edit-current-mode"
                         as="select"
-                        value={data.mode}
+                        defaultValue={props.data.mode}
                     >
                         <option>None</option>
                         {modeOptions}
