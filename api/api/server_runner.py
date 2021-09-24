@@ -35,13 +35,9 @@ def __poll_process(server_id: str) -> None:
     Internal helper function to continually poll the process for the server with the given id.
     :param server_id: The ID of the server to poll.
     """
-    process = __running.get(server_id)
-    while process is not None and process.returncode is None:
-        process.poll()
-        time.sleep(0.1)
-
-    if __running.get(server_id):
-        __running.pop(server_id)
+    process: Popen = __running.get(server_id)
+    process.wait()
+    # Inform of server closure
     GameServer.objects(id=server_id).update(
         set__status="stopped",
         push__output=f"Exited with code '{process.returncode}'"
