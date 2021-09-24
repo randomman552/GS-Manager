@@ -132,19 +132,24 @@ def stop_server(server: GameServer) -> bool:
         process: Popen = __running.pop(server_id)
         pgid = os.getpgid(process.pid)
 
-        # Attempt to kill the process with SIGINT, if this fails try SIGKILL
         try:
-            os.killpg(pgid, signal.SIGINT)
-            process.wait(10)
-        except TimeoutExpired:
-            # If SIGKILL fails, try SIGTERM
+            # Attempt to kill the process with SIGINT, if this fails try SIGKILL
             try:
-                os.killpg(pgid, signal.SIGKILL)
-                process.wait(5)
+                os.killpg(pgid, signal.SIGINT)
+                process.wait(10)
             except TimeoutExpired:
-                # Finally try SIGTERM
-                os.killpg(pgid, signal.SIGTERM)
-                process.wait()
+                # If SIGKILL fails, try SIGTERM
+                try:
+                    os.killpg(pgid, signal.SIGKILL)
+                    process.wait(5)
+                except TimeoutExpired:
+                    # Finally try SIGTERM
+                    os.killpg(pgid, signal.SIGTERM)
+                    process.wait()
+        except ProcessLookupError:
+            # If process lookup error occurs, the process is no longer running.
+            # So we can return true
+            pass
         return True
     return False
 
