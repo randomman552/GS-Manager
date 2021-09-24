@@ -3,9 +3,9 @@ import {Link} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import api from "../../../../api/api";
 import {addMessage} from "../../../components/MessageDisplay";
-import {NewServerForm} from "./NewServerForm";
+import {NewServerModalForm} from "./NewServerModalForm";
 import PropTypes from "prop-types";
-import {NewCategoryForm} from "./NewCategoryForm";
+import {CategoryModalForm} from "./CategoryModalForm";
 import {ConfirmDeleteModal} from "../../../components/ConfirmDeleteModal";
 
 
@@ -112,10 +112,10 @@ function CategoryListing(props) {
 
     return (
         <article className="servers-grid">
-            <NewServerForm
+            <NewServerModalForm
                 show={show === "new"}
-                setShow={(show) => {
-                    setShow((show) ? "new" : "")
+                onHide={() => {
+                    setShow("")
                 }}
                 onSubmit={(data) => {
                     setShow("");
@@ -132,6 +132,17 @@ function CategoryListing(props) {
                     api.categories.delete(props.category.id).then();
                 }}
             />
+            <CategoryModalForm
+                data={props.category}
+                show={show === "edit"}
+                onHide={() => {setShow("")}}
+                onSubmit={(data) => {
+                    api.categories.modify(props.category.id, data).then((json) => {
+                        if (json.success)
+                            setShow("");
+                    });
+                }}
+            />
             {categoryHeader}
             {servers}
             <article className="server new-server" onClick={() => setShow("new")}>
@@ -143,7 +154,7 @@ function CategoryListing(props) {
 }
 
 CategoryListing.propTypes = {
-    category: PropTypes.object.isRequired,
+    category: PropTypes.object,
     servers: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
@@ -161,9 +172,9 @@ export function ServerListing(props) {
 
     return (
         <div className="server-dashboard">
-            <NewCategoryForm
+            <CategoryModalForm
                 show={show}
-                setShow={setShow}
+                onHide={() => {setShow(false)}}
                 onSubmit={(data) => {
                     setShow(false);
                     api.categories.create(data).then();

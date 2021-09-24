@@ -282,7 +282,7 @@ ArgumentSettingsForm.propTypes = {
 }
 
 
-export function UpdateServerForm(props) {
+export function UpdateServerModalForm(props) {
     return (
         <Modal
             show={props.show}
@@ -347,7 +347,7 @@ export function UpdateServerForm(props) {
     )
 }
 
-UpdateServerForm.propTypes = {
+UpdateServerModalForm.propTypes = {
     categories: PropTypes.arrayOf(PropTypes.object).isRequired,
 
     data: PropTypes.object,
@@ -364,7 +364,7 @@ UpdateServerForm.propTypes = {
     onModeDelete: PropTypes.func.isRequired
 }
 
-UpdateServerForm.defaultProps = {
+UpdateServerModalForm.defaultProps = {
     data: {
         name: "",
         start_cmd: "",

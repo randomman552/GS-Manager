@@ -3,7 +3,7 @@ import {Button, Form, Modal} from "react-bootstrap";
 import PropTypes from "prop-types";
 import {BaseForm} from "../../../components/BaseForm";
 
-export function NewServerForm(props) {
+export function NewServerModalForm(props) {
     return (
         <Modal
             show={props.show}
@@ -65,7 +65,7 @@ export function NewServerForm(props) {
     )
 }
 
-NewServerForm.propTypes = {
+NewServerModalForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     onHide: PropTypes.func.isRequired,
     show: PropTypes.bool.isRequired

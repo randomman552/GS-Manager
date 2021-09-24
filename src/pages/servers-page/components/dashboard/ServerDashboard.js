@@ -3,7 +3,7 @@ import api from "../../../../api/api";
 import {addMessage} from "../../../components/MessageDisplay";
 import {Redirect} from "react-router-dom";
 import {deepCopy} from "../../../../util";
-import {UpdateServerForm} from "./UpdateServerForm";
+import {UpdateServerModalForm} from "./UpdateServerModalForm";
 import {Button, Card} from "react-bootstrap";
 import ScrollToBottom from "react-scroll-to-bottom";
 import {SendCommandForm} from "./SendCommandForm";
@@ -167,7 +167,7 @@ export class ServerDashboard extends React.Component {
         const show = this.state.showSettingsModal;
 
         return (
-            <UpdateServerForm
+            <UpdateServerModalForm
                 categories={this.props.categories}
                 show={show}
 

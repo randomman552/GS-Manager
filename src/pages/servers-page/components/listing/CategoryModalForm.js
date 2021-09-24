@@ -1,10 +1,10 @@
 import {Button, Form, Modal} from "react-bootstrap";
-import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
-import React, {useState} from "react";
+import {BaseForm} from "../../../components/BaseForm";
+import React from "react";
 import PropTypes from "prop-types";
 
 
-export function CategoryForm(props) {
+export function CategoryModalForm(props) {
     const title = (props.data) ? "Edit category" : "New category";
     const submitText = (props.data) ? "Update" : "Create";
 
@@ -49,9 +49,9 @@ export function CategoryForm(props) {
     );
 }
 
-CategoryForm.propTypes = {
+CategoryModalForm.propTypes = {
     data: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
-    onHide: PropTypes.func,
-    show: PropTypes.bool
+    onHide: PropTypes.func.isRequired,
+    show: PropTypes.bool.isRequired
 }
