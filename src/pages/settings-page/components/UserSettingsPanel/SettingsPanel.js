@@ -3,7 +3,7 @@ import {ChangeUsernameForm} from "./ChangeUsernameForm";
 import api from "../../../../api/api";
 import {useState} from "react";
 import {ChangePasswordForm} from "./ChangePasswordForm";
-import {ConfirmDeleteModal} from "../ConfirmDeleteModal";
+import {ConfirmDeleteModal} from "../../../components/ConfirmDeleteModal";
 
 export function SettingsPanel(props) {
     const [show, setShow] = useState("none");

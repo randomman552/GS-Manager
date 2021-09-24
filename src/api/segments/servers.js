@@ -1,127 +1,55 @@
-import {apiFetch, StorageCache} from "../util";
 import io from "socket.io-client"
+import Resource from "../rest/Resource";
+import {apiFetch, buildUrl} from "../rest/util";
 
 const socket = io("/servers");
 
 
-const servers = {
-    cache: new StorageCache(),
-    socket,
-
-    // region API requests
-    getServers() {
-        return apiFetch("/api/servers/").then(data => {
-            if (data.code >= 200 && data.code < 300)
-                this.cache.fromArray(data.data);
-            return data;
-        });
-    },
-
-    createServer(data) {
-        return apiFetch("/api/servers/", data, "put").then(data => {
-            if (data.code >= 200 && data.code < 300)
-                this.cache.updateObj(data.data)
-            return data;
-        });
-    },
-
-    // region Server information access methods
-
-    getServer(serverID) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID;
-            return apiFetch(url).then(data => {
-                if (data.code >= 200 && data.code < 300)
-                    this.cache.updateObj(data.data)
-                return data;
-            });
-        }
-    },
-
-    getServerOutput(serverID) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID;
-            return apiFetch(url).then(data => {
-                if (data.code >= 200 && data.code < 300) {
-                    const server = this.cache.getObject(serverID);
-                    server.output = data.data;
-                    this.cache.updateObj(server);
-                }
-                return data;
-            });
-        }
-    },
-
-    modifyServer(serverID, data) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID;
-            return apiFetch(url, data, "put").then(data => {
-                if (data.code >= 200 && data.code < 300)
-                    this.cache.updateObj(data.data)
-                return data;
-            });
-        }
-    },
-
-    deleteServer(serverID) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID;
-            return apiFetch(url, null, "delete").then(data => {
-                if (data.code >= 200 && data.code < 300)
-                    this.cache.deleteObj(data.data)
-                return data;
-            });
-        }
-    },
-
-    // endregion
-
-    // region Interaction methods (for starting and stopping server)
-
-    runCommand(serverID, data) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID + "/command";
-            return apiFetch(url, data);
-        }
-    },
-
-    runStart(serverID) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID + "/start";
-            return apiFetch(url).then(data => {
-                if (data.code >= 200 && data.code < 300) {
-                    this.cache.updateObj(data.data);
-                }
-            });
-        }
-    },
-
-    runUpdate(serverID) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID + "/update";
-            return apiFetch(url).then(data => {
-                if (data.code >= 200 && data.code < 300) {
-                    this.cache.updateObj(data.data);
-                }
-            });
-        }
-    },
-
-    runStop(serverID) {
-        if (serverID) {
-            const url = "/api/servers/" + serverID + "/stop";
-            return apiFetch(url).then(data => {
-                if (data.code >= 200 && data.code < 300) {
-                    this.cache.updateObj(data.data);
-                }
-            });
-        }
+class ServersResource extends Resource {
+    constructor() {
+        super("/api/servers/");
     }
 
-    // endregion
+    // region Interaction endpoints
+    start(id) {
+        const url = buildUrl(this.baseUrl, [id, "start"]);
+        return apiFetch(url).then(json => {
+            if (json.success) {
+                this.cache.updateObj(json.data);
+            }
+            return json;
+        });
+    }
+
+    update(id) {
+        const url = buildUrl(servers.baseUrl, [id, "update"]);
+        return apiFetch(url).then(json => {
+            if (json.success) {
+                this.cache.updateObj(json.data);
+            }
+            return json;
+        });
+    }
+
+    stop(id) {
+        const url = buildUrl(servers.baseUrl, [id, "stop"]);
+        return apiFetch(url);
+    }
+
+    /**
+     * Send a command to the stdin of the given server.
+     * @param id {string}
+     * @param data {{command: string}}
+     * @returns {Promise<*>}
+     */
+    sendCommand(id, data) {
+        const url = buildUrl(servers.baseUrl, [id, "command"]);
+        return apiFetch(url, data);
+    }
     // endregion
 }
 
+const servers = new ServersResource();
 
 // region SocketIO event handlers
 

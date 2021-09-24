@@ -1,13 +1,13 @@
 import React from "react";
 import {Button, Form, Modal} from "react-bootstrap";
 import PropTypes from "prop-types";
-import {BaseForm} from "../../components/BaseForm";
+import {BaseForm} from "../../../components/BaseForm";
 
-export function NewServerForm(props) {
+export function NewServerModalForm(props) {
     return (
         <Modal
             show={props.show}
-            onHide={() => {props.setShow(false)}}
+            onHide={props.onHide}
             backdrop={true}
         >
             <Modal.Header closeButton>
@@ -44,16 +44,14 @@ export function NewServerForm(props) {
                     </Form.Group>
 
                     <Form.Group className="flex flex-column flex-center">
-                        <Form.Label className="required-star" htmlFor="update_cmd">
+                        <Form.Label htmlFor="update_cmd">
                             Update command
                         </Form.Label>
                         <Form.Control
                             id="update_cmd"
                             name="update_cmd"
                             type="text"
-                            required
                         />
-                        <Form.Control.Feedback type="invalid">Required</Form.Control.Feedback>
                     </Form.Group>
                 </Modal.Body>
 
@@ -67,8 +65,8 @@ export function NewServerForm(props) {
     )
 }
 
-NewServerForm.propTypes = {
+NewServerModalForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
-    show: PropTypes.bool,
-    setShow: PropTypes.func
+    onHide: PropTypes.func.isRequired,
+    show: PropTypes.bool.isRequired
 }

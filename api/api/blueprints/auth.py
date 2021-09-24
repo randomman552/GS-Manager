@@ -1,5 +1,6 @@
 from flask import Blueprint, request, abort
 from flask_login import current_user, login_required, login_user, logout_user
+from mongoengine import NotUniqueError
 
 from .. import rest
 from ..models import User
@@ -69,15 +70,14 @@ def create_user():
     """
     Route to add a new user
     """
-    json = request.get_json()
-    if json:
-        data = json.get("data")
-        if data:
-            new_user = User(**data)
-            new_user.save()
-            new_user.reload()
-            return rest.response(201, data=new_user.to_dict())
-    return rest.response(400, error="No data provided.")
+    data = rest.get_json_data()
+    try:
+        new_user = User(**data)
+        new_user.save()
+        new_user.reload()
+        return rest.response(201, data=new_user.to_dict())
+    except NotUniqueError:
+        abort(400, "User with that name already exists")
 
 # endregion
 
@@ -97,19 +97,15 @@ def get_user(user_id: str):
 def modify_user(user_id: str):
     user = User.objects(id=user_id).first_or_404()
 
-    json = request.get_json()
-    if json:
-        data = json.get("data")
-        if data:
-            # Prevent removal of only admin
-            if user.is_only_admin:
-                if not data.get("is_admin", True):
-                    abort(400, "Cannot remove only admin")
+    data = rest.get_json_data()
+    # Prevent removal of only admin
+    if user.is_only_admin:
+        if not data.get("is_admin", True):
+            abort(400, "Cannot remove only admin")
 
-            user.update(**data)
-            user.reload()
-            return rest.response(200, data=user.to_dict())
-    abort(400, "JSON provided was empty")
+    user.update(**data)
+    user.reload()
+    return rest.response(200, data=user.to_dict())
 
 
 @auth.route("/users/<user_id>", methods=["DELETE"])

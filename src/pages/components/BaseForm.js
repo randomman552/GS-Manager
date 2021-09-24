@@ -109,6 +109,7 @@ export class BaseForm extends React.Component {
             <Form
                 noValidate
                 validated={this.state.validated}
+                autofill={this.props.autofill}
 
                 id={this.props.id}
                 className={this.props.className}
@@ -131,9 +132,12 @@ BaseForm.propTypes = {
 
     id: PropTypes.string,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+
+    autofill: PropTypes.oneOf(["on", "off", "new-password"])
 }
 
 BaseForm.defaultProps = {
-    className: ""
+    className: "",
+    autofill: "on"
 }

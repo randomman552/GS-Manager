@@ -2,9 +2,10 @@ import os
 import shutil
 import uuid
 
+import mongoengine
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_mongoengine import Document
-from mongoengine import StringField, DictField, ListField, BooleanField
+from mongoengine import StringField, DictField, ListField, BooleanField, ReferenceField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -13,11 +14,12 @@ def _convert_to_dict(document: Document) -> dict:
     Function used to convert a mongodb document to a compatible JSON dict.
     This is used in all the data models contained in this file.
     """
-    as_dict = document.to_mongo().to_dict()
-    as_dict["id"] = str(as_dict["_id"])
-    as_dict.pop("_id")
-
-    return as_dict
+    if isinstance(document, Document):
+        as_dict = document.to_mongo().to_dict()
+        as_dict["id"] = str(as_dict["_id"])
+        as_dict.pop("_id")
+        return as_dict
+    return dict()
 
 
 class User(Document, UserMixin):
@@ -83,10 +85,18 @@ class AnonymousUser(AnonymousUserMixin):
         return False
 
 
+class Category(Document):
+    name = StringField(required=True, unique=True)
+
+    def to_dict(self):
+        return _convert_to_dict(self)
+
+
 class GameServer(Document):
     STORAGE_PATH = os.path.join(os.getcwd(), "storage")
 
     name = StringField(required=True, unique=True, min_length=3)
+    category = ReferenceField(Category, reverse_delete_rule=mongoengine.CASCADE)
     status = StringField(default="stopped")
     output = ListField(StringField())
 
@@ -149,5 +159,16 @@ class GameServer(Document):
         shutil.rmtree(self.working_directory)
         super().delete(signal_kwargs, **write_concern)
 
+    def update(self, **kwargs):
+        if "category" in kwargs:
+            if not kwargs["category"]:
+                kwargs["category"] = None
+            else:
+                kwargs["category"] = Category.objects(id=kwargs["category"]).first()
+        super().update(**kwargs)
+
     def to_dict(self):
-        return _convert_to_dict(self)
+        as_dict = _convert_to_dict(self)
+        if self.category:
+            as_dict["category"] = str(self.category.id)
+        return as_dict

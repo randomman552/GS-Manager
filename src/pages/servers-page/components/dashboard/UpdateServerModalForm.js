@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Accordion, Button, Card, Form, Modal, Tab, Tabs} from "react-bootstrap";
 import PropTypes from "prop-types";
-import {BaseForm, onChangeFactory} from "../../components/BaseForm";
+import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
 
 
 function GeneralSettingsForm(props) {
@@ -9,27 +9,46 @@ function GeneralSettingsForm(props) {
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const onDelete = (confirmDelete) ? props.onDelete : () => {setConfirmDelete(true)};
-    const deleteText = (confirmDelete) ? "Confirm delete" : "Delete";
+    const deleteText = (confirmDelete) ? "Confirm delete? (this is irreversible)" : "Delete";
+
+    const categoryOptions = props.categories.map((category) => {
+        return (<option value={category.id}>{category.name}</option>)
+    })
 
     return (
         <BaseForm
             onSubmit={props.onSubmit}
             onChange={onChangeFactory(data, setData)}
             className="modal-body text-center"
+            autofill="off"
         >
             <Form.Group className="flex flex-column flex-center">
-                    <Form.Label htmlFor="name">
-                        Name
-                    </Form.Label>
-                    <Form.Control
-                        id="name"
-                        name="name"
-                        type="text"
-                        minLength="3"
-                        value={data.name}
-                    />
-                    <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
-                </Form.Group>
+                <Form.Label htmlFor="name">
+                    Name
+                </Form.Label>
+                <Form.Control
+                    id="name"
+                    name="name"
+                    type="text"
+                    minLength="3"
+                    value={data.name}
+                />
+                <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+                <Form.Label htmlFor="category">
+                    Category
+                </Form.Label>
+                <Form.Control
+                    id="category"
+                    name="category"
+                    as="select"
+                    value={data.category}
+                >
+                    <option value="">None</option>
+                    {categoryOptions}
+                </Form.Control>
+            </Form.Group>
             <Form.Group className="flex flex-column flex-center">
                 <Form.Label htmlFor="start_cmd">
                     Start command
@@ -53,13 +72,10 @@ function GeneralSettingsForm(props) {
                 />
             </Form.Group>
             <Form.Group>
-                <Button variant="primary" type="submit">
-                Update
-            </Button>
-            </Form.Group>
-
-            <Form.Group>
-                <Button variant="danger" onClick={onDelete}>
+                <Button variant="primary" type="submit" block>
+                    Update
+                </Button>
+                <Button variant="danger" type="reset" onClick={onDelete} block>
                     {deleteText}
                 </Button>
             </Form.Group>
@@ -68,6 +84,7 @@ function GeneralSettingsForm(props) {
 }
 
 GeneralSettingsForm.propTypes = {
+    categories: PropTypes.arrayOf(PropTypes.object).isRequired,
     data: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired
@@ -148,6 +165,7 @@ function ModeSettingsForm(props) {
             <BaseForm
                 onSubmit={props.onAdd}
                 className="mode-display"
+                autofill="off"
             >
                 <Form.Control
                     id="new-mode-name"
@@ -207,6 +225,7 @@ function ArgumentSettingsForm(props) {
             <BaseForm
                 onSubmit={props.onSubmit}
                 onChange={onChangeFactory(data, setData)}
+                autofill="off"
             >
                 <Form.Group>
                     <Form.Label
@@ -251,7 +270,7 @@ function ArgumentSettingsForm(props) {
                     </Form.Control>
                 </Form.Group>
 
-                <Button type="submit">Update</Button>
+                <Button type="submit" block>Update</Button>
             </BaseForm>
         </div>
     );
@@ -263,7 +282,7 @@ ArgumentSettingsForm.propTypes = {
 }
 
 
-export function UpdateServerForm(props) {
+export function UpdateServerModalForm(props) {
     return (
         <Modal
             show={props.show}
@@ -276,6 +295,7 @@ export function UpdateServerForm(props) {
             <Tabs defaultActiveKey="general" fill justify>
                 <Tab eventKey="general" title="General">
                     <GeneralSettingsForm
+                        categories={props.categories}
                         data={props.data}
                         onSubmit={props.onGeneralSubmit}
                         onDelete={props.onDelete}
@@ -327,7 +347,9 @@ export function UpdateServerForm(props) {
     )
 }
 
-UpdateServerForm.propTypes = {
+UpdateServerModalForm.propTypes = {
+    categories: PropTypes.arrayOf(PropTypes.object).isRequired,
+
     data: PropTypes.object,
     show: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
@@ -342,7 +364,7 @@ UpdateServerForm.propTypes = {
     onModeDelete: PropTypes.func.isRequired
 }
 
-UpdateServerForm.defaultProps = {
+UpdateServerModalForm.defaultProps = {
     data: {
         name: "",
         start_cmd: "",

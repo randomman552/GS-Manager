@@ -1,4 +1,4 @@
-import {addMessage} from "../pages/components/MessageDisplay";
+import {addMessage} from "../../pages/components/MessageDisplay";
 
 /**
  * Method to send a request to the api backend
@@ -6,7 +6,7 @@ import {addMessage} from "../pages/components/MessageDisplay";
  * @param data Object containing data to send with request.
  * @param method {string} HTTP method to use, defaults to 'post'.
  * @param auth Object containing authorisation information.
- * @returns {Promise<any>} Promise of return data as object.
+ * @returns {Promise<{code: number, error: string, data:any, success: boolean}>} Promise of return data as object.
  */
 export async function apiFetch(url, data, method = "post", auth = null) {
     data = {
@@ -25,6 +25,9 @@ export async function apiFetch(url, data, method = "post", auth = null) {
             body: JSON.stringify(data)
         }
     ).then(res => res.json()).then((json) => {
+        // Set success bool so we dont have to write this boolean check everywhere
+        json.success = json.code >= 200 && json.code < 300;
+
         // If response fails, report the error to the user.
         if (json.code >= 400 && json.code < 600) {
             let error = json.error
@@ -35,6 +38,20 @@ export async function apiFetch(url, data, method = "post", auth = null) {
         return json;
     });
     return await response;
+}
+
+export function buildUrl(base, parts) {
+    if (!(parts instanceof Array))
+        return buildUrl(base, [parts])
+
+    let url = base;
+    if (base[base.length - 1] === '/')
+        url = base.slice(0, base.length - 1);
+
+    for (const part of parts) {
+        url += "/" + part;
+    }
+    return url;
 }
 
 /**

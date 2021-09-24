@@ -2,7 +2,7 @@ import React from "react";
 import api from "../../../../api/api";
 import {Button} from "react-bootstrap";
 import {UserForm} from "./UserForm";
-import {ConfirmDeleteModal} from "../ConfirmDeleteModal";
+import {ConfirmDeleteModal} from "../../../components/ConfirmDeleteModal";
 
 class AdminUserSettings extends React.Component {
     constructor(props) {
@@ -51,13 +51,13 @@ class AdminUserSettings extends React.Component {
 
     updateUser(data) {
         if (this.state.modalData)
-            api.auth.modifyUser(this.state.modalData.id, data).then()
+            api.auth.modify(this.state.modalData.id, data).then()
         else
-            api.auth.createUser(data).then()
+            api.auth.create(data).then()
     }
 
     deleteUser(userID) {
-        api.auth.deleteUser(userID).then()
+        api.auth.delete(userID).then()
     }
 
 
@@ -146,11 +146,11 @@ class AdminUserSettings extends React.Component {
                 users
             });
         }
-        api.auth.cache.addChangeListener(userUpdateFunc);
+        api.auth.addChangeListener(userUpdateFunc);
         this.componentWillUnmount = () => {
-            api.auth.cache.removeChangeListener(userUpdateFunc)
+            api.auth.removeChangeListener(userUpdateFunc)
         }
-        api.auth.getUsers().then();
+        api.auth.get().then();
     }
 }
 
