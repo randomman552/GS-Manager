@@ -1,0 +1,30 @@
+.utilisation-widget {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 20px;
+    background-color: white;
+	box-shadow: 0 0 3px #888888;
+    width: 350px;
+    min-width: 350px;
+    min-height: 100px;
+    position: relative;
+    box-sizing: content-box;
+}
+
+.utilisation-widget .title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.utilisation-widget .text p {
+    margin-bottom: 1px;
+}
+
+.utilisation-widget .circ-progress-container {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    max-width: 100px;
+    max-height: 100px;
+}

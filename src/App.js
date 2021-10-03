@@ -8,6 +8,7 @@ import './App.css';
 import api from "./api/api";
 import MessageDisplay from "./pages/components/MessageDisplay";
 import {Navigation} from "./pages/components/Navigation";
+import {SystemPage} from "./pages/system-page/SystemPage";
 
 export class App extends React.Component {
     constructor(props) {
@@ -186,6 +187,10 @@ export class App extends React.Component {
                                 user={user}
                             />
                         }}
+                    />
+                    <Route
+                        path="/system"
+                        component={SystemPage}
                     />
                     <Redirect to="/servers" />
                 </Switch>
