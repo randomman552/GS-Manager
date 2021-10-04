@@ -31,13 +31,7 @@ class UsersResource extends Resource {
     }
 
     login(auth) {
-        return apiFetch(buildUrl("/api/auth/", "login"), null, "post", auth).then(json => {
-            if (json.success) {
-                this.cache.addObj(json.data);
-                console.log(json)
-            }
-            return json;
-        });
+        return apiFetch(buildUrl("/api/auth/", "login"), null, "post", auth);
     }
 
     logout() {
