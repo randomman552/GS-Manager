@@ -21,8 +21,9 @@ def system_info():
     partitions = psutil.disk_partitions()
     disk_info = dict()
     for partition in partitions:
+        short_name = partition.device.split("/")[2]
         usage = psutil.disk_usage(partition.mountpoint)
-        disk_info[partition.device] = {
+        disk_info[short_name] = {
             "mountPoint": partition.mountpoint,
             "fileSystem": partition.fstype,
             "size": {
