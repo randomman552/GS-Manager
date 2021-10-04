@@ -8,6 +8,7 @@ import api from "./api/api";
 import MessageDisplay from "./pages/components/MessageDisplay";
 import {Navigation} from "./pages/components/Navigation";
 import {SystemPage} from "./pages/system-page/SystemPage";
+import {NotFoundPage} from "./pages/components/NotFoundPage";
 
 export class App extends React.Component {
     constructor(props) {
@@ -122,7 +123,9 @@ export class App extends React.Component {
                         path="/system"
                         component={SystemPage}
                     />
-                    <Redirect to="/servers" />
+                    <Route
+                        component={NotFoundPage}
+                    />
                 </Switch>
             </div>
         );

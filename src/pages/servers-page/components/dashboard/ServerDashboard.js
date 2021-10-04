@@ -205,10 +205,6 @@ export class ServerDashboard extends React.Component {
     }
 
     render() {
-        if (!this.server)
-            return (
-                <Redirect to="/servers"/>
-            )
         const outputLines = this.renderOutputLines();
         const settingsModal = this.renderSettings();
         const running = this.server.status !== "stopped";

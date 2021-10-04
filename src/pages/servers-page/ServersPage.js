@@ -4,14 +4,16 @@ import "./ServersPage.css"
 import {ServerListing} from "./components/listing/ServerListing";
 import {ServerDashboard} from "./components/dashboard/ServerDashboard";
 import api from "../../api/api";
+import {LoaderWrapper} from "../components/LoaderWrapper";
+import {NotFoundPage} from "../components/NotFoundPage";
 
 
 export class ServersPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            servers: [],
-            categories: []
+            servers: null,
+            categories: null
         }
     }
 
@@ -27,29 +29,38 @@ export class ServersPage extends React.Component {
                         path="/servers/:serverID"
                         render={(props) => {
                             const serverID = props.match.params.serverID;
-
-                            let curServer;
-                            for (const server of servers) {
-                                if (server.id === serverID) {
-                                    curServer = server;
-                                    break;
-                                }
-                            }
+                            const curServer = api.servers.cache.getObject(serverID);
 
                             return (
-                                <ServerDashboard
-                                    {...props}
-                                    key={serverID}
-                                    server={curServer}
-                                    categories={categories}
-                                />
-                            )
+                                <LoaderWrapper
+                                    condition={!!curServer}
+                                    timeout={1000}
+                                    timeoutComponent={<NotFoundPage/>}
+                                >
+                                    <ServerDashboard
+                                        {...props}
+                                        key={serverID}
+                                        server={curServer}
+                                        categories={categories}
+                                    />
+                                </LoaderWrapper>
+                            );
                         }}
                     />
                     <Route
                         exact path="/servers"
                         render={(props) => {
-                            return (<ServerListing {...props} servers={servers} categories={categories} />)
+                            return (
+                                <LoaderWrapper
+                                    condition={servers && categories}
+                                >
+                                    <ServerListing
+                                        {...props}
+                                        servers={servers}
+                                        categories={categories}
+                                    />
+                                </LoaderWrapper>
+                            );
                         }}
                     />
                 </Switch>
