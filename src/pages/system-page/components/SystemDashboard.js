@@ -2,7 +2,6 @@ import React from "react";
 import {UtilisationWidget} from "./UtilisationWidget";
 import api from "../../../api/api";
 import "./SystemDashboard.css";
-import * as util from "util";
 
 export class SystemDashboard extends React.Component {
     constructor(props) {
@@ -11,7 +10,6 @@ export class SystemDashboard extends React.Component {
             systemInfo: undefined
         };
     }
-
 
     render() {
         const systemInfo = this.state.systemInfo;
@@ -87,6 +85,7 @@ export class SystemDashboard extends React.Component {
             </article>
         );
     }
+
 
     updateSystemInfo() {
         api.system.getSystemInfo().then(json => {
