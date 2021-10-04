@@ -99,6 +99,19 @@ export class App extends React.Component {
                 />
                 <MessageDisplay/>
                 <Switch>
+                    {/* Root path redirect to servers */}
+                    <Route
+                        exact path="/"
+                        render={(props) => {
+                            return (
+                                <Redirect
+                                    to="/servers"
+                                />
+                            )
+                        }}
+                    />
+
+                    {/* Other endpoints */}
                     <Route
                         path="/servers"
                         render={(props) => {
@@ -123,6 +136,8 @@ export class App extends React.Component {
                         path="/system"
                         component={SystemPage}
                     />
+
+                    {/* Display 404 page if none of the previous routes are used */}
                     <Route
                         component={NotFoundPage}
                     />
