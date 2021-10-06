@@ -31,8 +31,12 @@ def input_to_server(json):
 @servers.route("/", methods=["GET", "POST"])
 @login_required
 def get_servers():
+    """
+    Endpoint does not return server output, server must be directly queried by id to get output.
+    Server output will be provided if a url argument of output=true is provided.
+    """
     all_servers = GameServer.objects().all()
-    servers_list = [server.to_dict() for server in all_servers]
+    servers_list = [server.to_dict(request.args.get("output", False)) for server in all_servers]
 
     return rest.response(200, data=servers_list)
 

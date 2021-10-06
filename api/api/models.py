@@ -167,8 +167,13 @@ class GameServer(Document):
                 kwargs["category"] = Category.objects(id=kwargs["category"]).first()
         super().update(**kwargs)
 
-    def to_dict(self):
+    def to_dict(self, include_output: bool = True):
         as_dict = _convert_to_dict(self)
+
         if self.category:
             as_dict["category"] = str(self.category.id)
+
+        if not include_output:
+            as_dict.pop("output")
+
         return as_dict
