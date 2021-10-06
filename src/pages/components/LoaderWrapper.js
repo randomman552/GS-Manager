@@ -29,7 +29,7 @@ export class LoaderWrapper extends React.Component {
                 )
             }
             return (
-                <article className="page flex-center p-4">
+                <article className={this.props.className}>
                     <ClipLoader size={100}/>
                 </article>
             )
@@ -51,17 +51,11 @@ export class LoaderWrapper extends React.Component {
                 });
             }, this.props.timeout);
         }
-
-        if (this.props.onMount)
-            this.props.onMount();
     }
 
     componentWillUnmount() {
         if (this.timeoutID)
             clearTimeout(this.timeoutID);
-
-        if (this.props.onUnmount)
-            this.props.onUnmount();
     }
 }
 
@@ -85,14 +79,13 @@ LoaderWrapper.propTypes = {
      */
     timeout: PropTypes.number,
     failComponent: PropTypes.node,
-
-    onMount: PropTypes.func,
-    onUnmount: PropTypes.func
+    className: PropTypes.string
 }
 
 LoaderWrapper.defaultProps = {
     render: true,
     failed: false,
     timeout: -1,
+    className: "page flex-center p-4",
     failComponent: <NotFoundPage/>
 }
