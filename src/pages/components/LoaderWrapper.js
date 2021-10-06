@@ -5,6 +5,8 @@ import {NotFoundPage} from "./NotFoundPage";
 
 /**
  * React component designed to wrap a component and prevent it from being rendered until data is loaded for it.
+ * If data fails to load, a specified failure component can be rendered.
+ * A timeout can be specified to automatically render the failure component after the duration expires.
  */
 export class LoaderWrapper extends React.Component {
     constructor(props) {
@@ -16,11 +18,13 @@ export class LoaderWrapper extends React.Component {
 
 
     render() {
-        if (!this.props.condition) {
-            if (this.state.timeout) {
+        // Awaiting render condition
+        if (!this.props.render) {
+            // If timeout has expired or failure prop has been set, render the failure component
+            if (this.state.timeout || this.props.failed) {
                 return (
                     <>
-                        {this.props.timeoutComponent}
+                        {this.props.failComponent}
                     </>
                 )
             }
@@ -31,11 +35,12 @@ export class LoaderWrapper extends React.Component {
             )
         }
 
+        // Render as normal
         return (
-                <>
-                    {this.props.children}
-                </>
-            );
+            <>
+                {this.props.children}
+            </>
+        );
     }
 
     componentDidMount() {
@@ -46,11 +51,17 @@ export class LoaderWrapper extends React.Component {
                 });
             }, this.props.timeout);
         }
+
+        if (this.props.onMount)
+            this.props.onMount();
     }
 
     componentWillUnmount() {
         if (this.timeoutID)
             clearTimeout(this.timeoutID);
+
+        if (this.props.onUnmount)
+            this.props.onUnmount();
     }
 }
 
@@ -58,21 +69,30 @@ LoaderWrapper.propTypes = {
     /**
      * If this evaluates to true, the children that this component wraps will be rendered instead of a loading spinner.
      */
-    condition: PropTypes.bool.isRequired,
+    render: PropTypes.bool.isRequired,
     children: PropTypes.arrayOf(PropTypes.node),
 
     /**
-     * Period to wait before assuming the required data is not available.
+     * If this evaluates to true, the failComponent attribute is rendered instead of the children of this component.
+     * This defaults to a 404 page.
+     */
+    failed: PropTypes.bool,
+    /**
+     * Period to wait before assuming the required data is not available (in ms).
      * Set to -1 to prevent the timeout from occurring.
      * Default value is -1.
-     * When timeout expires, the timeoutComponent is rendered.
+     * When timeout expires, the failComponent is rendered.
      */
     timeout: PropTypes.number,
-    timeoutComponent: PropTypes.node
+    failComponent: PropTypes.node,
+
+    onMount: PropTypes.func,
+    onUnmount: PropTypes.func
 }
 
 LoaderWrapper.defaultProps = {
-    condition: true,
+    render: true,
+    failed: false,
     timeout: -1,
-    timeoutComponent: <NotFoundPage/>
+    failComponent: <NotFoundPage/>
 }

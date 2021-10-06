@@ -16,7 +16,7 @@ export class SystemPage extends React.Component {
         const systemInfo = this.state.systemInfo;
         return (
             <LoaderWrapper
-                condition={systemInfo}
+                render={systemInfo}
             >
                 <SystemDashboard
                     systemInfo={systemInfo}
