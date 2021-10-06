@@ -9,6 +9,7 @@ import MessageDisplay from "./pages/components/MessageDisplay";
 import {Navigation} from "./pages/components/Navigation";
 import {SystemPage} from "./pages/system-page/SystemPage";
 import {NotFoundPage} from "./pages/components/NotFoundPage";
+import {setFetchOptions} from "./api/rest/util";
 
 export class App extends React.Component {
     constructor(props) {
@@ -17,6 +18,8 @@ export class App extends React.Component {
             user: null
         };
 
+        // Suppress errors so that the user will not see an error message if they aren't logged in.
+        setFetchOptions({suppressError: true});
         // Attempt login using old session
         api.auth.getCurrentUser().then(json => {
             if (json.success) {
@@ -26,28 +29,20 @@ export class App extends React.Component {
             } else if (json.code === 401) {
                 this.logout();
             }
+        }).finally(() => {
+            setFetchOptions({suppressError: false});
         });
     }
 
 
     /**
      * Send an authentication request to the server to get the api key used to make future requests.
-     * @param data Data provided by BaseForm class.
+     * @param user The user object retrieved by login.
      */
-    login(data) {
-        let auth = {
-            "username": data.username,
-            "password": data.password
-        };
-
-        api.auth.login(auth)
-            .then(json => {
-                if (json.success) {
-                    this.setState({
-                        user: json.data
-                    });
-                }
-            });
+    login(user) {
+        this.setState({
+            user
+        });
     }
 
     /**
@@ -61,17 +56,6 @@ export class App extends React.Component {
                 });
             }
         });
-    }
-
-    /**
-     * Method to construct authentication object from current app state.
-     */
-    getAuth() {
-        if (this.state.user)
-            return {
-                apikey: this.state.user.api_key
-            };
-        return null;
     }
 
 
@@ -89,7 +73,6 @@ export class App extends React.Component {
 
         const user = this.state.user;
         const servers = this.state.servers;
-        const auth = this.getAuth();
 
         return (
             <div id="app">
@@ -117,7 +100,6 @@ export class App extends React.Component {
                         render={(props) => {
                             return <ServersPage
                                 {...props}
-                                auth={auth}
                                 servers={servers}
                             />
                         }}
@@ -127,7 +109,6 @@ export class App extends React.Component {
                         render={(props) => {
                             return <SettingsPage
                                 {...props}
-                                auth={auth}
                                 user={user}
                             />
                         }}
@@ -152,20 +133,18 @@ export class App extends React.Component {
             if (!this.state.user)
                 return;
 
-            // Update user object
+            // Update user object if not deleted
             const user = api.auth.data.get(this.state.user.id);
-            this.setState({
-                user
-            });
-
             if (user) {
-                // Re-log after api-key change
-                api.auth.login(this.getAuth()).then(json => {
-                    if (!json.success)
-                        this.logout();
+                // If api_key has changed, re-log with new one
+                if (user.api_key && this.state.user.api_key !== user.api_key)
+                    api.auth.login({apikey: user.api_key});
+
+                // Update stored user
+                this.setState({
+                    user
                 });
             } else {
-                // Log out if user deleted
                 this.logout();
             }
         }
