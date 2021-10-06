@@ -9,6 +9,7 @@ system = Blueprint("system", __name__, url_prefix="/api/system")
 
 
 @system.route("/", methods=["GET", "POST"])
+@login_required
 def system_info():
     """
     Endpoint to return system information
