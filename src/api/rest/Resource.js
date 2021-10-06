@@ -20,7 +20,7 @@ export default class Resource {
      * Data accessor.
      * Can access data.asArray to access the data in an array.
      * Or data.asObject to access the data in an object map.
-     * @returns {{}|{readonly asArray: *[], readonly asObject: {}}|*[]}
+     * @returns {{readonly asArray: *[], readonly asObject: {}, get(string): *}|{}|*[]|*}
      */
     get data() {
         const cache = this.cache;

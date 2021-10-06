@@ -29,7 +29,7 @@ export class ServersPage extends React.Component {
                         path="/servers/:serverID"
                         render={(props) => {
                             const serverID = props.match.params.serverID;
-                            const curServer = api.servers.cache.getObject(serverID);
+                            const curServer = api.servers.data.get(serverID);
 
                             return (
                                 <LoaderWrapper
