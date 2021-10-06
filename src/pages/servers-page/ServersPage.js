@@ -32,7 +32,7 @@ export class ServersPage extends React.Component {
 
                             return (
                                 <LoaderWrapper
-                                    render={!!curServer && curServer.output}
+                                    render={!!curServer}
                                     timeout={1000}
                                 >
                                     <ServerDashboard
@@ -50,7 +50,7 @@ export class ServersPage extends React.Component {
                         render={(props) => {
                             return (
                                 <LoaderWrapper
-                                    render={servers && categories}
+                                    render={!!servers && !!categories}
                                 >
                                     <ServerListing
                                         {...props}

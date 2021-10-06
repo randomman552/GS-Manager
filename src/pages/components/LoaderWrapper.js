@@ -64,7 +64,10 @@ LoaderWrapper.propTypes = {
      * If this evaluates to true, the children that this component wraps will be rendered instead of a loading spinner.
      */
     render: PropTypes.bool.isRequired,
-    children: PropTypes.arrayOf(PropTypes.node),
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node
+    ]),
 
     /**
      * If this evaluates to true, the failComponent attribute is rendered instead of the children of this component.
