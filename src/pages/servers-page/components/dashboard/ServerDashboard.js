@@ -254,6 +254,11 @@ export class ServerDashboard extends React.Component {
             </article>
         );
     }
+
+
+    componentDidMount() {
+        api.servers.get(this.server.id);
+    }
 }
 
 ServerDashboard.propTypes = {

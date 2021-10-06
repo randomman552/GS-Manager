@@ -5,7 +5,6 @@ import {ServerListing} from "./components/listing/ServerListing";
 import {ServerDashboard} from "./components/dashboard/ServerDashboard";
 import api from "../../api/api";
 import {LoaderWrapper} from "../components/LoaderWrapper";
-import {NotFoundPage} from "../components/NotFoundPage";
 
 
 export class ServersPage extends React.Component {
@@ -33,9 +32,8 @@ export class ServersPage extends React.Component {
 
                             return (
                                 <LoaderWrapper
-                                    condition={!!curServer}
+                                    render={!!curServer && curServer.output}
                                     timeout={1000}
-                                    timeoutComponent={<NotFoundPage/>}
                                 >
                                     <ServerDashboard
                                         {...props}
@@ -52,7 +50,7 @@ export class ServersPage extends React.Component {
                         render={(props) => {
                             return (
                                 <LoaderWrapper
-                                    condition={servers && categories}
+                                    render={servers && categories}
                                 >
                                     <ServerListing
                                         {...props}
@@ -89,7 +87,7 @@ export class ServersPage extends React.Component {
     }
 
     componentWillUnmount() {
-        api.categories.removeChangeListener(this.onServerChange)
-            api.servers.removeChangeListener(this.onCategoryChange)
+        api.categories.removeChangeListener(this.onServerChange);
+        api.servers.removeChangeListener(this.onCategoryChange);
     }
 }
