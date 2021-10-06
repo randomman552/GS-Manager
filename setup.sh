@@ -50,7 +50,7 @@ fi
 
 
 # region Install new config files if requested or required
-if [  $REPLACE_CONFIG = true || ! -f "gsmanager.service" ]
+if [  $REPLACE_CONFIG = true ]
 then
   # Install service file
   echo "Linking service file..."
@@ -61,7 +61,7 @@ then
   cd /home/gsmanager
 fi
 
-if [ $REPLACE_CONFIG = true || ! -f "nginx.conf" ]
+if [ $REPLACE_CONFIG = true ]
 then
   # Link NGINX config file
   echo "Linking NGINX config"

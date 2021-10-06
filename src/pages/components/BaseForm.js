@@ -67,24 +67,25 @@ export class BaseForm extends React.Component {
             validated: true
         });
 
+        // Extract data from form
+        const data = {};
+        const forbiddenKeys = ["validated"]
+
+        // Ignore keys we dont need
+        for (const key in this.state) {
+            if (this.state.hasOwnProperty(key) && !forbiddenKeys.includes(key)) {
+                // Move data into new data object for submission
+                data[key] = this.state[key];
+            }
+        }
+
         // Return if form does not validate correctly
-        if (!form.checkValidity())
+        if (!form.checkValidity() || (this.props.onValidate && !this.props.onValidate(data)))
             return
 
-        if (this.props.onSubmit) {
-            const data = {};
-            const forbiddenKeys = ["validated"]
-
-            // Ignore keys we dont need
-            for (const key in this.state) {
-                if (this.state.hasOwnProperty(key) && !forbiddenKeys.includes(key)) {
-                    // Move data into new data object for submission
-                    data[key] = this.state[key];
-                }
-            }
+        if (this.props.onSubmit)
             this.props.onSubmit(data);
-            form.reset();
-        }
+        form.reset();
     }
 
     handleReset(event) {
@@ -98,10 +99,10 @@ export class BaseForm extends React.Component {
                 newState[key] = undefined;
             }
         }
-        this.setState(newState)
+        this.setState(newState);
 
         if (this.props.onReset)
-            this.props.onReset(event)
+            this.props.onReset(event);
     }
 
     render() {
@@ -129,6 +130,12 @@ BaseForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     onChange: PropTypes.func,
     onReset: PropTypes.func,
+    /**
+     * Function called just before submitting the form.
+     * Takes the form data as an argument.
+     * If this function returns false, onSubmit will not be called and the form will not be reset.
+     */
+    onValidate: PropTypes.func,
 
     id: PropTypes.string,
     className: PropTypes.string,

@@ -1,15 +1,9 @@
-import {BaseForm, onChangeFactory} from "../../../components/BaseForm";
+import {BaseForm} from "../../../components/BaseForm";
 import PropTypes from "prop-types";
 import {Button, Form, Modal} from "react-bootstrap";
-import React, {useState} from "react";
+import React from "react";
 
 export function UserForm(props) {
-    const [data, setData] = useState(props.data);
-    // As the instance of user form is reused for multiple users
-    // We must handle if the user passed through props has changed
-    if (data.id !== props.data.id)
-        setData(props.data);
-
     const modalTitle = (props.data.id) ? "Edit User" : "New User";
     const submitText = (props.data.id) ? "Update" : "Create";
     const passwordRequired = !props.data.id;
@@ -26,8 +20,7 @@ export function UserForm(props) {
 
             <BaseForm
                 onSubmit={props.onSubmit}
-                onChange={onChangeFactory(data, setData)}
-                onReset={() => {props.onHide(); setData(props.data)}}
+                onReset={() => {props.onHide()}}
                 autofill="new-password"
             >
                 <Modal.Body>
@@ -42,7 +35,7 @@ export function UserForm(props) {
                             minLength="3"
                             placeholder="Username"
                             required
-                            value={data.name}
+                            defaultValue={props.data.name}
                         />
                         <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
                     </Form.Group>
@@ -58,7 +51,6 @@ export function UserForm(props) {
                             placeholder="Password"
                             required={passwordRequired}
                             minLength="8"
-                            value={data.password}
                         />
                         <Form.Control.Feedback type="invalid">Must be at least 8 characters long</Form.Control.Feedback>
                     </Form.Group>
@@ -69,7 +61,7 @@ export function UserForm(props) {
                             id="is_admin"
                             name="is_admin"
                             label="Admin User"
-                            checked={data.is_admin}
+                            defaultChecked={props.data.is_admin}
                         />
                     </Form.Group>
                 </Modal.Body>

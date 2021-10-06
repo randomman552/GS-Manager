@@ -8,6 +8,7 @@ import {Button, Card} from "react-bootstrap";
 import ScrollToBottom from "react-scroll-to-bottom";
 import {SendCommandForm} from "./SendCommandForm";
 import PropTypes from "prop-types";
+import {LoaderWrapper} from "../../../components/LoaderWrapper";
 
 
 /**
@@ -201,14 +202,10 @@ export class ServerDashboard extends React.Component {
                 );
             });
         }
-        return [];
+        return [<pre className="server-console-line">No console output yet...</pre>];
     }
 
     render() {
-        if (!this.server)
-            return (
-                <Redirect to="/servers"/>
-            )
         const outputLines = this.renderOutputLines();
         const settingsModal = this.renderSettings();
         const running = this.server.status !== "stopped";
@@ -220,13 +217,19 @@ export class ServerDashboard extends React.Component {
                     <Card.Header className="server-info-header">{this.server.name}</Card.Header>
                     <Card.Body className="server-info-body">
                         <article className="server-console-container">
-                            <ScrollToBottom
-                                className="server-console"
-                                scrollViewClassName="server-console-lines"
-                                initialScrollBehavior="auto"
+                            {/* Only render output lines after they have loaded */}
+                            <LoaderWrapper
+                                render={!!this.server.output}
+                                className="server-console flex-center"
                             >
-                                {outputLines}
-                            </ScrollToBottom>
+                                <ScrollToBottom
+                                    className="server-console"
+                                    scrollViewClassName="server-console-lines"
+                                    initialScrollBehavior="auto"
+                                >
+                                        {outputLines}
+                                </ScrollToBottom>
+                            </LoaderWrapper>
 
                             <SendCommandForm
                                 key={this.server.name}
@@ -257,6 +260,11 @@ export class ServerDashboard extends React.Component {
                 </Card>
             </article>
         );
+    }
+
+
+    componentDidMount() {
+        api.servers.get(this.server.id);
     }
 }
 

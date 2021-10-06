@@ -132,8 +132,9 @@ def login():
     """
     This endpoint sets a cookie to allow requests to be made without providing auth.
     """
+    user_dict = current_user.to_dict(True)
     login_user(current_user)
-    return rest.response(200)
+    return rest.response(200, data=user_dict)
 
 
 @auth.route("/logout", methods=["GET", "POST"])

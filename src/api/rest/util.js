@@ -1,14 +1,31 @@
 import {addMessage} from "../../pages/components/MessageDisplay";
 
+let fetchOptions = {
+    suppressError: false
+}
+
+/**
+ * @param options {{suppressError: boolean}} Object specifying options for all apiFetch calls.
+ */
+export function setFetchOptions(options) {
+    fetchOptions = {
+        ...fetchOptions,
+        ...options
+    }
+}
+
 /**
  * Method to send a request to the api backend
  * @param url {string} URL to send request to.
  * @param data Object containing data to send with request.
  * @param method {string} HTTP method to use, defaults to 'post'.
  * @param auth Object containing authorisation information.
+ * @param options {{suppressError: boolean}} Object specifying options. Includes:
+ *  postMessage - Whether the fetch should show error messages to the ui.
+ *  If not supplied, will use the options specified by setFetchOptions.
  * @returns {Promise<{code: number, error: string, data:any, success: boolean}>} Promise of return data as object.
  */
-export async function apiFetch(url, data, method = "post", auth = null) {
+export async function apiFetch(url, data, method="post", auth=null, options=fetchOptions) {
     data = {
         "auth": auth,
         "data": data
@@ -30,10 +47,12 @@ export async function apiFetch(url, data, method = "post", auth = null) {
 
         // If response fails, report the error to the user.
         if (json.code >= 400 && json.code < 600) {
-            let error = json.error
-            if (error.includes(":"))
-                error = error.split(":")[1]
-            addMessage(error, "danger", 5000);
+            if (!options.suppressError) {
+                let error = json.error
+                if (error.includes(":"))
+                    error = error.split(":")[1]
+                addMessage(error, "danger", 5000);
+            }
         }
         return json;
     });

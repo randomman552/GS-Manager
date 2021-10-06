@@ -3,16 +3,24 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { LoginPage } from "./pages/login-page/LoginPage";
 import { ServersPage } from "./pages/servers-page/ServersPage";
 import { SettingsPage } from "./pages/settings-page/SettingsPage";
-import { Modal, Button } from "react-bootstrap";
 import './App.css';
 import api from "./api/api";
 import MessageDisplay from "./pages/components/MessageDisplay";
 import {Navigation} from "./pages/components/Navigation";
+import {SystemPage} from "./pages/system-page/SystemPage";
+import {NotFoundPage} from "./pages/components/NotFoundPage";
+import {setFetchOptions} from "./api/rest/util";
 
 export class App extends React.Component {
     constructor(props) {
         super(props);
-        // Attempt login from cookie on load
+        this.state = {
+            user: null
+        };
+
+        // Suppress errors so that the user will not see an error message if they aren't logged in.
+        setFetchOptions({suppressError: true});
+        // Attempt login using old session
         api.auth.getCurrentUser().then(json => {
             if (json.success) {
                 this.setState({
@@ -21,143 +29,50 @@ export class App extends React.Component {
             } else if (json.code === 401) {
                 this.logout();
             }
+        }).finally(() => {
+            setFetchOptions({suppressError: false});
         });
-
-        this.state = {
-            user: null,
-            modal: {
-                "title": null,
-                "message": null
-            }
-        };
     }
 
 
     /**
      * Send an authentication request to the server to get the api key used to make future requests.
-     * @param data Data provided by BaseForm class.
+     * @param user The user object retrieved by login.
      */
-    login(data) {
-        let auth = {
-            "username": data.username,
-            "password": data.password
-        };
-
-        api.auth.login(auth)
-            .then(() => {
-                api.auth.getCurrentUser()
-                    .then(json => {
-                    if (!json.error) {
-                        this.setState({
-                            user: json.data
-                        });
-                        api.auth.get().then();
-                    } else if (json.code === 401) {
-                        this.showModal("Login Failed", "Incorrect username or password...");
-                    }
-                });
-            });
+    login(user) {
+        this.setState({
+            user
+        });
     }
 
     /**
      * Destroy current session.
      */
     logout() {
-        api.auth.logout().then(() => {
-            this.setState({
-                "user": null
-            });
-        });
-    }
-
-    /**
-     * Method to construct authentication object from current app state.
-     */
-    getAuth() {
-        if (this.state.user)
-            return {
-                apikey: this.state.user.api_key
-            };
-        return null;
-    }
-
-
-    /**
-     * Method to show the global modal in the application.
-     * @param title The title to display
-     * @param message The message to display
-     */
-    showModal(title, message) {
-        this.setState({
-            "modal": {
-                "show": true,
-                "title": title,
-                "message": message
+        api.auth.logout().then(json => {
+            if (json.success) {
+                this.setState({
+                    "user": null
+                });
             }
         });
     }
-
-    hideModal() {
-        this.setState({
-            "modal": {
-                "show": false,
-                "title": this.state.modal.title,
-                "message": this.state.modal.message
-            }
-        });
-    }
-
-    renderModal() {
-        const show = this.state.modal.show;
-        const title = this.state.modal.title;
-        const message = this.state.modal.message;
-
-        const onHide = () => { this.hideModal() };
-
-        return (
-            <Modal
-                show={show}
-                onHide={onHide}
-                keyboard={true}
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>{title}</Modal.Title>
-              </Modal.Header>
-
-              <Modal.Body>
-                <p>
-                    {message}
-                </p>
-              </Modal.Body>
-
-              <Modal.Footer>
-                <Button variant="primary" onClick={onHide}>Close</Button>
-              </Modal.Footer>
-            </Modal>
-        )
-}
 
 
     render() {
-        const modal = this.renderModal();
         if (!this.state.user) {
             return (
                 <div id="app">
                     <MessageDisplay/>
-                    {modal}
-                    <Switch>
-                        <Route exact path="/login" render={ () => {
-                            return <LoginPage onLogin={ (u, p) => this.login(u, p) }/>
-                        }} />
-                        <Redirect to="/login" />
-                    </Switch>
+                    <LoginPage
+                        onLogin={ (u, p) => this.login(u, p) }
+                    />
                 </div>
             );
         }
 
         const user = this.state.user;
         const servers = this.state.servers;
-        const auth = this.getAuth();
 
         return (
             <div id="app">
@@ -167,12 +82,24 @@ export class App extends React.Component {
                 />
                 <MessageDisplay/>
                 <Switch>
+                    {/* Root path redirect to servers */}
+                    <Route
+                        exact path="/"
+                        render={(props) => {
+                            return (
+                                <Redirect
+                                    to="/servers"
+                                />
+                            )
+                        }}
+                    />
+
+                    {/* Other endpoints */}
                     <Route
                         path="/servers"
                         render={(props) => {
                             return <ServersPage
                                 {...props}
-                                auth={auth}
                                 servers={servers}
                             />
                         }}
@@ -182,12 +109,19 @@ export class App extends React.Component {
                         render={(props) => {
                             return <SettingsPage
                                 {...props}
-                                auth={auth}
                                 user={user}
                             />
                         }}
                     />
-                    <Redirect to="/servers" />
+                    <Route
+                        path="/system"
+                        component={SystemPage}
+                    />
+
+                    {/* Display 404 page if none of the previous routes are used */}
+                    <Route
+                        component={NotFoundPage}
+                    />
                 </Switch>
             </div>
         );
@@ -199,20 +133,18 @@ export class App extends React.Component {
             if (!this.state.user)
                 return;
 
-            // Update user object
+            // Update user object if not deleted
             const user = api.auth.data.get(this.state.user.id);
-            this.setState({
-                user
-            });
-
             if (user) {
-                // Re-log after api-key change
-                api.auth.login(this.getAuth()).then(json => {
-                    if (!json.success)
-                        this.logout();
+                // If api_key has changed, re-log with new one
+                if (user.api_key && this.state.user.api_key !== user.api_key)
+                    api.auth.login({apikey: user.api_key});
+
+                // Update stored user
+                this.setState({
+                    user
                 });
             } else {
-                // Log out if user deleted
                 this.logout();
             }
         }

@@ -4,14 +4,15 @@ import "./ServersPage.css"
 import {ServerListing} from "./components/listing/ServerListing";
 import {ServerDashboard} from "./components/dashboard/ServerDashboard";
 import api from "../../api/api";
+import {LoaderWrapper} from "../components/LoaderWrapper";
 
 
 export class ServersPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            servers: [],
-            categories: []
+            servers: null,
+            categories: null
         }
     }
 
@@ -27,29 +28,37 @@ export class ServersPage extends React.Component {
                         path="/servers/:serverID"
                         render={(props) => {
                             const serverID = props.match.params.serverID;
-
-                            let curServer;
-                            for (const server of servers) {
-                                if (server.id === serverID) {
-                                    curServer = server;
-                                    break;
-                                }
-                            }
+                            const curServer = api.servers.data.get(serverID);
 
                             return (
-                                <ServerDashboard
-                                    {...props}
-                                    key={serverID}
-                                    server={curServer}
-                                    categories={categories}
-                                />
-                            )
+                                <LoaderWrapper
+                                    render={!!curServer}
+                                    timeout={1000}
+                                >
+                                    <ServerDashboard
+                                        {...props}
+                                        key={serverID}
+                                        server={curServer}
+                                        categories={categories}
+                                    />
+                                </LoaderWrapper>
+                            );
                         }}
                     />
                     <Route
                         exact path="/servers"
                         render={(props) => {
-                            return (<ServerListing {...props} servers={servers} categories={categories} />)
+                            return (
+                                <LoaderWrapper
+                                    render={!!servers && !!categories}
+                                >
+                                    <ServerListing
+                                        {...props}
+                                        servers={servers}
+                                        categories={categories}
+                                    />
+                                </LoaderWrapper>
+                            );
                         }}
                     />
                 </Switch>
@@ -78,7 +87,7 @@ export class ServersPage extends React.Component {
     }
 
     componentWillUnmount() {
-        api.categories.removeChangeListener(this.onServerChange)
-            api.servers.removeChangeListener(this.onCategoryChange)
+        api.categories.removeChangeListener(this.onServerChange);
+        api.servers.removeChangeListener(this.onCategoryChange);
     }
 }

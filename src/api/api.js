@@ -1,6 +1,7 @@
 import auth from "./segments/auth";
 import servers from "./segments/servers";
 import categories from "./segments/categories";
+import system from "./segments/system";
 
 
 /**
@@ -12,7 +13,8 @@ import categories from "./segments/categories";
 const api = {
     servers,
     auth,
-    categories
+    categories,
+    system
 }
 
 export default api;

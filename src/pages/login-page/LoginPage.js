@@ -6,7 +6,9 @@ import {LoginForm} from "./components/LoginForm";
 export function LoginPage(props) {
     return (
         <div className="login-page">
-            <LoginForm onSubmit={props.onLogin}/>
+            <LoginForm
+                onLogin={props.onLogin}
+            />
         </div>
     );
 }

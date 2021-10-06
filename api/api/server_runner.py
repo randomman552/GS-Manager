@@ -9,6 +9,20 @@ from .socketIO import socketIO
 __running = dict()
 
 
+def __on_server_exit(server_id: str):
+    process: Popen = __running.pop(server_id)
+    GameServer.objects(id=server_id).update(
+        set__status="stopped",
+        push__output=f"Exited with code '{process.returncode}'"
+    )
+    socketIO.emit(
+        "output",
+        {"server_id": server_id, "output": f"Exited with code '{process.returncode}'"},
+        namespace="/servers"
+    )
+    socketIO.emit("status", {"server_id": server_id, "status": "stopped"}, namespace="/servers")
+
+
 def __read_stdout(server_id: str) -> None:
     """
     Internal helper function called on a separate thread to read from the STDOUT
@@ -35,23 +49,11 @@ def __poll_process(server_id: str) -> None:
     Internal helper function to continually poll the process for the server with the given id.
     :param server_id: The ID of the server to poll.
     """
-    process = __running.get(server_id)
-    while process is not None and process.returncode is None:
-        process.poll()
-        time.sleep(0.1)
-
-    if __running.get(server_id):
-        __running.pop(server_id)
-    GameServer.objects(id=server_id).update(
-        set__status="stopped",
-        push__output=f"Exited with code '{process.returncode}'"
-    )
-    socketIO.emit(
-        "output",
-        {"server_id": server_id, "output": f"Exited with code '{process.returncode}'"},
-        namespace="/servers"
-    )
-    socketIO.emit("status", {"server_id": server_id, "status": "stopped"}, namespace="/servers")
+    process: Popen = __running.get(server_id)
+    process.wait()
+    # Inform of server closure if process was not killed by us
+    if process.returncode >= 0:
+        __on_server_exit(server_id)
 
 
 def __create_process(working_directory: str, command: str) -> Popen:
@@ -129,22 +131,28 @@ def stop_server(server: GameServer) -> bool:
     """
     server_id = str(server.id)
     if __running.get(server_id):
-        process: Popen = __running.pop(server_id)
+        process: Popen = __running.get(server_id)
         pgid = os.getpgid(process.pid)
 
-        # Attempt to kill the process with SIGINT, if this fails try SIGKILL
         try:
-            os.killpg(pgid, signal.SIGINT)
-            process.wait(10)
-        except TimeoutExpired:
-            # If SIGKILL fails, try SIGTERM
+            # Attempt to kill the process with SIGINT, if this fails try SIGKILL
             try:
-                os.killpg(pgid, signal.SIGKILL)
-                process.wait(5)
+                os.killpg(pgid, signal.SIGINT)
+                process.wait(10)
             except TimeoutExpired:
-                # Finally try SIGTERM
-                os.killpg(pgid, signal.SIGTERM)
-                process.wait()
+                # If SIGKILL fails, try SIGTERM
+                try:
+                    os.killpg(pgid, signal.SIGKILL)
+                    process.wait(5)
+                except TimeoutExpired:
+                    # Finally try SIGTERM
+                    os.killpg(pgid, signal.SIGTERM)
+                    process.wait()
+        except ProcessLookupError:
+            # If process lookup error occurs, the process is no longer running.
+            # So we can return true
+            pass
+        __on_server_exit(server_id)
         return True
     return False
 

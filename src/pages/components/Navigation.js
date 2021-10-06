@@ -20,6 +20,9 @@ export function Navigation(props) {
                         <Nav.Link as={Link} className="text-capitalize" to="/servers">
                             Servers
                         </Nav.Link>
+                        <Nav.Link as={Link} className="text-capitalize" to="/system">
+                            System
+                        </Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
                 <Navbar.Collapse className="justify-content-end">
