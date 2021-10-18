@@ -1,0 +1,17 @@
+.tooltip-icon {
+    cursor: pointer;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    padding-left: 2px;
+    padding-right: 2px;
+    color: rgba(0, 0, 0, 0.5);
+    transition: 0.3s;
+}
+
+.tooltip-icon:hover,
+.tooltip-icon:active,
+.tooltip-icon:focus,
+.tooltip-icon.active {
+    color: rgba(0, 0, 0, 0.9);
+}

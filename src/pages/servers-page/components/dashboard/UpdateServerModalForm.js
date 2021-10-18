@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Accordion, Button, Card, Form, Modal, Tab, Tabs} from "react-bootstrap";
 import PropTypes from "prop-types";
 import {BaseForm} from "../../../components/BaseForm";
+import {InfoTooltip} from "../../../components/InfoTooltip";
 
 
 function GeneralSettingsForm(props) {
@@ -218,11 +219,14 @@ function ArgumentSettingsForm(props) {
                 autofill="off"
             >
                 <Form.Group>
-                    <Form.Label
-                        htmlFor="edit-default-args"
-                    >
-                        Default arguments
-                    </Form.Label>
+                    <span>
+                        <Form.Label
+                            htmlFor="edit-default-args"
+                        >
+                            Default arguments
+                        </Form.Label>
+                        <InfoTooltip text="Arguments that will always be supplied before any other arguments"/>
+                    </span>
                     <Form.Control
                         name="default_args"
                         id="edit-default-args"
@@ -231,11 +235,14 @@ function ArgumentSettingsForm(props) {
                 </Form.Group>
 
                 <Form.Group>
-                    <Form.Label
-                        htmlFor="edit-unspecified-args"
-                    >
-                        Unspecified arguments (used when mode not found)
-                    </Form.Label>
+                    <span>
+                        <Form.Label
+                            htmlFor="edit-unspecified-args"
+                        >
+                            Unspecified arguments
+                        </Form.Label>
+                        <InfoTooltip text="The arguments that will be supplied if some for the current mode cannot be found."/>
+                    </span>
                     <Form.Control
                         name="unspecified_args"
                         id="edit-unspecified-args"
