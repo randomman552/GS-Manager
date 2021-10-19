@@ -49,25 +49,25 @@ function GeneralSettingsForm(props) {
                 </Form.Control>
             </Form.Group>
             <Form.Group className="flex flex-column flex-center">
-                <Form.Label htmlFor="start_cmd">
+                <Form.Label htmlFor="startCmd">
                     Start command
                 </Form.Label>
                 <Form.Control
-                    id="start_cmd"
-                    name="start_cmd"
+                    id="startCmd"
+                    name="startCmd"
                     type="text"
-                    defaultValue={props.data.start_cmd}
+                    defaultValue={props.data.startCmd}
                 />
             </Form.Group>
             <Form.Group className="flex flex-column flex-center">
-                <Form.Label htmlFor="update_cmd">
+                <Form.Label htmlFor="updateCmd">
                     Update command
                 </Form.Label>
                 <Form.Control
-                    id="update_cmd"
-                    name="update_cmd"
+                    id="updateCmd"
+                    name="updateCmd"
                     type="text"
-                    defaultValue={props.data.update_cmd}
+                    defaultValue={props.data.updateCmd}
                 />
             </Form.Group>
             <Form.Group>
@@ -91,7 +91,7 @@ GeneralSettingsForm.propTypes = {
 
 
 function ModeSettingsForm(props) {
-    const modeMap = props.data.mode_map;
+    const modeMap = props.data.modeMap;
     const [editing, setEditing] = useState(null);
 
     let modes = Object.keys(modeMap).map((key) => {
@@ -206,7 +206,7 @@ ModeSettingsForm.propTypes = {
 
 
 function ArgumentSettingsForm(props) {
-    const modeMap = props.data.mode_map;
+    const modeMap = props.data.modeMap;
 
     const modeOptions = Object.keys(modeMap).map((key) => {
         return (<option value={key}>{key}</option>)
@@ -228,9 +228,9 @@ function ArgumentSettingsForm(props) {
                         <InfoTooltip text="Arguments that will always be supplied before any other arguments"/>
                     </span>
                     <Form.Control
-                        name="default_args"
+                        name="defaultArgs"
                         id="edit-default-args"
-                        defaultValue={props.data.default_args}
+                        defaultValue={props.data.defaultArgs}
                     />
                 </Form.Group>
 
@@ -244,9 +244,9 @@ function ArgumentSettingsForm(props) {
                         <InfoTooltip text="The arguments that will be supplied if some for the current mode cannot be found."/>
                     </span>
                     <Form.Control
-                        name="unspecified_args"
+                        name="unspecifiedArgs"
                         id="edit-unspecified-args"
-                        defaultValue={props.data.unspecified_args}
+                        defaultValue={props.data.unspecifiedArgs}
                     />
                 </Form.Group>
 
@@ -364,11 +364,14 @@ UpdateServerModalForm.propTypes = {
 UpdateServerModalForm.defaultProps = {
     data: {
         name: "",
-        start_cmd: "",
-        update_cmd: "",
+        startCmd: "",
+        updateCmd: "",
 
         mode: "",
-        mode_map: {}
+        modeMap: {},
+
+        defaultArgs: "",
+        unspecifiedArgs: ""
     },
     show: false
 }

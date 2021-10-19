@@ -58,10 +58,10 @@ export function UserForm(props) {
                     <Form.Group  className="flex flex-column flex-center">
                         <Form.Check
                             type="checkbox"
-                            id="is_admin"
-                            name="is_admin"
+                            id="isAdmin"
+                            name="isAdmin"
                             label="Admin User"
-                            defaultChecked={props.data.is_admin}
+                            defaultChecked={props.data.isAdmin}
                         />
                     </Form.Group>
                 </Modal.Body>
