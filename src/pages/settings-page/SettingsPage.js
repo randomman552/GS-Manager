@@ -28,7 +28,7 @@ export function SettingsPage(props) {
                      eventKey="admin-settings"
                      title="Admin"
                      className="container-md text-center"
-                     disabled={!props.user.is_admin}
+                     disabled={!props.user.isAdmin}
                 >
                     <AdminSettingsPanel/>
                 </Tab>

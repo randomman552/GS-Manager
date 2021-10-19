@@ -114,12 +114,12 @@ export class ServerDashboard extends React.Component {
     addMode(data) {
         const server = this.server;
         if (server && data.name && data.arguments) {
-            let mode_map = {}
+            let modeMap = {}
             if (server.mode_map)
-                mode_map = deepCopy(server.mode_map)
-            mode_map[data.name] = data.arguments
+                modeMap = deepCopy(server.mode_map)
+            modeMap[data.name] = data.arguments
 
-            api.servers.modify(server.id, {mode_map}).then();
+            api.servers.modify(server.id, {mode_map: modeMap}).then();
         }
     }
 
@@ -130,20 +130,20 @@ export class ServerDashboard extends React.Component {
     editMode(data) {
         const server = this.server;
         if (server && data.originalName) {
-            let mode_map = {};
-            if (server.mode_map)
-                mode_map = deepCopy(server.mode_map);
+            let modeMap = {};
+            if (server.modeMap)
+                modeMap = deepCopy(server.modeMap);
 
 
             if (!data.name)
                 data.name = data.originalName;
             if (!data.arguments)
-                data.arguments = mode_map[data.originalName]
+                data.arguments = modeMap[data.originalName]
 
-            delete mode_map[data.originalName];
-            mode_map[data.name] = data.arguments;
+            delete modeMap[data.originalName];
+            modeMap[data.name] = data.arguments;
 
-            api.servers.modify(server.id, {mode_map}).then();
+            api.servers.modify(server.id, {modeMap}).then();
         }
     }
 
@@ -154,12 +154,12 @@ export class ServerDashboard extends React.Component {
     deleteMode(data) {
         const server = this.server;
         if (server && data.name) {
-            let mode_map = {}
-            if (server.mode_map)
-                mode_map = deepCopy(server.mode_map)
-            delete mode_map[data.name]
+            let modeMap = {}
+            if (server.modeMap)
+                modeMap = deepCopy(server.modeMap)
+            delete modeMap[data.name]
 
-            api.servers.modify(server.id, {mode_map}).then();
+            api.servers.modify(server.id, {modeMap}).then();
         }
     }
 

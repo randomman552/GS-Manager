@@ -79,8 +79,22 @@ login_manager.anonymous_user = AnonymousUser
 
 @login_manager.request_loader
 def load_user_from_request(request: Request):
+    def get_with_vars(obj, variations):
+        """
+        Utility method to call .get with multiple variations.
+        :param obj: The object to call the .get method on
+        :param variations: The variations to call .get with
+        :return:
+        """
+        for key in variations:
+            if key in obj:
+                return obj.get(key, None)
+        return None
+
+    api_key_variations = ["apikey", "apiKey", "api_key"]
+
     if request.method == "GET" or request.method == "HEAD":
-        api_key = request.args.get("apikey", "")
+        api_key = get_with_vars(request.args, api_key_variations)
         if api_key:
             return User.objects(api_key=api_key).first()
 
@@ -96,7 +110,7 @@ def load_user_from_request(request: Request):
             if not data:
                 return None
 
-            api_key = data.get("apikey", "")
+            api_key = get_with_vars(data, api_key_variations)
             if api_key:
                 return User.objects(api_key=api_key).first()
 
