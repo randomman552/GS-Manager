@@ -31,12 +31,12 @@ export function NewServerModalForm(props) {
                     </Form.Group>
 
                     <Form.Group className="flex flex-column flex-center">
-                        <Form.Label className="required-star" htmlFor="start_cmd">
+                        <Form.Label className="required-star" htmlFor="startCmd">
                             Start command
                         </Form.Label>
                         <Form.Control
-                            id="start_cmd"
-                            name="start_cmd"
+                            id="startCmd"
+                            name="startCmd"
                             type="text"
                             required
                         />
@@ -44,12 +44,12 @@ export function NewServerModalForm(props) {
                     </Form.Group>
 
                     <Form.Group className="flex flex-column flex-center">
-                        <Form.Label htmlFor="update_cmd">
+                        <Form.Label htmlFor="updateCmd">
                             Update command
                         </Form.Label>
                         <Form.Control
-                            id="update_cmd"
-                            name="update_cmd"
+                            id="updateCmd"
+                            name="updateCmd"
                             type="text"
                         />
                     </Form.Group>

@@ -70,7 +70,7 @@ class AdminUserSettings extends React.Component {
                         {user.name}
                     </td>
                     <td headers="admin">
-                        {(user.is_admin) ? "yes" : "no"}
+                        {(user.isAdmin) ? "yes" : "no"}
                     </td>
                     <td headers="options">
                         <Button

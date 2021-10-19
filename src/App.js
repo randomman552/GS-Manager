@@ -136,9 +136,9 @@ export class App extends React.Component {
             // Update user object if not deleted
             const user = api.auth.data.get(this.state.user.id);
             if (user) {
-                // If api_key has changed, re-log with new one
-                if (user.api_key && this.state.user.api_key !== user.api_key)
-                    api.auth.login({apikey: user.api_key});
+                // If apikey has changed, re-log with new one
+                if (user.apiKey && this.state.user.apiKey !== user.apiKey)
+                    api.auth.login({apikey: user.apiKey});
 
                 // Update stored user
                 this.setState({
