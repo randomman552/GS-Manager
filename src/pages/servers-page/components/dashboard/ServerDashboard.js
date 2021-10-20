@@ -31,22 +31,28 @@ export class ServerDashboard extends React.Component {
 
     startServer() {
         if (this.server)
-            api.servers.start(this.server.id).then(() => {
-                addMessage("Server started", "success", 5000);
+            api.servers.start(this.server.id).then((json) => {
+                if (json.success) {
+                    addMessage("Server started", "success", 5000);
+                }
             });
     }
 
     updateServer() {
         if (this.server)
-            api.servers.update(this.server.id).then(() => {
-                addMessage("Server updating", "warning", 5000);
+            api.servers.update(this.server.id).then((json) => {
+                if (json.success) {
+                    addMessage("Server updating", "warning", 5000);
+                }
             });
     }
 
     stopServer() {
         if (this.server)
-            api.servers.stop(this.server.id).then(() => {
-                addMessage("Server stopped", "danger", 5000);
+            api.servers.stop(this.server.id).then((json) => {
+                if (json.success) {
+                    addMessage("Server stopped", "danger", 5000);
+                }
             });
     }
 
@@ -246,7 +252,7 @@ export class ServerDashboard extends React.Component {
                             <Button disabled={running} variant="success" onClick={() => this.startServer()} block>
                                 Start
                             </Button>
-                            <Button disabled={running} variant="warning" onClick={() => this.updateServer()} block>
+                            <Button disabled={running || !this.server.updateCmd} variant="warning" onClick={() => this.updateServer()} block>
                                 Update
                             </Button>
                             <Button disabled={!running} variant="danger" onClick={() => this.stopServer()} block>
