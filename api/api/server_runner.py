@@ -138,7 +138,7 @@ def stop_server(server: GameServer) -> bool:
             # Attempt to kill the process with SIGINT, if this fails try SIGKILL
             try:
                 os.killpg(pgid, signal.SIGINT)
-                process.wait(10)
+                process.wait(server.kill_delay)
             except TimeoutExpired:
                 # If SIGKILL fails, try SIGTERM
                 try:
