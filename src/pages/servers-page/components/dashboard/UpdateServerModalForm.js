@@ -30,6 +30,7 @@ function GeneralSettingsForm(props) {
                     name="name"
                     type="text"
                     minLength="3"
+                    required={true}
                     defaultValue={props.data.name}
                 />
                 <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
@@ -56,8 +57,10 @@ function GeneralSettingsForm(props) {
                     id="startCmd"
                     name="startCmd"
                     type="text"
+                    required={true}
                     defaultValue={props.data.startCmd}
                 />
+                <Form.Control.Feedback type="invalid">Cannot be empty</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="flex flex-column flex-center">
                 <Form.Label htmlFor="updateCmd">
