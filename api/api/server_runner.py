@@ -110,6 +110,8 @@ def update_server(server: GameServer) -> bool:
     """
     server_id = str(server.id)
     if not __running.get(server_id) or not server.is_running:
+        if not server.update_cmd:
+            return False
         process = __create_process(server.working_directory, server.update_cmd)
         __running[server_id] = process
 
