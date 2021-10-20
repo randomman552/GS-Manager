@@ -5,7 +5,7 @@ import uuid
 import mongoengine
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_mongoengine import Document
-from mongoengine import StringField, DictField, ListField, BooleanField, ReferenceField
+from mongoengine import StringField, DictField, ListField, BooleanField, ReferenceField, FloatField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -98,33 +98,32 @@ class GameServer(Document):
     name = StringField(required=True, unique=True, min_length=3)
     category = ReferenceField(Category, reverse_delete_rule=mongoengine.CASCADE)
     status = StringField(default="stopped")
-    output = ListField(StringField())
-
+    output = ListField(StringField(), max_length=2000)
+    kill_delay = FloatField(min_value=0, max_value=30, default=10)
+    """
+    Amount of time (in seconds) to wait a process to stop after trying SIGINT.
+    After this time expires, SIGKILL and SIGTERM will be sent in an attempt to properly kill the process.
+    """
     default_args = StringField()
     """
     Arguments to be provided to start cmd, regardless of mode.
     """
-
     unspecified_args = StringField()
     """
     Arguments to be provided to start cmd when no mode is specified.
     """
-
     mode = StringField()
     """
     Mode specifies the arguments to get from the `mode_map` when starting.
     """
-
     mode_map = DictField()
     """
     Map of modes to arguments to supply when running in that mode.
     """
-
     start_cmd = StringField(required=True)
     """
     Command to run when start requested, arguments are provided according to the set mode
     """
-
     update_cmd = StringField()
     """
     Command to run when update requested.
@@ -166,6 +165,16 @@ class GameServer(Document):
             else:
                 kwargs["category"] = Category.objects(id=kwargs["category"]).first()
         super().update(**kwargs)
+
+    def clean(self):
+        # Check if output length is correct
+        length = len(self.output)
+        max_length = self.__class__.output.max_length
+        length_diff = length - max_length
+        if length_diff > 0:
+            # If we are over the length limit, discard the oldest entries from the list
+            # This puts exactly at the length limit
+            self.output = self.output[length_diff::]
 
     def to_dict(self, include_output: bool = True):
         as_dict = _convert_to_dict(self)

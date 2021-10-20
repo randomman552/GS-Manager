@@ -30,6 +30,7 @@ function GeneralSettingsForm(props) {
                     name="name"
                     type="text"
                     minLength="3"
+                    required={true}
                     defaultValue={props.data.name}
                 />
                 <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
@@ -56,8 +57,10 @@ function GeneralSettingsForm(props) {
                     id="startCmd"
                     name="startCmd"
                     type="text"
+                    required={true}
                     defaultValue={props.data.startCmd}
                 />
+                <Form.Control.Feedback type="invalid">Cannot be empty</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="flex flex-column flex-center">
                 <Form.Label htmlFor="updateCmd">
@@ -70,6 +73,27 @@ function GeneralSettingsForm(props) {
                     defaultValue={props.data.updateCmd}
                 />
             </Form.Group>
+            <Form.Group className="flex flex-column flex-center">
+                <span>
+                    <Form.Label htmlFor="killDelay">
+                        Kill Delay
+                    </Form.Label>
+                    <InfoTooltip
+                        text="Amount of time (in seconds) to wait before forcefully terminating the server"
+                    />
+                </span>
+                <Form.Control
+                    id="killDelay"
+                    name="killDelay"
+                    type="number"
+                    min={0}
+                    max={30}
+                    step={0.5}
+                    defaultValue={props.data.killDelay}
+                />
+                <Form.Control.Feedback type="invalid">Must be between 0 and 30.</Form.Control.Feedback>
+            </Form.Group>
+
             <Form.Group>
                 <Button variant="primary" type="submit" block>
                     Update
@@ -371,7 +395,8 @@ UpdateServerModalForm.defaultProps = {
         modeMap: {},
 
         defaultArgs: "",
-        unspecifiedArgs: ""
+        unspecifiedArgs: "",
+        killDelay: 0
     },
     show: false
 }
