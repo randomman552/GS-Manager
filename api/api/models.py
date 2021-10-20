@@ -99,7 +99,7 @@ class GameServer(Document):
     category = ReferenceField(Category, reverse_delete_rule=mongoengine.CASCADE)
     status = StringField(default="stopped")
     output = ListField(StringField())
-    kill_delay = FloatField(default=10)
+    kill_delay = FloatField(min_value=0, max_value=30, default=10)
     """
     Amount of time (in seconds) to wait a process to stop after trying SIGINT.
     After this time expires, SIGKILL and SIGTERM will be sent in an attempt to properly kill the process.
