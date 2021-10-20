@@ -98,7 +98,7 @@ class GameServer(Document):
     name = StringField(required=True, unique=True, min_length=3)
     category = ReferenceField(Category, reverse_delete_rule=mongoengine.CASCADE)
     status = StringField(default="stopped")
-    output = ListField(StringField())
+    output = ListField(StringField(), max_length=2000)
     kill_delay = FloatField(min_value=0, max_value=30, default=10)
     """
     Amount of time (in seconds) to wait a process to stop after trying SIGINT.
@@ -165,6 +165,16 @@ class GameServer(Document):
             else:
                 kwargs["category"] = Category.objects(id=kwargs["category"]).first()
         super().update(**kwargs)
+
+    def clean(self):
+        # Check if output length is correct
+        length = len(self.output)
+        max_length = self.__class__.output.max_length
+        length_diff = length - max_length
+        if length_diff > 0:
+            # If we are over the length limit, discard the oldest entries from the list
+            # This puts exactly at the length limit
+            self.output = self.output[length_diff::]
 
     def to_dict(self, include_output: bool = True):
         as_dict = _convert_to_dict(self)
