@@ -33,7 +33,7 @@ function ServerDetails(props) {
                     }}>
                         Start
                     </Button>
-                    <Button variant="warning" disabled={serverRunning} onClick={() => {
+                    <Button variant="warning" disabled={serverRunning || !server.updateCmd} onClick={() => {
                         api.servers.update(server.id).then((json) => {
                             if (json.success) {
                                 addMessage(

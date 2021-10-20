@@ -166,6 +166,8 @@ def update_server(server_id: str):
     Endpoint to run the server update command.
     """
     server = GameServer.objects(id=server_id).first_or_404()
+    if not server.update_cmd:
+        return rest.response(400, "Server has no assigned update command")
     if runner.update_server(server):
         return rest.response(200, data=server.to_dict())
     return rest.response(409, error="Server is already running/updating")
