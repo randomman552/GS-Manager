@@ -1,9 +1,12 @@
 import {BaseForm} from "../../../components/BaseForm";
 import PropTypes from "prop-types";
 import {Button, Form, Modal} from "react-bootstrap";
-import React from "react";
+import React, {useState} from "react";
 
 export function ChangeUsernameModal(props) {
+    const [invalid, setInvalid] = useState(false);
+    const [feedback, setFeedback] = useState("Must be at least 3 characters long")
+
     const modalTitle = "Edit username";
     const submitText = "Update";
 
@@ -32,10 +35,17 @@ export function ChangeUsernameModal(props) {
                             type="text"
                             minLength="3"
                             placeholder="Username"
+                            onChange={event => {
+                                const containsSpaces = event.target.value.includes(" ");
+                                const feedback = (containsSpaces) ? "Cannot contain spaces" : "Must be at least 3 characters long";
+                                setInvalid(containsSpaces);
+                                setFeedback(feedback);
+                            }}
+                            isInvalid={invalid}
                             required
                             defaultValue={props.data.name}
                         />
-                        <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">{feedback}</Form.Control.Feedback>
                     </Form.Group>
                 </Modal.Body>
 

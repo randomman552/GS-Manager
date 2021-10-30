@@ -1,9 +1,12 @@
 import {BaseForm} from "../../../components/BaseForm";
 import PropTypes from "prop-types";
 import {Button, Form, Modal} from "react-bootstrap";
-import React from "react";
+import React, {useState} from "react";
 
 export function UserForm(props) {
+    const [nameInvalid, setNameInvalid] = useState(false);
+    const [nameFeedback, setNameFeedback] = useState("Must be at least 3 characters long");
+
     const modalTitle = (props.data.id) ? "Edit User" : "New User";
     const submitText = (props.data.id) ? "Update" : "Create";
     const passwordRequired = !props.data.id;
@@ -20,6 +23,7 @@ export function UserForm(props) {
 
             <BaseForm
                 onSubmit={props.onSubmit}
+                onValidate={props.onValidate}
                 onReset={() => {props.onHide()}}
                 autofill="new-password"
             >
@@ -33,11 +37,18 @@ export function UserForm(props) {
                             name="name"
                             type="text"
                             minLength="3"
-                            placeholder="Username"
+                            onChange={event => {
+                                // Check the username contains no spaces
+                                const containsSpaces = event.target.value.includes(" ");
+                                const feedback = (containsSpaces) ? "Cannot contain any spaces" : "Must be at least 3 characters long";
+                                setNameInvalid(containsSpaces);
+                                setNameFeedback(feedback);
+                            }}
+                            isInvalid={nameInvalid}
                             required
                             defaultValue={props.data.name}
                         />
-                        <Form.Control.Feedback type="invalid">Must be at least 3 characters long</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">{nameFeedback}</Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="flex flex-column flex-center">
