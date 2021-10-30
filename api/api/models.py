@@ -23,7 +23,7 @@ def _convert_to_dict(document: Document) -> dict:
 
 
 class User(Document, UserMixin):
-    name = StringField(required=True, unique=True)
+    name = StringField(regex="^\\S*$", min_length=3, required=True, unique=True)
     is_admin = BooleanField(default=False)
     __password_hash = StringField(required=True, db_field="password")
     api_key = StringField()
