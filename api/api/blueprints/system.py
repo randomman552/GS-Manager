@@ -22,18 +22,22 @@ def system_info():
     partitions = psutil.disk_partitions()
     disk_info = dict()
     for partition in partitions:
-        short_name = partition.device.split("/")[2]
-        usage = psutil.disk_usage(partition.mountpoint)
-        disk_info[short_name] = {
-            "mountPoint": partition.mountpoint,
-            "fileSystem": partition.fstype,
-            "size": {
-                "total": usage.total,
-                "used": usage.used,
-                "free": usage.free,
-                "percent": usage.percent
+        try:
+            short_name = partition.device.split("/")[2]
+            usage = psutil.disk_usage(partition.mountpoint)
+            disk_info[short_name] = {
+                "mountPoint": partition.mountpoint,
+                "fileSystem": partition.fstype,
+                "size": {
+                    "total": usage.total,
+                    "used": usage.used,
+                    "free": usage.free,
+                    "percent": usage.percent
+                }
             }
-        }
+        except PermissionError:
+            # Prevent permission denied on drives from breaking this endpoint
+            pass
 
     # Get network stats for each nic
     net_io_counters = psutil.net_io_counters()
