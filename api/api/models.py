@@ -148,6 +148,18 @@ class GameServer(Document):
     def working_directory(self) -> str:
         return os.path.join(self.STORAGE_PATH, str(self.id))
 
+    def join_paths(self, paths) -> str:
+        """
+        Utility method to build a local path for this server
+        :param paths: The paths to join to the working directory
+        :return: The desired path, if it does not exist a FileNotFoundError will be raised
+        """
+
+        path = os.path.join(self.working_directory, paths)
+        if not os.path.exists(path):
+            raise FileNotFoundError("Path does not exist")
+        return path
+
     def create_working_directory(self):
         try:
             os.makedirs(self.working_directory)
