@@ -26,6 +26,7 @@ RUN npm run build
 
 FROM nginx:latest
 ENV PATH="/api/venv/bin:$PATH"
+ENV NGINX_PORT=80
 ENV FLASK_ENV=production
 ENV MONGODB_HOST=mongodb://localhost:27017/gsmanager
 ENV GSM_STORAGE_PATH=/storage
@@ -36,7 +37,7 @@ RUN apt update && apt upgrade -y --no-install-recommends
 # Frontend
 WORKDIR /app
 COPY --from=fendBuild /app/build/ /app/
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Backend
 WORKDIR /api
