@@ -14,40 +14,50 @@ from . import rest
 
 from .blueprints import auth_bp, servers_bp, errors_bp, categories_bp, system_bp
 
-# region Config loading functions
-storage_path = os.path.join(os.getcwd(), "storage")
+# region Config loading
+storage_path = os.getenv("GSM_STORAGE_PATH", os.path.join(os.getcwd(), "storage"))
 config_path = os.path.join(storage_path, "config.json")
+print(f"Storage path is: {storage_path}")
 
 
-def load_config(app):
+def load_config_from_env() -> dict:
+    """Function to get all variables we need from environment variables"""
+    config = {}
+    keys = ["MONGODB_HOST"]
+    for key in keys:
+        if value := os.getenv(key):
+            config[key] = value
+    return config
+
+
+def load_config() -> dict:
     try:
-        app.config.from_json(config_path)
-        return False
+        with open(config_path, "r") as f:
+            config = json.load(f)
+            return config | load_config_from_env()
     except FileNotFoundError:
         config = {
-            "MONGODB_SETTINGS": {
-                "host": "mongodb://localhost:27017/gsmanager?authSource=gsmanager"
-            },
+            "MONGODB_HOST": "localhost:27017/gsmanager",
             "SECRET_KEY": os.urandom(24).hex()
         }
-        save_config(config)
-        return True
+        config |= load_config_from_env()
+        return save_config(config)
 
 
-def save_config(config: dict):
+def save_config(config: dict) -> dict:
     try:
         os.makedirs(storage_path)
     except FileExistsError:
         pass
     with open(config_path, "w") as file:
         json.dump(config, file, indent=4)
+    return config
 
 # endregion
 
 
 app = Flask(__name__)
-if load_config(app) or "--config-only" in sys.argv:
-    sys.exit(f"Created config file: {config_path}")
+app.config.from_mapping(load_config())
 
 socketIO.init_app(app)
 
