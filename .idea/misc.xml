@@ -1,4 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (game-server-manager)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (GS-Manager)" project-jdk-type="Python SDK" />
+  <component name="UnattendedHostPersistenceState">
+    <option name="openedFilesInfos">
+      <list>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="92" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/api/start.sh" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="607" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/Dockerfile" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="188" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/api/storage/config.json" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/api/storage/config.json.bak" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="1740" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/api/api/__init__.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="172" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/api/api.ini" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="8" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/nginx.conf" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="235" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/docker-compose.yml" />
+        </OpenedFileInfo>
+      </list>
+    </option>
+  </component>
 </project>

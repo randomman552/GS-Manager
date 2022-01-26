@@ -10,8 +10,9 @@
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/api/venv" />
       <excludeFolder url="file://$MODULE_DIR$/storage" />
+      <excludeFolder url="file://$MODULE_DIR$/api/storage" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (game-server-manager)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (GS-Manager)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bootstrap" level="application" />
   </component>
