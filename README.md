@@ -1,4 +1,6 @@
 # Game-Server-Manager
+**NOTE: THIS PROJECT IS NO LONGER UNDER DEVELOPMENT AND SHOULD NOT BE USED**
+
 Web application designed to allow me to launch game servers on my linux server via a web portal.
 
 Includes a frontend made in React alongside a backend REST API implemented in Flask.
